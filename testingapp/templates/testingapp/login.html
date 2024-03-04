@@ -1,0 +1,105 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Login</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block content %}
+
+
+<body>
+
+  <div class="container-fluid">
+    <div class="row no-gutter">
+        <!-- The image half -->
+        <div class="col-md-7 d-none d-md-flex bg-image"></div>
+      
+
+        <!-- The content half -->
+        <div class="col-md-5 second-half">
+            <div class="login d-flex align-items-center py-5">
+
+                <!-- Demo content-->
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-10 col-xl-7 mx-auto">
+                            <h3>Welcome back</h3>
+                            <form method="POST" class="login-form">
+                              {% csrf_token %}
+                              <div class="form-group mb-4">
+                                  <input type="email" name="email" class="form-control" id="inputEmail3" placeholder="Email" required>
+                              </div>
+                              <div class="form-group mb-4">
+                                <input type="password" name="password" class="form-control" id="inputPassword3" placeholder="Password" required>
+                              </div>
+                              <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-primary" id="btnSubmit">Login</button>
+
+                                <a type="submit" class="btn btn-primary" href="{% url 'password_reset' %}">Forgot password</a>
+                              </div>
+                            </form>
+                        </div>
+                    </div>
+                </div><!-- End -->
+
+            </div>
+        </div><!-- End -->
+
+    </div>
+</div>
+
+
+</body>
+
+
+{% if messages %}
+                                  
+  <div class="modal fade" id="messagesModal" tabindex="-1" aria-labelledby="messagesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-search">
+      <div class="modal-content logoutmodal deletemodal messagemodal">
+          <div class="modal-header">
+              <h5 class="modal-title" id="messagesModalLabel">Error</h5>
+              <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+          </div>
+          
+          <div class="modal-body">
+          {% for message in messages %}
+          <div class="callout callout-warning">
+              <h5><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> {{ message }}</h5>
+          </div>
+              
+          {% endfor %}
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
+              <!-- <a href="{% url 'profile' %}#credits" class="btn btn-transparent footer-btn delete-btn logout-modal-btn">View credits</a> -->
+          </div>
+      </div>
+      </div>
+  </div>
+
+  <script>
+      $(document).ready(function() {
+      $('#messagesModal').modal('show');
+      });
+  </script>
+
+{% endif %}
+
+
+{% endblock %}

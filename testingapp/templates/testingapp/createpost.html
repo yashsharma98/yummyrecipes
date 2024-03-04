@@ -1,0 +1,858 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block title %}
+<title>New recipe</title>
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+              Create new recipe
+            </h1>
+
+            <p class="sub-heading">Share your favorite recipe with others</p>
+
+            <!-- {% if messages %}
+
+              {% for message in messages %}
+                <p class="alert alert-danger mx-auto"> {{message}}</p>
+              {% endfor %}
+
+            {% endif %} -->
+
+            <div class="recipe-form-container main-recipe-form">
+
+              <form id="imageGenerationForm" class="row m-1 g-4 create-recipe-form">
+                {% csrf_token %}
+                
+                <input type="hidden" name="img_type" value="mainimage">
+
+                <div class="col-12 first-div">
+                  <label for="inputTitle" class="form-label">Cover image</label>
+                  <div class="ai_img_input">
+                  <div class="col-sm-11 img_prompt_text">
+                    <input type="text" name="newtitle" class="form-control" id="inputTitle" required="required" placeholder="Enter promt for image" autocomplete="off" title="Promt for image">
+                  </div>
+                  </div>
+                  <span id="nameError"></span>
+                </div>
+
+                <div class="text-center">
+                  <div class="form-btns">
+                    <button id="generateImageButton" class="btn btn-transparent generate_ai_img_btn generate-button"><span>Generate</span></button>
+                    <button type="button" id="uploadImageButton" class="btn btn-transparent"><span>Select image</span></button>
+                  </div>
+                </div>
+
+                <!-- <button id="generateImageButton">Generate Image</button> -->
+              </form>
+
+              <button type="button" id="generateImageToggle" class="btn btn-transparent generate_ai_img_btn gen_img_toggle_btn"><span>Generate image</span></button>
+              
+              <form class="row m-1 g-4 create-recipe-form" method="POST" id="myForm" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div id="imageUploadContainer" style="display: none;">
+                  <div class="col-lg-12 image-field">
+                    <label for="inputTitle" class="form-label">Cover image</label>
+                    <!-- <div ></div> -->
+                    <br>
+                    <label for="images" name="image" class="border form-label img-input-btn">
+                      <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter">Select images</span>
+                    </label>
+                    <div class="col-sm-11 input-field">
+                      <input class="form-control image-input" type="file" id="images" name="image" accept="image/png, image/gif, image/jpeg, image/webp" multiple>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Image preview -->
+                <div class="imgarea">
+                  <!-- <div class="testpreview"></div> -->
+                    <div class="new-container">
+                      
+                    </div>
+
+                  <div class="gen-img" style="display: none;">
+                    <img class="preview-image" src="" alt="Image">
+                    <div class="preview_ai_img_title"></div>
+                  </div>
+                
+                </div>  
+                
+                <!-- Hidden input field for image URL -->
+                <input type="hidden" name="image_url" id="imageURLField">
+
+                <input type="hidden" name="api_image_title" id="imageTitle">
+
+
+                <br>
+                <div class="col-12 first-div">
+                  <label for="inputTitle" class="form-label">Title</label>
+                  <div class="col-sm-11 input-field">
+
+                    {% if form.title.value %}
+                      <input type="text" name="title" class="form-control" value="{{ form.title.value }}" id="inputTitleRecipe" placeholder="Title of the recipe" required="required" title="Title">
+                    {% else %}
+                      <input type="text" name="title" class="form-control" id="inputTitleRecipe" placeholder="Title of the recipe" required="required" title="Title">
+                    {% endif %}
+                  </div>
+                  <span id="nameError"></span>
+                </div>
+
+      
+                <div class="row mx-0 gx-4 gy-2 select-options">
+
+                  <div class="col-md-4">
+                    <label for="inputTyoe" class="col col-form-label">Type of recipe</label>
+                    {% if form.type.value %}
+                      <select class="form-select" id="specificSizeSelect" name="type" required title="Type of the recipe">
+                        <option value="{{form.type.value}}">{{form.type.value}}</option>
+                        <option value="Breakfast"> Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Evening Snack">Evening Snack</option>
+                        <option value="Dinner">Dinner</option>
+                      </select>
+                    {% else %}
+                      <select class="form-select" id="specificSizeSelect" name="type" required title="Type of the recipe">
+                        <option value="">Type</option>
+                        <option value="Breakfast"> Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Evening Snack">Evening Snack</option>
+                        <option value="Dinner">Dinner</option>
+                      </select>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="inputCuisine" class="col col-form-label">Cuisine</label>
+                    {% if form.cuisine.value %}
+                      <select class="form-select" id="specificSizeSelect" name="cuisine" required title="Cuisine">
+                        <option value="{{form.cuisine.value}}">{{form.cuisine.value}}</option>
+                        <option value="Indian">Indian Cuisine</option>
+                        <option value="American">American Cuisine</option>
+                        <option value="Italian">Italian Cuisine</option>
+                      </select>
+                    {% else %}
+                      <select class="form-select" id="specificSizeSelect" name="cuisine" required title="Cuisine">
+                        <option value="">Cuisine</option>
+                        <option value="Indian">Indian Cuisine</option>
+                        <option value="American">American Cuisine</option>
+                        <option value="Italian">Italian Cuisine</option>
+                      </select>
+                    {% endif %}
+                  </div>
+                  
+                  <div class="col-md-3">
+                    <label for="inputTime" class="col col-form-label">Preparation time</label>
+                    {% if form.timing.value %}
+                      <input type="number" class="form-control" name="timing" value="{{form.timing.value}}" id="inputTime" min="1" placeholder="Time (in min)" required="required" title="Preparation time">
+                    {% else %}
+                      <input type="number" class="form-control" name="timing" id="inputTime" min="1" placeholder="Time (in min)" required="required" title="Preparation time">
+                    {% endif %}
+                  </div>
+
+                </div>
+                
+                <div class="row mx-0 gx-4 gy-2 select-options">
+                  
+                  <div class="col-md-4">
+                    <label for="inputCategory" class="col col-form-label">Category</label>
+                    {% if form.category.value %}
+                      <select class="form-select" id="specificSizeSelect" name="category" required title="Category">
+                        <option value="{{form.category.value}}">{{form.category.value}}</option>
+                        <option value="Veg">Veg</option>
+                        <option value="Non-Veg">Non-Veg</option>
+                      </select>
+                    {% else %}
+                      <select class="form-select" id="specificSizeSelect" name="category" required title="Category">
+                        <option value="">Category</option>
+                        <option value="Veg">Veg</option>
+                        <option value="Non-Veg">Non-Veg</option>
+                      </select>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="inputDifficulty" class="col col-form-label">Difficulty</label>
+                    {% if form.difficulty.value %}
+                      <select class="form-select" id="specificSizeSelect" name="difficulty" required title="Difficulty">
+                        <option value="{{form.difficulty.value}}">{{form.difficulty.value}}</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    {% else %}
+                      <select class="form-select" id="specificSizeSelect" name="difficulty" required title="Difficulty">
+                        <option value="">Difficulty</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    {% endif %}
+                  </div>
+
+                  <div class="col-md-3">
+                    <label for="inputServings" class="col col-form-label">Servings</label>
+                    {% if form.servings.value %}
+                      <input type="number" name="servings" value="{{form.servings.value}}" class="form-control" id="inputServings" min="1" placeholder="Serves" required="required" title="Serving">
+                    {% else %}
+                      <input type="number" name="servings" class="form-control" id="inputServings" min="1" placeholder="Serves" required="required" title="Serving">
+                    {% endif %}
+                  </div>
+
+                </div>
+
+                <div class="col-12">
+                  <label for="inputIngredients" class="form-label">Ingredients</label>
+                  <div class="col-sm-11 input-field">
+                    {% if form.ingredients.value %}
+                      <textarea class="form-control" name="ingredients" id="inputIngredients" placeholder="Ingredients" rows="6" required="required" title="Ingredients">{{form.ingredients.value}}</textarea>
+                    {% else %}
+                      <textarea class="form-control" name="ingredients" id="inputIngredients" placeholder="Ingredients" rows="6" required="required" title="Ingredients">1. </textarea>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <label for="inputRecipe" class="form-label">Main recipe</label>
+                  <div class="col-sm-11 input-field">
+                    {% if form.content.value %}
+                      <textarea class="form-control" name="content" id="id_content" placeholder="Instructions for the recipe" rows="10" cols="" required="required"> {{ form.content.value }}</textarea>
+                      
+                      {{form.media}}
+
+                    {% else %}
+                      <textarea class="form-control" name="content" id="id_content" placeholder="Instructions for the recipe" rows="10" cols="" required="required"> </textarea>
+                        
+                      {{form.media}}
+                    {% endif %}
+                  </div>
+
+                <div class="recipe-instruction-text mt-2">Enter recipe instructions in a numeric list format <b>(e.g. 1. Preheat the oven...)</b></div>
+
+                </div> 
+
+                <div class="text-center">
+                  <div class="form-btns">
+                    <button type="submit" class="btn btn-transparent" id="postButton" onclick="validateForm()"><span>Post</span></button>
+                    <button type="reset" class="btn btn-transparent" onclick="removeimg()"><span>Clear</span></button>
+                    
+                  </div>
+                </div>
+
+                <!-- <div class="text-center">
+                  <div class="form-btns">
+                    <input type="submit" value="Post">
+                    
+                    <button type="reset" class="btn btn-transparent" onclick="removeimg()"><span>Clear</span></button>
+                    
+                  </div>
+                </div> -->
+                
+              </form>
+
+              <div style="display: none;">
+              {{form.as_p}}
+              </div>
+
+            </div>
+            
+          </div>
+
+        </main>
+
+        <aside class="sidebar sidebar-dashboard recipe-img-preview-sidebar" id="show-sidebar">
+                    
+          <div class="sidebar-recipes">
+              
+            <!-- <h2></h2> -->
+
+              <!-- Image preview -->
+              <div class="preview-container">
+                <img class="preview-image" src="" alt="Image" style="display: none;">
+                <div class="recipe-title preview_ai_img_title"></div>
+              </div>
+               
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+
+{% else %} 
+  
+<script>
+  location.href = "{% url 'login' %}";
+</script>
+
+{% endif %}
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<!-- <script>
+  $('#myForm').submit(function (e) {
+    e.preventDefault();
+
+    var formData = new FormData(this);
+
+    // console.log(formData);
+    if (formData){
+    console.log(true);
+    }
+    else{
+      console.log(false);
+    }
+});
+</script> -->
+
+<div class="modal fade Modal-logout" id="recipeFormModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content logoutmodal">
+          <div class="modal-header">
+              <h5 class="modal-title">Yummy Recipes</h5>
+          </div>
+
+          <div class="modal-body">
+              <h2>Error</h2>
+              <p2 class="del-text">You cannot re-submit this form!</p2>
+              <p>You will be automatically redirected to home page.</p>
+          </div>
+
+          <div class="modal-footer" id="logoutfooter">
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- After successful form submission if user clicks navigate back to re-submit form it will redirect -->
+<script>
+  // if (window.performance.navigation.type === 2){
+  // // location.href = "{% url 'home' %}";
+
+  // $(document).ready(function () {
+  //   $('#myForm')[0].reset();
+
+  //     //   $('#recipeFormModal').modal('show');
+
+  //     //   // Set a timeout to hide the modal and redirect after 3 seconds
+  //     //   setTimeout(function () {
+  //     //     $('#recipeFormModal').modal('show');
+  //     //     location.href = "{% url 'home' %}";
+  //     //   }, 3000);
+  //     });
+  // }
+
+  document.addEventListener('DOMContentLoaded', function () {
+  if (window.performance.navigation.type === 2) {
+    location.reload();
+  }
+});
+
+</script>
+
+{% if newrecipe_error_message %}
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div id="formErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+      <div class="d-flex"> 
+          <div class="toast-body">
+              {{newrecipe_error_message}}
+          </div>
+          <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+  </div>
+</div>
+
+<script>
+  var successToast = new bootstrap.Toast(document.getElementById('formErrorToast'));
+  successToast.show();
+</script>
+
+{% endif %}
+
+
+<script>
+  $(document).ready(function() {
+      $('#myForm').show();
+      $('#imageUploadContainer, #generateImageToggle').hide();
+      $('#images').attr('required', 'required'); 
+
+      $('#generateImageButton').on('click', function(e) {
+          e.preventDefault();
+          $('#imageUploadContainer, #generateImageToggle').hide();
+          $('#myForm').show();
+          $('#images').removeAttr('required'); 
+      });
+
+      $('#uploadImageButton').on('click', function(e) {
+          e.preventDefault();
+          $('#imageGenerationForm, #uploadImageButton').hide();
+          $('#myForm, #imageUploadContainer, #generateImageToggle').show();
+          $('#images').attr('required', 'required'); 
+      });
+
+      $('#generateImageToggle').on('click', function(e) {
+          e.preventDefault();
+          $('#imageUploadContainer, #generateImageToggle').hide();
+          $('#imageGenerationForm, #uploadImageButton').show();
+        });
+    });
+</script>
+
+<!-- Tooltip for image generation error -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div id="imgErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex"> 
+          <div class="toast-body">
+              Can't generate image at this moment 
+          </div>
+          <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+  </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div id="testsToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex"> 
+          <div class="toast-body">
+              Test form
+          </div>
+          <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+  </div>
+</div>
+
+
+<!-- Sending & getting response of image using openai api -->
+<script>
+  $(document).ready(function() {
+    $('#generateImageButton').on('click', function(e) {
+        e.preventDefault(); 
+
+        var emptytitle = $('#inputTitle').val();
+        if (!emptytitle.trim()) {
+            return;
+        }
+
+        $(this).addClass('loading').text('Generating...');
+
+        var imgType = $('#imageGenerationForm [name="img_type"]').val();
+        var title = $('#inputTitle').val();
+        var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+
+        var formData = {
+            img_type: imgType,
+            title: title, 
+        };
+
+        $.ajax({
+            url: '{% url "createpost" %}', 
+            method: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRFToken': csrfToken 
+            },
+            success: function(response) {
+                if (response.image_url) {
+                    $('#imageURLField').val(response.image_url);
+                    $('#imageTitle').val(response.title);
+
+
+                    var previewImage = $('.preview-image');
+                    previewImage.attr('src', response.image_url);
+                    previewImage.css('display', 'block'); 
+
+                    $('#post_button').css('display', 'block');
+
+                    var title = $('#inputTitle').val();
+
+                    var recipeTitleElement = $('.recipe-title');
+                    recipeTitleElement.text(title);
+
+                    $('.gen-img').css('display', 'block');
+
+                    $('.gen-img .preview-image').attr('src', response.image_url);
+
+                    $('.gen-img .preview_ai_img_title').text(title);
+
+                    sideBar.classList.add('show-sidebar');
+
+                    $('#generateImageButton').text('Regenerate');
+
+                    $('#generateImageButton').removeClass('loading');
+                }
+
+                else if (response.error){
+                  var successToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
+                  successToast.show();
+                  $('#generateImageButton').removeClass('loading').text('Generate');
+                }
+
+                else if (response.form_error){
+                  var successToast = new bootstrap.Toast(document.getElementById('testsToast'));
+                  successToast.show();
+                }
+                
+            },
+            error: function(error) {
+                console.error('Error:', error);
+
+                $('#generateImageButton').removeClass('loading').text('Generate Image');
+            }
+        });
+    });
+  });
+</script>
+
+
+<!-- Getting title from Imagegenerationform into myForm (main recipe forms) -->
+<!-- <script>
+  $(document).ready(function() {
+      // Listen to input events in the imageGenerationForm title field
+      $('#inputTitle').on('input', function() {
+          // Get the value entered in the imageGenerationForm title field
+          var newTitle = $(this).val();
+          
+          // Update the myForm title field with the new title
+          $('#inputTitleRecipe').val(newTitle);
+          $('#nameError').text(""); // Clear any previous error message
+      });
+  });
+</script> -->
+
+
+
+
+<script>
+function validateForm() {
+  const form = document.getElementById('myForm');
+
+  for (const input of form.elements) {
+    if (input.required && input.value.trim() === '') {
+      alert(`${input.name} is required`);
+      return false;
+    }
+  }
+}
+</script>
+
+<script>
+  function formsubmit() 
+  {
+    // var image = document.forms["myForm"]["image"].value;
+    var timing = document.forms["myForm"]["timing"].value;
+    var servings = document.forms["myForm"]["servings"].value;
+    var type = document.getElementById("inputGroupSelect01").value;
+    var cuisine = document.forms["myForm"]["cuisine"].value;
+    var category = document.forms["myForm"]["category"].value;
+    var title = document.forms["myForm"]["title"].value;
+    var ingredients = document.forms["myForm"]["ingredients"].value;
+    var content = document.forms["myForm"]["content"].value;
+    // if (image == "")
+    // {
+    //   alert("Please choose a image")
+    //   return false;
+    // }
+    if (timing == "") 
+    {
+      alert("Please provide preparation time");
+      return false;
+    }
+    else if (servings == "") 
+    {
+      alert("Please provide number of serving");
+      return false;
+    }
+    else if (type == "") 
+    {
+      alert("Please select type from list");
+      return false;
+    }
+    else if (cuisine == "") 
+    {
+      alert("Please select cuisine");
+      return false;
+    }
+    else if (category == "") 
+    {
+      alert("Please select category");
+      return false;
+    }
+    else if (difficulty == "") 
+    {
+      alert("Please select difficulty");
+      return false;
+    }
+    else if (title == "") 
+    {
+      alert("Title field cannot be empty");
+      return false;
+    }
+    else if (ingredients == "")
+    {
+      alert("Ingredient field cannot be empty");
+      return false;
+    }
+    else if (content == "")
+    {
+      alert("Recipe field cannot be empty");
+      return false;
+    }  
+    alert("Your recipe has been posted suceesfully 😊");
+    // location.href = "{% url 'home' %}";
+  }
+
+  // Form reset
+  function myFunction() {
+document.getElementById("output").reset();
+}
+
+</script>
+
+<!-- image preview with name of the file -->
+<script>
+const previewContainers = document.querySelector('.new-container');
+const imagesInput = document.getElementById('images');
+const previewContainer = document.querySelector('.preview-container');
+const imgcounter = document.getElementById('counter');
+const sideBar = document.getElementById('show-sidebar');
+let counterValue = 0;
+
+const ttpreviewContainer = document.querySelector('.preview-counter');
+
+imagesInput.addEventListener('change', () => {
+  previewContainer.innerHTML = '';
+  previewContainers.innerHTML = '';
+
+  for (const file of imagesInput.files) {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      const image = document.createElement('img');
+      image.classList.add('preview-image');
+      image.src = reader.result;
+
+  
+      sideBar.classList.add('show-sidebar');
+
+      const name = document.createElement('div');
+      name.classList.add('preview-name');
+      name.textContent = file.name;
+
+      const removeButtonNew = document.createElement('button');
+      removeButtonNew.textContent = 'x';    
+      removeButtonNew.classList.add('img-remove-button');
+
+      const removeButtonPreview = document.createElement('button');
+      removeButtonPreview.textContent = 'x';   
+      removeButtonPreview.classList.add('img-remove-button');
+
+      const preview1 = document.createElement('div');
+      preview1.classList.add('new-container');
+      preview1.appendChild(copyElementWithChildren(image));
+      preview1.appendChild(copyElementWithChildren(name));
+      preview1.appendChild(removeButtonNew);
+
+      const preview = document.createElement('div');
+      preview.classList.add('preview-container');
+      preview.appendChild(image);
+      preview.appendChild(name);
+      preview.appendChild(removeButtonPreview);
+
+      previewContainers.appendChild(preview1);
+      previewContainer.appendChild(preview);
+
+      removeButtonNew.addEventListener('click', () => {
+        preview1.remove();
+        preview.remove();
+
+  updateCounter();
+
+    updateFileList(file);
+      });
+
+      removeButtonPreview.addEventListener('click', () => {
+        preview1.remove();
+        preview.remove();
+
+  updateCounter();
+
+    updateFileList(file);
+      });
+    });
+
+    reader.readAsDataURL(file);
+  }
+  sideBar.classList.add('show-sidebar');
+});
+
+function copyElementWithChildren(element) {
+  const htmlContent = element.outerHTML;
+  const newElement = document.createElement('div');
+  newElement.innerHTML = htmlContent;
+  return newElement.firstChild;
+}
+
+function updateCounter() {
+  const numFiles = imagesInput.files.length;
+
+  if (numFiles === 1) {
+    const counter = document.createElement('span');
+    counter.classList.add('preview-counter');
+    counter.textContent = `${numFiles} file selected`;
+
+    ttpreviewContainer.innerHTML = '';
+    ttpreviewContainer.appendChild(counter);
+  } else if (numFiles > 1) {
+    const counter = document.createElement('span');
+    counter.classList.add('preview-counter');
+    counter.textContent = `${numFiles} files selected`;
+
+    ttpreviewContainer.innerHTML = '';
+    ttpreviewContainer.appendChild(counter);
+  } else {
+    
+    ttpreviewContainer.innerHTML = 'Select images';
+    sideBar.classList.remove('show-sidebar');
+  }
+}
+
+imagesInput.addEventListener('change', () => {
+  updateCounter();
+});
+
+document.addEventListener('click', (event) => {
+  const target = event.target;
+  if (target.classList.contains('img-remove-button')) {
+    updateCounter();
+  }
+});
+
+
+updateCounter();
+
+function updateFileList(fileToRemove) {
+  const files = Array.from(imagesInput.files);
+  const updatedFiles = files.filter(file => file !== fileToRemove);
+
+  const newFileList = new DataTransfer();
+  updatedFiles.forEach(file => newFileList.items.add(file));
+
+  imagesInput.files = newFileList.files;
+}
+
+
+  
+</script>
+
+
+<!-- increasing the counter inside textarea by pressing enter -->
+<script>
+  const textarea = document.getElementById('inputRecipe');
+  let counter = 2; 
+  let lastCounter = 1;
+  textarea.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const value = this.value;
+      const selectionStart = this.selectionStart;
+      const selectionEnd = this.selectionEnd;
+      const beforeCursor = value.substring(0, selectionStart);
+      const afterCursor = value.substring(selectionEnd);
+      const newLine = `\n${counter}. `;
+      this.value = beforeCursor + newLine + afterCursor;
+      this.selectionStart = selectionEnd + newLine.length;
+      this.selectionEnd = selectionEnd + newLine.length;
+      lastCounter = counter;
+      counter++;
+    }
+  });
+
+  textarea.addEventListener('keyup', function(event) {
+    if (event.key === 'Backspace') {
+      const value = this.value;
+      const cursorPosition = this.selectionStart;
+      const lastCounterIndex = value.lastIndexOf('\n', cursorPosition - 2);
+      const lastCounterValue = parseInt(value.substring(lastCounterIndex + 1, cursorPosition - 2));
+      if (!isNaN(lastCounterValue)) {
+        lastCounter = lastCounterValue; 
+        counter = lastCounter + 1;
+      }
+    }
+  });
+</script>
+
+<!-- same above counter for ingredients -->
+<script>
+  const ingredientstextarea = document.getElementById('inputIngredients');
+  let newcounter = 2; 
+  let prevcounter = 1; 
+  ingredientstextarea.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const value = this.value;
+      const selectionStart = this.selectionStart;
+      const selectionEnd = this.selectionEnd;
+      const beforeCursor = value.substring(0, selectionStart);
+      const afterCursor = value.substring(selectionEnd);
+      const newLine = `\n${newcounter}. `;
+      this.value = beforeCursor + newLine + afterCursor;
+      this.selectionStart = selectionEnd + newLine.length;
+      this.selectionEnd = selectionEnd + newLine.length;
+      lastCounter = newcounter;
+      newcounter++;
+    }
+  });
+
+  ingredientstextarea.addEventListener('keyup', function(event) {
+    if (event.key === 'Backspace') {
+      const value = this.value;
+      const cursorPosition = this.selectionStart;
+      const lastCounterIndex = value.lastIndexOf('\n', cursorPosition - 2);
+      const lastCounterValue = parseInt(value.substring(lastCounterIndex + 1, cursorPosition - 2));
+      if (!isNaN(lastCounterValue)) {
+        prevcounter = lastCounterValue; 
+        newcounter = prevcounter + 1; 
+      }
+    }
+  });
+</script>
+
+{% endblock %}

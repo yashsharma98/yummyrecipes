@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+
+</head>
+
+<body style="font-family: Arial, sans-serif; background-color: #C9D7DD; padding: 20px;border-radius: 30px;">
+    <div style="max-width: 600px; margin: 0 auto;padding-bottom: 20px;  background-color: #E0F4FF; border-radius: 22px; overflow: hidden; box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);">
+        <div style="background-color: #8ECDDD; color: #2D3250; padding: 20px; text-align: center;">
+            <h1>New Recipe Published!</h1>
+        </div>
+        <div style="padding: 30px;padding-top: 10px; color: #2D3250;">
+            <p style="font-size: 18px; margin-bottom: 20px;">Hi <b>{{ name }}</b>,</p>
+            <p style="font-size: 14px;">Congratulations🎉, </p>
+            <p style="font-size: 14px;margin-bottom: 20px;">Your new recipe <strong>"{{ title }}"</strong> has been successfully published. 
+                <br><span style="opacity: 0.8;">{{ date_posted }} • {{ post_timing }}</span></p>
+
+            <!-- for adding images from backblaze cloud (downloading & embedding) -->
+            {% if file_name %}
+                <img src="cid:file_name" class="recipe-image" style="border-radius: 22px;aspect-ratio: 12/9;object-fit: cover;max-width: 100%; height: auto; margin-bottom: 20px;" alt="{{ title }}">
+
+            {% elif uploaded_image %}
+                <img src="cid:uploaded_image" class="recipe-image" style="border-radius: 22px;aspect-ratio: 12/9;object-fit: cover;max-width: 100%; height: auto; margin-bottom: 20px;" alt="{{ title }}">
+
+            {% endif %}
+
+
+
+            <a href="{{ post_url }}" style="display: inline-block; background-color: #9AD0EC; color: #2B3467; padding: 10px 20px; text-decoration: none; border-radius: 22px;">View recipe</a>
+        </div>
+        <div style="padding: 20px; text-align: center;font-size: 14px;color: #2D3250;"">
+            <p>Follow Yummy Recipes for more</p>
+            <!-- Include social media icons/links here -->
+        </div>
+    </div>
+</body>
+</html>

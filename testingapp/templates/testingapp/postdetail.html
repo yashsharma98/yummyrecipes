@@ -1,0 +1,2195 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+{% load humanize %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+{% block title %}
+<title>{{post.title}}</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block content%}
+
+{% if user.is_authenticated %}
+  <style>
+  :root{
+    /* lightest to darkest order */
+
+    /* directly getting the colors from function */
+    --color-1: {{ colors_data.color_1 }};
+    --color-2: {{ colors_data.color_2 }};
+    --color-3: {{ colors_data.color_3 }};  
+    --color-4: {{ colors_data.color_4 }};  
+    --color-5: {{ colors_data.color_5 }}; 
+    --color-6: {{ colors_data.color_6 }};  
+    --color-7: {{ colors_data.color_7 }};
+
+    /* uncomment only while using ajax response */
+    /* --color-1: #default-color-1;  
+    --color-2: #default-color-2;  
+    --color-3: #default-color-3;  
+    --color-4: #default-color-4;  
+    --color-5: #default-color-5; 
+    --color-6: #default-color-6;  
+    --color-7: #default-color-7; */
+
+    .navrail,.navbar,.logout-wrapper,.primary-wrapper,body,.dynamic-recipes h1,.sidebar-header,
+  .qv-offcanvas-title-container,.qv-offcanvas-table-wrapper,.comment-input textarea,
+  .body-detail-dropdown-list .dropdown-first-child button,.body-detail-dropdown-list .dropdown-second-child{
+      background: var(--color-1);
+  }
+
+  .navrail-logo img,.footer-brand-logo,.trending-number,.tot_recipe_badge,.comments-offcanvas,.bottom-navigation,
+  .recipe-content-actions button,.recipe-content-actions a button{
+      background: var(--color-2);
+  }
+
+  .logout-link,.comment-input button{
+    background: var(--color-3);
+  }
+
+  .qv-modal-body .footer-area,.bottom-navigation .nav-link.active,.bottom-navlinks::before,.more-dropdown-btn[aria-expanded="true"],
+  #listenButton.listenButton-button,.navrail-icons-active{
+      background: var(--color-4);
+  }
+
+  .hover-profile-card,.recipe-details-1 .like-dislike-div button,.more-horiz-icon,
+  .side-recipes-card-container .sidebar-cards,.sidebar-cards .sidebar-recipe-read-more-icon,
+  .footer-waveline,.accordion-button,.qv-offcanvas,.body-detail-dropdown-content{
+      background: var(--color-5);
+  }
+
+  .navbar-brand-name a,#title-image-color,.navrail-icons,.navrail-text,.navrail-text-active,.like-dislike-icon,.total-likes,.total-dislikes,
+  .recipe-detail-table table th,.recipe-detail-table table td,.recipe-content-actions button,.recipe-content-actions a button,
+  .body-detail-dropdown-list .dropdown-first-child button,.body-detail-dropdown-list .dropdown-second-child,.comments-accordian button,
+  .more-horiz-icon,.recipe-details-1 .auth-name a,.hover-profile-card,.trending-number,.recipe-body .recipe-body-content,
+  .tot_recipe_badge,.comments-offcanvas,.comments-offcanvas h5,.comment-input textarea,.comment-input button span,.comment-input textarea::placeholder,
+  .comments-section,.footer-container,.footer-container .column ul li a,.footer-bottom,.sidebar-header h1,.side-recipes-card-container .sidebar-cards a,
+  .logouticon,.bottom-navigation a.nav-link,.bottom-navigation .nav-link.active,.bottom-navlinks::before,.qv-offcanvas .offcanvas-header h5,
+  .qv-offcanvas-title-container,.qv-offcanvas-table-wrapper table tr th,.qv-offcanvas-table-wrapper table tr td,
+  .qv-modal-body .footer-area a,.sidebar-recipe-read-more-icon{
+      color: var(--color-7);
+  }
+
+  .recipe-detail-container .left,.recipe-detail-container .right,.user-detail-table,.recipe-body .ingred-body{
+      border: 1.5px solid var(--color-5);
+    }
+
+    .recipe-detail-table table th,.recipe-detail-table table td{
+      border-bottom: 0.5px solid var(--color-5);
+    }
+
+    .comment-input textarea:focus{
+      border: 2px solid var(--color-5);
+    } 
+  }
+  </style>
+{% else %}
+
+  <style>
+    :root{
+      --color-1: #F0ECE3;
+      --color-2: #DBCBBD;
+      --color-3: {{ colors_data.color_3 }};  
+      --color-4: #DFD3C3;  
+      --color-5: #DBCBBD; 
+      --color-6: {{ colors_data.color_6 }};  
+      --color-7: #221e20;
+    }
+
+  .navrail,.navbar,.logout-wrapper,.primary-wrapper,body,.dynamic-recipes h1,.sidebar-header,
+  .qv-offcanvas-title-container,.qv-offcanvas-table-wrapper,.comment-input textarea,
+  .body-detail-dropdown-list .dropdown-first-child button,.body-detail-dropdown-list .dropdown-second-child{
+      background: var(--color-1);
+  }
+
+  .navrail-logo img,.footer-brand-logo,.trending-number,.tot_recipe_badge,.comments-offcanvas,.bottom-navigation,
+  .recipe-content-actions button,.recipe-content-actions a button{
+      background: var(--color-2);
+  }
+
+  .logout-link,.comment-input button{
+    background: var(--color-3);
+  }
+
+  .qv-modal-body .footer-area,.bottom-navigation .nav-link.active,.bottom-navlinks::before,.more-dropdown-btn[aria-expanded="true"],
+  #listenButton.listenButton-button,.navrail-icons-active{
+      background: var(--color-4);
+  }
+
+  .hover-profile-card,.recipe-details-1 .like-dislike-div button,.more-horiz-icon,
+  .side-recipes-card-container .sidebar-cards,.sidebar-cards .sidebar-recipe-read-more-icon,
+  .footer-waveline,.accordion-button,.qv-offcanvas,.body-detail-dropdown-content{
+      background: var(--color-5);
+  }
+
+  .navbar-brand-name a,#title-image-color,.navrail-icons,.navrail-text,.navrail-text-active,.like-dislike-icon,.total-likes,.total-dislikes,
+  .recipe-detail-table table th,.recipe-detail-table table td,.recipe-content-actions button,.recipe-content-actions a button,
+  .body-detail-dropdown-list .dropdown-first-child button,.body-detail-dropdown-list .dropdown-second-child,.comments-accordian button,
+  .more-horiz-icon,.recipe-details-1 .auth-name a,.hover-profile-card,.trending-number,.recipe-body .recipe-body-content,
+  .tot_recipe_badge,.comments-offcanvas,.comments-offcanvas h5,.comment-input textarea,.comment-input button span,.comment-input textarea::placeholder,
+  .comments-section,.footer-container,.footer-container .column ul li a,.footer-bottom,.sidebar-header h1,.side-recipes-card-container .sidebar-cards a,
+  .logouticon,.bottom-navigation a.nav-link,.bottom-navigation .nav-link.active,.bottom-navlinks::before,.qv-offcanvas .offcanvas-header h5,
+  .qv-offcanvas-title-container,.qv-offcanvas-table-wrapper table tr th,.qv-offcanvas-table-wrapper table tr td,
+  .qv-modal-body .footer-area a,.sidebar-recipe-read-more-icon{
+      color: var(--color-7);
+  }
+
+  .recipe-detail-container .left,.recipe-detail-container .right,.user-detail-table,.recipe-body .ingred-body{
+      border: 1.5px solid var(--color-5);
+    }
+
+    .recipe-detail-table table th,.recipe-detail-table table td{
+      border-bottom: 0.5px solid var(--color-5);
+    }
+
+    .comment-input textarea:focus{
+      border: 2px solid var(--color-5);
+    } 
+  </style>
+
+{% endif %}
+
+
+<body>
+
+  {% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+    
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex">
+
+        <main role="main" class="home-main recipe-detail-main">
+
+            <div class="dynamic-recipes recipe-detail-wrapper">                    
+
+              <div class="dynamic-card-container carousel-container rcdet-card-container">
+                
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                  
+                  {% if post.photo_set.all.count == 1 %}
+                  {% else %}
+                    <div class="carousel-indicators">
+                      {% for image in post.photo_set.all %}
+                      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></button>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+
+                  <div class="carousel-inner">
+                    {% for post in post.photo_set.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                      <img src="{{ post.image.url }}" class="d-block carousel-image" alt="{{ post.title }}">
+                    </div>
+                    {% empty %}
+                    <div>
+                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image" alt="{{ post.title }}">
+                    </div>
+                    {% endfor %}
+                  </div>
+
+                  {% if post.photo_set.all.count == 1 %}
+                  {% else %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                  {% endif %}
+                </div>
+
+              </div>
+
+
+              <div class="recipe-body">
+                <h1 id="title-image-color">{{post.title}}</h1>
+
+                <div class="d-flex recipe-details-1">
+                  <div class="p-2 auth-img">
+                    {% for i in user_profiles %}
+                      {% if i.user.email == post.author.email %}
+                      <div>
+                        <a href="{% url 'userchannelpage' pk=post.author.id %}">
+                          <img src="{{ post.author.profile.profile_img.url }}" alt="Image">
+                        </a>
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+  
+                    <div class="child">
+  
+                      <div class="card hover-profile-card">
+                        <div class="row g-0">
+                          <div class="col-lg-4 card-img-container">
+                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body">
+                              <h5 class="card-title">{{ post.author.first_name }} {{ post.author.last_name }}</h5>
+                              <p class="card-text">{{post.author.profile.bio}}</p>
+                            </div>
+                            <div class="cards-footer">
+                              Recipes : 
+                              {% for user in tot_posts_by_user %}
+                                {% if post.author.email == user.email %}
+                                  {{ user.num_posts }}
+                                {% endif %}  
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+  
+                    </div>
+                  </div>
+  
+                  <div class="p-2 flex-grow-1 auth-name">
+                    {% for i in user_profiles %}
+                      {% if i.user.email == post.author.email %}
+                        <div class="text-truncate">
+                          <a href="{% url 'userchannelpage' pk=post.author.id %}">
+                            <b>{{i.user.first_name}} {{i.user.last_name}}</b>
+                          </a>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                    
+                    <div class="child">
+  
+                      <div class="card hover-profile-card">
+                        <div class="row g-0">
+                          <div class="col-lg-4 card-img-container">
+                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body">
+                              <h5 class="card-title">{{ post.author.first_name }} {{ post.author.last_name }}</h5>
+                              <p class="card-text">{{post.author.profile.bio}} </p>
+                            </div>
+                            <div class="cards-footer">
+                              Recipes : 
+                              {% for user in tot_posts_by_user %}
+                                {% if post.author.email == user.email %}
+                                  {{ user.num_posts }}
+                                {% endif %}  
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+  
+                    </div>
+                  </div>
+  
+                  <div class="p-2 like-dislike-div">
+                    <div class="like-div">
+                      <!-- <form action="{% url 'like-view' %}" method="POST">
+                        {% csrf_token %}
+                        
+                        {% if request.user.profile in post.likes.all %}
+  
+                          <button type="submit" class="" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="Unlike">
+                            <span class="material-symbols-rounded like-dislike-icon liked">thumb_up</span>  
+                          </button>
+  
+                          <div class="total-likes">{{post.total_likes}}</div>
+                        {% else %}
+  
+                          {% if post.total_likes == 0 %}
+  
+                            <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I like this">
+                              <span class="material-symbols-rounded like-dislike-icon">thumb_up</span>  
+                            </button>
+                              <div class="total-likes">{{post.total_likes}}</div>
+  
+                          {% else %}
+  
+                            <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I like this">
+                              <span class="material-symbols-rounded like-dislike-icon">thumb_up</span>  
+                            </button>
+                              <div class="total-likes">{{post.total_likes}}</div>
+  
+                          {% endif %}
+  
+                        {% endif %}
+                        
+                      </form> -->
+                      <form action="{% url 'like-view' %}" method="POST">
+                        {% csrf_token %}
+                    
+                        <button type="submit" class="like-button {% if request.user.profile in post.likes.all %}liked{% endif %}" data-post-id="{{ post.id }}"
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="I like this">
+                          {% if request.user.profile in post.likes.all %}  
+                            <span class="material-symbols-rounded like-dislike-icon liked">thumb_up</span>  
+                          {% else %}
+                            <span class="material-symbols-rounded like-dislike-icon">thumb_up</span>  
+                          {% endif %}
+                        </button>
+                        
+                        <div class="total-likes" data-post-id="{{ post.id }}">{{ post.total_likes }}</div>
+                      </form>
+                    </div>
+                  </div>
+  
+                  <div class="p-2 like-dislike-div">
+                    <div class="dislike-div">
+                      <!-- <form action="{% url 'dislike-view' %}" method="POST">
+                        {% csrf_token %}
+  
+                        {% if request.user.profile in post.dislikes.all %}
+  
+                          <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="Disliked">
+                            <span class="material-symbols-rounded like-dislike-icon disliked">thumb_down</span>  
+                          </button>
+                          <div class="total-dislikes">{{post.total_dislikes}}</div>
+  
+                        {% else %}
+  
+                        {% if post.total_dislikes == 0 %}
+  
+                          <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I dislike this">
+                            <span class="material-symbols-rounded like-dislike-icon">thumb_down</span>
+                          </button>
+                          <div class="total-dislikes">{{post.total_dislikes}}</div>
+  
+                        {% else %}
+  
+                          <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I dislike this">
+                            <span class="material-symbols-rounded like-dislike-icon">thumb_down</span>
+                          </button>
+                          <div class="total-dislikes">{{post.total_dislikes}}</div>
+  
+                        {% endif %}
+  
+                        {% endif %}
+  
+                      </form> -->
+                    
+                      <form action="{% url 'dislike-view' %}" method="POST">
+                        {% csrf_token %}
+                    
+                        <button type="submit" class="dislike-button {% if request.user.profile in post.dislikes.all %}disliked{% endif %}" data-post-id="{{ post.id }}"
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="I dislike this">
+                          {% if request.user.profile in post.dislikes.all %}  
+                            <span class="material-symbols-rounded like-dislike-icon disliked">thumb_down</span>  
+                          {% else %}
+                            <span class="material-symbols-rounded like-dislike-icon">thumb_down</span>  
+                          {% endif %}
+                        </button>
+                        
+                        <div class="total-dislikes" data-post-id="{{ post.id }}">{{ post.total_dislikes }}</div>
+                      </form>
+                    </div>
+                  </div>
+  
+                  <div class="p-2 more-dropmenu">
+                    <div class="dropdown-center body-detail-dropdown">
+                      <button class="more-dropdown-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          <span class="material-symbols-rounded more-horiz-icon">more_horiz</span>
+                      </button>
+  
+                      <div class="dropdown-menu body-detail-dropdown-content">
+                        <div class="body-detail-dropdown-list">
+                            <div class="dropdown-first-child">
+                              <button class="clipboard dropdown-links" id="copylink" onclick="Copy();">
+                                <span class="material-symbols-rounded share-recipe-icon">content_copy</span>
+                                Copy link
+                              </button>
+                            </div>
+  
+                            <div class="dropdown-second-child">
+                              <a class="dropdown-links" href="{% url 'customerrender' feed=post.title pk=post.pk %}">
+                                <span class="material-symbols-rounded share-recipe-icon">file_download</span>
+                                Download
+                              </a>
+                            </div>
+                        </div>
+                      </div>
+  
+                      <!-- toast message -->
+
+                      <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+                        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                            <div class="d-flex"> 
+                                <div class="toast-body" id="urlCopied">
+                                    
+                                </div>
+                                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                        </div>
+                      </div>
+
+  
+                  </div>
+                  </div>
+  
+                </div>                
+
+                <!-- trending text & read time -->
+                <div class="recipe-trending-text">
+                  {% if post.title in top_10_trend_recipes|join:"" %}
+                        
+                    <span class="trending-number">#{{check|join:""}} on Trending</span>  
+
+                  {% else %}
+
+                  {% endif %}
+
+                  <span class="trending-number postdetail-readtime"><p>{{ post.read_time }} min read</p></span>
+                </div>
+
+                <div class="recipe-detail-container">
+                  <div class="left">
+
+                    <div class="recipe-detail-table">
+                      <table class="table">
+                          
+                          <tbody>
+                          <tr>
+                              <th scope="row" colspan="2">Type</th>
+                              <td>:</td>
+                              <td>{{post.type}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Category</th>
+                              <td>:</td>
+                              <td>{{post.category}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Cuisine</th>
+                              <td>:</td>
+                              <td>{{post.cuisine}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Prep time</th>
+                              <td>:</td>
+                              <td>{{post.timing}} min</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Servings</th>
+                              <td>:</td>
+                              <td>{{post.servings}}</td>
+                          </tr>
+                          <!-- <tr>
+                              <th scope="row" colspan="2">Likes</th>
+                              <td>:</td>
+                              <td>{{post.total_likes}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Dislikes</th>
+                              <td>:</td>
+                              <td>{{post.total_dislikes}}</td>
+                          </tr> -->
+                          </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+
+                  <div class="right">
+                    
+                    <div class="recipe-detail-table">
+                      <table class="table">
+                          
+                          <tbody>
+                          <tr>
+                              <th scope="row" colspan="2">Views</th>
+                              <td>:</td>
+                              <td>{% get_hit_count for post %}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Posted</th>
+                              <td>:</td>
+                              <td>{{post.get_date}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Updated</th>
+                              <td>:</td>
+                              <td>
+                                {% if post.get_date == post.get_modified_date %}
+                                  No change
+                                {% else %}
+                                {{post.get_modified_date}}
+                                {% endif %}
+                              </td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Popularity</th>
+                              <td>:</td>
+                              <td>
+                                {% if post.type == 'Breakfast' %}
+
+                                  {% if fetched_recipe|join:"" in post.title %}
+
+                                    {% for post in breakfast.all %}
+
+                                      {% if fetched_recipe|join:"" in post.title %}
+
+                                        {{forloop.counter| ordinal }} in breakfast recipes
+
+                                      {% endif %}
+
+                                    {% endfor %}
+
+                                  {% else %}
+                                    0
+                                  {% endif %}
+
+                                {% elif post.type == 'Lunch' %} 
+                                
+                                {% if fetched_recipe|join:"" in post.title %}
+
+                                  {% for post in lunch.all %}
+
+                                    {% if fetched_recipe|join:"" in post.title %}
+
+                                      {{forloop.counter| ordinal }} in lunch recipes
+
+                                    {% endif %}
+
+                                  {% endfor %}
+                                
+                                {% else %}
+                                  0
+                                {% endif %}
+
+                                {% elif post.type == 'Evening Snack' %} <!-- 12pm - 4:59pm (17:59) -->
+
+                                  {% if fetched_recipe|join:"" in post.title %}
+
+                                    {% for post in evesnack.all %}
+                                    
+                                      {% if fetched_recipe|join:"" in post.title %}
+
+                                        {{forloop.counter| ordinal }} in evening snack recipes
+                                      
+                                      {% endif %}
+                                
+                                    {% endfor %}
+
+                                  {% else %}
+                                    0
+                                  {% endif %}
+
+                                {% else %}
+
+                                {% if fetched_recipe|join:"" in post.title %}
+                                  
+                                  {% for post in dinner.all %}
+                                  
+                                    {% if fetched_recipe|join:"" in post.title %}
+
+                                      {{forloop.counter| ordinal }} in dinner recipes
+
+                                    {% endif %}
+
+                                  {% endfor %}
+
+                                {% else %}
+                                  0
+                                {% endif %}
+
+
+                                {% endif %}
+                              </td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Difficulty</th>
+                              <td>:</td>
+                              <td>{{post.difficulty}}</td>
+                          </tr>
+                          <!-- <tr>
+                              <th scope="row" colspan="2">Likes</th>
+                              <td>:</td>
+                              <td>{{post.total_likes}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Dislikes</th>
+                              <td>:</td>
+                              <td>{{post.total_dislikes}}</td>
+                          </tr> -->
+                          </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div data-spy="scroll" data-target="#navbar-example2" data-offset="50">
+
+                <div class="recipe-body-content ingred-body" id="ingredients">
+                  <span>Ingredients</span>
+                  
+                  <p>
+                    <pre>
+                      {{post.ingredients}}
+                    </pre>
+                  </p>
+                </div>
+
+                <div class="recipe-content-actions">
+                  <button id="listenButton"><span class="material-symbols-rounded recipe-action-icons">graphic_eq</span>Audio</button>
+
+                  <a href="#translated-text-wrapper">
+                    <button type="button" id="translateButton"><span class="material-symbols-rounded recipe-action-icons">translate</span>Translate in hindi</button>
+                  </a>
+                </div>
+
+                <!-- gtts library audio -->
+                <!-- <audio controls preload="auto">
+                  <source src="{{ audio_file_new }}" type="audio/mp3">
+                  Your browser does not support the audio element.
+                </audio> -->
+
+                <!-- Open ai api audio -->
+                <audio controls id="audioPlayer" preload="auto" style="display: none;">
+
+                  <!-- gtts library audio -->
+                  <source src="{{ audio_file_new }}" type="audio/mp3">
+                  Your browser does not support the audio element.
+
+                <!-- Open ai api audio -->
+                  <!-- <source src="{{ audio_file_name }}" type="audio/mp3">
+                  Your browser does not support the audio element. -->
+                </audio>
+
+                <div class="recipe-body-content summarizecontent" id="instructions">
+                  <span>Instructions</span>
+
+                  <p>
+                    {{post.content|safe}}
+                  </p>
+                  
+                  <div id="analyzingtextprompt">
+                    <!-- Summarizing text while waiting for the response -->
+                  </div>
+
+                  <!-- <p>
+                    <pre>{{post.content|safe}}</pre>
+                  </p> -->
+                  
+                </div>
+
+                <div id="translated-text-wrapper">
+                  <div class="recipe-body-content translatedcontainer" id="translatedTextContainer" style="display: none;">
+                    <span id="translateTextHeading" style="display: none;">Translated to hindi</span>
+
+                    <p id="translatedContent">
+                      
+                    </p>
+                    
+                  </div>
+                </div>
+
+                <form class="translate-form" id="translateForm">
+                  {% csrf_token %}
+                  <textarea type="text" name="post_content">{{post.content|safe}}</textarea>
+                  <input type="hidden" name="translate_content" value="1">
+                </form>
+
+              </div>
+                
+                <!-- Summarized text will be displayed here -->
+                <div class="recipe-body-content summarized-container" id="summarizedContentContainer" style="display: none;">
+                  <span id="sumheading" style="display: none;">Summarized text</span>
+
+                  <p id="summarizedtext"></p>
+                </div>
+
+              </div>
+              
+
+              <!-- Comments -->
+              <div class="accordion accordion-flush comments-accordian" id="accordionFlushExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
+                      Comments &nbsp; <span class="tot_recipe_badge badge">{{comments_count}}</span>
+                    </button>
+                  </h2>
+                  
+                  <div class="offcanvas offcanvas-bottom comments-offcanvas" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+                    <div class="offcanvas-header">
+                      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Comments</h5>
+                      <button class="cmt-offcanvas-btn">
+                        <span class="material-symbols-rounded btn-close cmt-offcanvas-close" data-bs-dismiss="offcanvas" aria-label="Close">close</span>
+                      </button>
+                      
+                      <div class="hstack gap-3 comment-input" id="cmt">
+                        <img src="{{ user.profile.profile_img.url }}" class="article-imae">
+                        <textarea class="form-control me-auto" id="inputComment" type="text" placeholder="Add a comment..." aria-label="Add your comment"></textarea>
+                        <button type="button" class="btn btn-transparent" value="comment" id="commentbutton"><span class="material-symbols-rounded">send</span></button>
+                      </div>
+                    </div>
+                    <div class="offcanvas-body">
+
+                      <div id="comments">
+                        {% if comments %}
+
+                          {% for comment in comments.reverse %}
+                            <div class="d-flex position-relative comments-section">
+                              <img src="{{ post.author.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="..." style="width: 40px;height: 40px;border-radius: 100%;">
+                              <div class="commented-author">
+                                <h6>{{ comment.comment_user.first_name }} {{ comment.comment_user.last_name }} &#11825; <span>{{ comment.get_date }}</span> </h6>
+                                <p>{{ comment.comment }}</p>
+                              </div>
+                            </div>
+                          
+                          {% endfor %}
+
+                        {% else %}
+
+                          <p class="no-comment">No comments</p>
+
+                        {% endif %}
+                      </div>
+        
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>           
+            
+        </main>
+        
+        
+        <aside class="sidebar similar-recipes-sidebar">
+          
+          <div class="sidebar-recipes">
+              <div class="sidebar-header">
+                {% if post.type == 'Breakfast' %}
+
+                <h1>More breakfast recipes</h1>
+
+                {% elif post.type == 'Lunch' %}
+
+                <h1>More lunch recipes</h1>
+
+                {% elif post.type == 'Evening Snack' %}
+
+                <h1>More snacks recipes</h1>
+
+                {% elif post.type == 'Dinner' %}
+
+                <h1>More dinner recipes</h1>
+
+                {% endif %}
+              </div>
+
+              <div class="dynamic-card-container side-recipes-card-container">
+                  
+                {% if post.type == 'Breakfast' %}
+                  {% for brkfst in breakfast.all %}
+
+                    {% if post.title != brkfst.title %}
+
+                      <div class="sidebar-cards">    
+                          <a href="{% url 'viewpost' brkfst.pk %}">
+                            <div class="sidebar-img-container">
+                              {% for i in brkfst.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                              {% endif %}
+                                {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                              {% endfor %}
+                            </div>
+
+                            <div class="card-body sidebar-recipe-info">
+                                <h4 class="card-title highlight">{{brkfst.title}}</h4>
+                            </div>
+                          </a>
+                          <div class="sidebar-cards-qv" title="Quick view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{brkfst.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+                      </div>
+                    
+                    {% else %}
+
+                    {% endif %}
+
+                  {% endfor %}
+
+                  {% elif post.type == 'Lunch' %} 
+                    {% for lnch in lunch.all %} 
+
+                    {% if post.title != lnch.title %}
+
+                      <div class="sidebar-cards">    
+                        <a href="{% url 'viewpost' lnch.pk %}">
+                          <div class="sidebar-img-container">
+                            {% for i in lnch.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                            {% endif %}
+                              {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                            {% endfor %}
+                          </div>
+
+                          <div class="card-body sidebar-recipe-info">
+                              <h4 class="card-title highlight">{{lnch.title}}</h4>
+                          </div>
+                        </a>
+                        <div class="sidebar-cards-qv" title="Quick view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{lnch.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+                      </div>
+
+                      {% else %}
+
+                      {% endif %}
+                  
+                    {% endfor %}
+
+                  {% elif post.type == 'Evening Snack' %} 
+                      {% for evesnack in evesnack.all %}
+
+                      {% if post.title != evesnack.title %}
+                          
+                        <div class="sidebar-cards">    
+                          <a href="{% url 'viewpost' evesnack.pk %}">
+                            <div class="sidebar-img-container">
+                              {% for i in evesnack.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                              {% endif %}
+                                {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                              {% endfor %}
+                            </div>
+
+                            <div class="card-body sidebar-recipe-info">
+                                <h4 class="card-title highlight">{{evesnack.title}}</h4>
+                            </div>
+                          </a>
+                          <div class="sidebar-cards-qv" title="Quick view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{evesnack.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+                        </div>
+
+                      {% else %}
+
+                      {% endif %}
+                  
+                    {% endfor %}
+                    
+                  {% else %}
+                    
+                    {% for dnr in dinner.all %}
+
+                      {% if post.title != dnr.title %}
+
+                        <div class="sidebar-cards">    
+                            <a href="{% url 'viewpost' dnr.pk %}">
+                              <div class="sidebar-img-container">
+                                {% for i in dnr.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                                {% endif %}
+                                  {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                {% endfor %}
+                              </div>
+
+                              <div class="card-body sidebar-recipe-info">
+                                  <h4 class="card-title highlight">{{dnr.title}}  </h4>
+                              </div>
+                            </a>
+                            <div class="sidebar-cards-qv" title="Quick view">
+                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{dnr.pk}}" aria-controls="quickviewModal">
+                                    <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                </button>
+                            </div>
+                        </div>
+                  
+                      {% else %}
+
+                      {% endif %}
+                      
+                    {% endfor %}
+                      
+                  {% endif %}
+              </div>
+
+          </div>
+          
+        </aside>
+        
+          
+      </div>
+
+    </div>
+
+    <!-- <div id="primary-color">primary</div>
+    <div id="secondary-color">secondary</div>
+    <div id="tertiary-color">tertiary</div>
+    <div id="active-link-bg-color">active</div>
+    <div id="hover-bg-color">hover</div>
+    <div id="primary-neutral-color">primary-neutral</div>
+    <div id="neutral-secondary-color">secondary-neutral</div> -->
+    
+
+    {% include 'testingapp/footer.html' %}
+    
+    
+    <nav id="navbar-example2" class="bottom-navigation">
+      <div class="nav nav-pill flex-sm-row" id="ijoasd">
+        <a class="flex-sm-fil nav-link bottom-navlinks active" href="#ingredients">Ingredients</a>
+        
+        <a class="flex-sm-fil nav-link bottom-navlinks" href="#instructions">Instructions</a>
+      </div>
+    </nav>
+
+    <nav id="navbar-example3" class="bottom-navigation2">
+      <ul class="nav nav-pills">
+        <li class="nav-item">
+          <a class="" href="#summarizedtext">
+            <form id="summarizeForm">
+              {% csrf_token %}
+              <input type="hidden" name="content" value="{{ post.content }}">
+              <button type="button" class="summarizeForm" id="toggleSummarizedContent">
+                <span id="buttontext">Summarize recipe</span>
+              </button>
+            </form>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+  </div>
+
+  
+
+  {% else %}
+
+  <div class="primary-wrapper">
+    
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex">
+
+        <main role="main" class="home-main recipe-detail-main">
+
+            <div class="dynamic-recipes recipe-detail-wrapper">                    
+
+              <div class="dynamic-card-container carousel-container recdet-card-container">
+                
+                <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                  
+                  {% if post.photo_set.all.count == 1 %}
+                  {% else %}
+                    <div class="carousel-indicators">
+                      {% for image in post.photo_set.all %}
+                      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></button>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+
+                  <div class="carousel-inner">
+                    {% for post in post.photo_set.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                      <img src="{{ post.image.url }}" class="d-block carousel-image" alt="{{ post.title }}">
+                    </div>
+                    {% empty %}
+                    <div>
+                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image" alt="{{ post.title }}">
+                    </div>
+                    {% endfor %}
+                  </div>
+
+                  {% if post.photo_set.all.count == 1 %}
+                  {% else %}
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
+                  {% endif %}
+                </div>
+
+              </div>
+
+
+              <div class="recipe-body">
+                <h1>{{post.title}}</h1>
+                
+                <div class="d-flex recipe-details-1">
+                  <div class="p-2 auth-img">
+                    {% for i in user_profiles %}
+                      {% if i.user.email == post.author.email %}
+                      <div>
+                        <a href="{% url 'userchannelpage' pk=post.author.id %}">
+                          <img src="{{ post.author.profile.profile_img.url }}" alt="Image">
+                        </a>
+                      </div>
+                      {% endif %}
+                    {% endfor %}
+  
+                    <div class="child">
+  
+                      <div class="card hover-profile-card">
+                        <div class="row g-0">
+                          <div class="col-lg-4 card-img-container">
+                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body">
+                              <h5 class="card-title">{{ post.author.first_name }} {{ post.author.last_name }}</h5>
+                              <p class="card-text">{{post.author.profile.bio}}</p>
+                            </div>
+                            <div class="cards-footer">
+                              Recipes : 
+                              {% for user in tot_posts_by_user %}
+                                {% if post.author.email == user.email %}
+                                  {{ user.num_posts }}
+                                {% endif %}  
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+  
+                    </div>
+                  </div>
+  
+                  <div class="p-2 flex-grow-1 auth-name">
+                    {% for i in user_profiles %}
+                      {% if i.user.email == post.author.email %}
+                        <div class="text-truncate">
+                          <a href="{% url 'userchannelpage' pk=post.author.id %}">
+                            <b>{{i.user.first_name}} {{i.user.last_name}}</b>
+                          </a>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                    
+                    <div class="child">
+  
+                      <div class="card hover-profile-card">
+                        <div class="row g-0">
+                          <div class="col-lg-4 card-img-container">
+                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                          </div>
+                          <div class="col-md-8">
+                            <div class="card-body">
+                              <h5 class="card-title">{{ post.author.first_name }} {{ post.author.last_name }}</h5>
+                              <p class="card-text">{{post.author.profile.bio}} </p>
+                            </div>
+                            <div class="cards-footer">
+                              Recipes : 
+                              {% for user in tot_posts_by_user %}
+                                {% if post.author.email == user.email %}
+                                  {{ user.num_posts }}
+                                {% endif %}  
+                              {% endfor %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+  
+                    </div>
+                  </div>
+  
+                  <div class="p-2 like-dislike-div">
+                    <div class="like-div">
+                      <form>
+                    
+                        <button class="like-button {% if request.user.profile in post.likes.all %}liked{% endif %}"
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Login to like" disabled>
+                          {% if request.user.profile in post.likes.all %}  
+                            <span class="material-symbols-rounded like-dislike-icon liked">thumb_up</span>  
+                          {% else %}
+                            <span class="material-symbols-rounded like-dislike-icon">thumb_up</span>  
+                          {% endif %}
+                        </button>
+                        
+                        <div class="total-likes" data-post-id="{{ post.id }}">{{ post.total_likes }}</div>
+                      </form>
+                    </div>
+                  </div>
+  
+                  <div class="p-2 like-dislike-div">
+                    <div class="dislike-div">
+                      <form>
+                    
+                        <button class="dislike-button {% if request.user.profile in post.dislikes.all %}disliked{% endif %}"
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Login to dislike" disabled>
+                          {% if request.user.profile in post.dislikes.all %}  
+                            <span class="material-symbols-rounded like-dislike-icon disliked">thumb_down</span>  
+                          {% else %}
+                            <span class="material-symbols-rounded like-dislike-icon">thumb_down</span>  
+                          {% endif %}
+                        </button>
+                        
+                        <div class="total-dislikes" data-post-id="{{ post.id }}">{{ post.total_dislikes }}</div>
+                      </form>
+                    </div>
+                  </div>
+  
+                  
+  
+                </div>                
+
+                <!-- trending text & read time -->
+                <div class="recipe-trending-text">
+                  {% if post.title in top_10_trend_recipes|join:"" %}
+                        
+                    <span class="trending-number">#{{check|join:""}} on Trending</span>  
+
+                  {% else %}
+
+                  {% endif %}
+
+                  <span class="trending-number postdetail-readtime"><p>{{ post.read_time }} min read</p></span>
+                </div>
+
+                <div class="recipe-detail-container">
+                  <div class="left">
+
+                    <div class="recipe-detail-table">
+                      <table class="table">
+                          
+                          <tbody>
+                          <tr>
+                              <th scope="row" colspan="2">Type</th>
+                              <td>:</td>
+                              <td>{{post.type}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Category</th>
+                              <td>:</td>
+                              <td>{{post.category}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Cuisine</th>
+                              <td>:</td>
+                              <td>{{post.cuisine}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Prep time</th>
+                              <td>:</td>
+                              <td>{{post.timing}} min</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Servings</th>
+                              <td>:</td>
+                              <td>{{post.servings}}</td>
+                          </tr>
+                          <!-- <tr>
+                              <th scope="row" colspan="2">Likes</th>
+                              <td>:</td>
+                              <td>{{post.total_likes}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Dislikes</th>
+                              <td>:</td>
+                              <td>{{post.total_dislikes}}</td>
+                          </tr> -->
+                          </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+
+                  <div class="right">
+                    
+                    <div class="recipe-detail-table">
+                      <table class="table">
+                          
+                          <tbody>
+                          <tr>
+                              <th scope="row" colspan="2">Views</th>
+                              <td>:</td>
+                              <td>{% get_hit_count for post %}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Posted</th>
+                              <td>:</td>
+                              <td>{{post.get_date}}</td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Updated</th>
+                              <td>:</td>
+                              <td>
+                                {% if post.get_date == post.get_modified_date %}
+                                  No change
+                                {% else %}
+                                {{post.get_modified_date}}
+                                {% endif %}
+                              </td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Popularity</th>
+                              <td>:</td>
+                              <td>
+                                {% if post.type == 'Breakfast' %}
+
+                                  {% if fetched_recipe|join:"" in post.title %}
+
+                                    {% for post in breakfast.all %}
+
+                                      {% if fetched_recipe|join:"" in post.title %}
+
+                                        {{forloop.counter| ordinal }} in breakfast recipes
+
+                                      {% endif %}
+
+                                    {% endfor %}
+
+                                  {% else %}
+                                    0
+                                  {% endif %}
+
+                                {% elif post.type == 'Lunch' %} 
+                                
+                                {% if fetched_recipe|join:"" in post.title %}
+
+                                  {% for post in lunch.all %}
+
+                                    {% if fetched_recipe|join:"" in post.title %}
+
+                                      {{forloop.counter| ordinal }} in lunch recipes
+
+                                    {% endif %}
+
+                                  {% endfor %}
+                                
+                                {% else %}
+                                  0
+                                {% endif %}
+
+                                {% elif post.type == 'Evening Snack' %} <!-- 12pm - 4:59pm (17:59) -->
+
+                                  {% if fetched_recipe|join:"" in post.title %}
+
+                                    {% for post in evesnack.all %}
+                                    
+                                      {% if fetched_recipe|join:"" in post.title %}
+
+                                        {{forloop.counter| ordinal }} in evening snack recipes
+                                      
+                                      {% endif %}
+                                
+                                    {% endfor %}
+
+                                  {% else %}
+                                    0
+                                  {% endif %}
+
+                                {% else %}
+
+                                {% if fetched_recipe|join:"" in post.title %}
+                                  
+                                  {% for post in dinner.all %}
+                                  
+                                    {% if fetched_recipe|join:"" in post.title %}
+
+                                      {{forloop.counter| ordinal }} in dinner recipes
+
+                                    {% endif %}
+
+                                  {% endfor %}
+
+                                {% else %}
+                                  0
+                                {% endif %}
+
+
+                                {% endif %}
+                              </td>
+                          </tr>
+                          <tr>
+                              <th scope="row" colspan="2">Difficulty</th>
+                              <td>:</td>
+                              <td>{{post.difficulty}}</td>
+                          </tr>
+                          </tbody>
+                      </table>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <div data-spy="scroll" data-target="#navbar-example2" data-offset="50">
+
+                <div class="recipe-body-content ingred-body" id="ingredients">
+                  <span>Ingredients</span>
+                  
+                  <p>
+                    <pre>
+                      {{post.ingredients}}
+                    </pre>
+                  </p>
+                </div>
+
+                <div class="recipe-body-content summarizecontent" id="instructions">
+                  <span>Instructions</span>
+
+                  <p>
+                    {{post.content|safe}}
+                  </p>
+                  
+                  <div id="analyzingtextprompt">
+                    <!-- Summarizing text while waiting for the response -->
+                  </div>
+
+                  <!-- <p>
+                    <pre>{{post.content|safe}}</pre>
+                  </p> -->
+                  
+                </div>
+
+              </div>
+
+              </div>
+              
+
+              <!-- Comments -->
+              <div class="accordion accordion-flush comments-accordian" id="accordionFlushExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
+                      Comments &nbsp; <span class="tot_recipe_badge badge">{{comments_count}}</span>
+                    </button>
+                  </h2>
+                  
+                  <div class="offcanvas offcanvas-bottom comments-offcanvas" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+                    <div class="offcanvas-header">
+                      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Comments</h5>
+                      <button class="cmt-offcanvas-btn">
+                        <span class="material-symbols-rounded btn-close cmt-offcanvas-close" data-bs-dismiss="offcanvas" aria-label="Close">close</span>
+                      </button>
+                    </div>
+                    <div class="offcanvas-body nologin-offcanvas-body">
+
+                      <div id="comments">
+                        {% if comments %}
+
+                          {% for comment in comments.reverse %}
+                            <div class="d-flex position-relative comments-section">
+                              <img src="{{ post.author.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="..." style="width: 40px;height: 40px;border-radius: 100%;">
+                              <div class="commented-author">
+                                <h6>{{ comment.comment_user.first_name }} {{ comment.comment_user.last_name }} &#11825; <span>{{ comment.get_date }}</span> </h6>
+                                <p>{{ comment.comment }}</p>
+                              </div>
+                            </div>
+                          
+                          {% endfor %}
+
+                        {% else %}
+
+                          <p class="no-comment">No comments</p>
+
+                        {% endif %}
+                      </div>
+        
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>           
+            
+        </main>
+        
+        
+        <aside class="sidebar similar-recipes-sidebar">
+          
+          <div class="sidebar-recipes">
+              <div class="sidebar-header">
+                {% if post.type == 'Breakfast' %}
+
+                <h1>More breakfast recipes</h1>
+
+                {% elif post.type == 'Lunch' %}
+
+                <h1>More lunch recipes</h1>
+
+                {% elif post.type == 'Evening Snack' %}
+
+                <h1>More snacks recipes</h1>
+
+                {% elif post.type == 'Dinner' %}
+
+                <h1>More dinner recipes</h1>
+
+                {% endif %}
+              </div>
+
+              <div class="dynamic-card-container side-recipes-card-container">
+                  
+                {% if post.type == 'Breakfast' %}
+                  {% for brkfst in breakfast.all %}
+
+                    {% if post.title != brkfst.title %}
+
+                      <div class="sidebar-cards">    
+                          <a href="{% url 'viewpost' brkfst.pk %}">
+                            <div class="sidebar-img-container">
+                              {% for i in brkfst.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                              {% endif %}
+                                {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                              {% endfor %}
+                            </div>
+
+                            <div class="card-body sidebar-recipe-info">
+                                <h4 class="card-title highlight">{{brkfst.title}}</h4>
+                            </div>
+                          </a>
+                          <div class="sidebar-cards-qv" title="Quick view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{brkfst.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+                      </div>
+                    
+                    {% else %}
+
+                    {% endif %}
+
+                  {% endfor %}
+
+                  {% elif post.type == 'Lunch' %} 
+                    {% for lnch in lunch.all %} 
+
+                    {% if post.title != lnch.title %}
+
+                      <div class="sidebar-cards">    
+                        <a href="{% url 'viewpost' lnch.pk %}">
+                          <div class="sidebar-img-container">
+                            {% for i in lnch.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                            {% endif %}
+                              {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                            {% endfor %}
+                          </div>
+
+                          <div class="card-body sidebar-recipe-info">
+                              <h4 class="card-title highlight">{{lnch.title}}</h4>
+                          </div>
+                        </a>
+                        <div class="sidebar-cards-qv" title="Quick view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{lnch.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+                      </div>
+
+                      {% else %}
+
+                      {% endif %}
+                  
+                    {% endfor %}
+
+                  {% elif post.type == 'Evening Snack' %} 
+                      {% for evesnack in evesnack.all %}
+
+                      {% if post.title != evesnack.title %}
+                          
+                        <div class="sidebar-cards">    
+                          <a href="{% url 'viewpost' evesnack.pk %}">
+                            <div class="sidebar-img-container">
+                              {% for i in evesnack.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                              {% endif %}
+                                {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                              {% endfor %}
+                            </div>
+
+                            <div class="card-body sidebar-recipe-info">
+                                <h4 class="card-title highlight">{{evesnack.title}}</h4>
+                            </div>
+                          </a>
+                          <div class="sidebar-cards-qv" title="Quick view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{evesnack.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+                        </div>
+
+                      {% else %}
+
+                      {% endif %}
+                  
+                    {% endfor %}
+                    
+                  {% else %}
+                    
+                    {% for dnr in dinner.all %}
+
+                      {% if post.title != dnr.title %}
+
+                        <div class="sidebar-cards">    
+                            <a href="{% url 'viewpost' dnr.pk %}">
+                              <div class="sidebar-img-container">
+                                {% for i in dnr.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="widget-image" alt="..." >
+                                {% endif %}
+                                  {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                {% endfor %}
+                              </div>
+
+                              <div class="card-body sidebar-recipe-info">
+                                  <h4 class="card-title highlight">{{dnr.title}}  </h4>
+                              </div>
+                            </a>
+                            <div class="sidebar-cards-qv" title="Quick view">
+                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{dnr.pk}}" aria-controls="quickviewModal">
+                                    <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                </button>
+                            </div>
+                        </div>
+                  
+                      {% else %}
+
+                      {% endif %}
+                      
+                    {% endfor %}
+                      
+                  {% endif %}
+              </div>
+
+          </div>
+          
+        </aside>
+        
+          
+      </div>
+
+    </div>
+    
+
+    {% include 'testingapp/footer.html' %}
+    
+    <nav id="navbar-example2nologin" class="bottom-navigation ithoutlogin">
+      <div class="nav nav-pill flex-sm-row" id="ijoasd">
+        <a class="flex-sm-fil nav-link bottom-navlinks active" href="#ingredients">Ingredients</a>
+        
+        <a class="flex-sm-fil nav-link bottom-navlinks" href="#instructions">Instructions</a>
+      </div>
+    </nav>
+
+  </div>
+
+
+    <!-- <script>
+      location.href = "{% url 'topostlogin' post.pk %}";
+    </script> -->
+
+  {% endif %}
+        
+
+</body>
+
+
+<!-- recipe images modal -->
+<div class="modal fade modal-xl" id="spotlightModal{{post.pk}}" tabindex="-1" aria-labelledby="spotlightModalLabel" aria-hidden="true">
+  <div class="modal-dialog spotlight-modal-dialog">
+    <div class="modal-content spotlight-modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="spotlightModalLabel">{{post.title}} | {{post.whenpublished}}</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body spotlight-modal-body">
+
+          <div class="cards-wrapper">
+              
+              <div class="card">
+                  {% for i in post.photo_set.all %}
+                    
+                        <img src="{{ i.image.url }}" class="img-fluid" alt="{{post.title}}">
+                    
+                  {% endfor %}
+
+                <div class="" style="color: black;">
+                  <h3>{{post.title}}</h3>
+                <ul>
+                  <li>{{post.get_date|date:"F j, Y"}}</li>
+                  <li>{{post.date_post.time}}</li>
+                </ul>
+                </div>
+              </div>
+          </div>
+        
+      </div>
+      <div class="modal-footer">
+          <a href="{% url 'viewpost' post.pk %}" class="btn btn-primary">View recipe</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- quick view offcanvas -->
+
+{% if all_recipes %} 
+{% for post in all_recipes %}
+<div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="quickviewModalLabel">Yummy Recipes</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body qv-modal-body">
+        <article class="article-featured">
+            <div class="qv-offcanvas-img-container">
+                {% for i in post.photo_set.all %}
+                    {% if forloop.counter0 == 0 %}
+                        <img src="{{ i.image.url }}" class="article-image qv-offcanvas-img" alt="{{post.title}}">
+                    {% endif %}
+                    {% empty %}
+                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
+                {% endfor %}
+            </div>
+            
+            <div class="qv-offcanvas-title-container">
+                <h3 class="article-title">{{post.title}}</h3>
+                <p>
+                    <ul>
+                      <li>
+                        <img src="{{ post.author.profile.profile_img.url }}" alt="Image" style="width: 30px; height: 30px; border-radius:100px">
+                      </li>
+                        <!-- <li><img src="{{ user.profile.profile_img.url }}" style="width: 30px; height: 30px; border-radius:100px" alt="Image"></li> -->
+                        <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="qv-offcanvas-table-wrapper">
+                <table class="table">
+                    
+                    <tbody class="qv-table-body">
+                    <tr>
+                        <th scope="row" colspan="2">Type</th>
+                        <td>{{post.type}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Category</th>
+                        <td>{{post.category}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Cuisine</th>
+                        <td>{{post.cuisine}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Prep time</th>
+                        <td>{{post.timing}} min</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Servings</th>
+                        <td>{{post.servings}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" colspan="2">Difficulty</th>
+                      <td>{{post.difficulty}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Likes</th>
+                        <td>{{post.total_likes}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Dislikes</th>
+                        <td>{{post.total_dislikes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            
+        </article>
+
+        <div class="footer-area">
+            <a href="{% url 'viewpost' post.pk %}" class="qv-offcanvas-footer-link">View <span class="material-symbols-rounded qv-offcanvas-link-icon">trending_flat</span></a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- uncomment only when getting ajax response from view function -->
+<!-- <script>
+  $(document).ready(function() {
+    function updateCssVariable(variableName, color) {
+      document.documentElement.style.setProperty(variableName, color);
+      console.log(color);
+    }
+
+    function updateDivColor(divId, color) {
+      $('#' + divId).css('background-color', color);
+    }
+
+    function updateColors() {
+      $.ajax({
+          url: "{% url 'viewpost' post.pk %}",
+          method: "GET",
+          async: false, 
+          success: function(data) {
+              updateCssVariable('--color-1', data[0]);
+              updateCssVariable('--color-2', data[1]);
+              updateCssVariable('--color-3', data[2]);
+              updateCssVariable('--color-4', data[3]);
+              updateCssVariable('--color-5', data[4]);
+              updateCssVariable('--color-6', data[5]);
+              updateCssVariable('--color-7', data[6]);
+
+              updateDivColor('primary-color', data[0]);
+              updateDivColor('secondary-color', data[1]);
+              updateDivColor('tertiary-color', data[2]);
+              updateDivColor('active-link-bg-color', data[3]);
+              updateDivColor('hover-bg-color', data[4]);
+              updateDivColor('primary-neutral-color', data[5]);
+              updateDivColor('neutral-secondary-color', data[6]);
+
+              // Update the text content of corresponding divs
+              $('#primary-color').text(data[0]);
+              $('#secondary-color').text(data[1]);
+              $('#tertiary-color').text(data[2]);
+              $('#active-link-bg-color').text(data[3]);
+              $('#hover-bg-color').text(data[4]);
+              $('#primary-neutral-color').text(data[5]);
+              $('#neutral-secondary-color').text(data[6]);
+          }
+      });
+    }
+
+    updateColors();
+    // setTimeout(updateColors, 0); 
+  });
+</script> -->
+
+<!-- showing & hiding the bottom navigation pill on scroll -->
+<script>
+  $(document).ready(function () {
+      var scrollableDiv = $('.primary-wrapper');
+      var bottomNavigation = $('#navbar-example2');
+
+      var bottomNavigatioQ = $('#navbar-example3');
+
+      var bottomNavnologin = $('#navbar-example2nologin');
+
+
+      scrollableDiv.scroll(function () {
+          if (scrollableDiv.scrollTop() > 700) {
+              bottomNavigation.addClass('show-nav');
+            bottomNavnologin.addClass('remove-move-nav');
+
+          }
+          else {
+              bottomNavigation.removeClass('show-nav');
+            bottomNavnologin.removeClass('remove-move-nav');
+
+          }
+          
+      });
+
+      scrollableDiv.scroll(function () {
+           if (scrollableDiv.scrollTop() > 1100){
+            bottomNavigatioQ.addClass('show-nav2');
+            bottomNavigation.addClass('move-nav');
+            bottomNavnologin.removeClass('remove-move-nav2');
+
+          }
+          else {
+            bottomNavigatioQ.removeClass('show-nav2');
+            bottomNavigation.removeClass('move-nav');
+            bottomNavnologin.removeClass('remove-move-nav2');
+
+
+          }
+          
+      });
+
+  });
+</script>
+  
+<!-- Adding active class to the bottom navigation pill -->
+<script>
+$(document).ready(function () {
+    $('.nav-link').click(function () {
+        $('.nav-link').removeClass('active');
+
+        $(this).addClass('active');
+    });
+});
+</script>
+
+<!-- Updating like form using ajax (icon & counter) -->
+<script>
+  $(document).ready(function() {
+    $('.like-button').click(function(e) {
+        e.preventDefault();
+
+        var post_id = $(this).data('post-id');
+        var csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "like-view" %}',
+            data: {
+                'post_id': post_id,
+                'csrfmiddlewaretoken': csrf_token,
+            },
+            success: function(response) {
+                $('.total-likes[data-post-id="' + post_id + '"]').text(response.total_likes);
+
+                $('.like-button[data-post-id="' + post_id + '"] .like-dislike-icon').toggleClass('liked');
+
+                var tooltipTitle = (response.action === 'remove') ? 'I like this' : 'Unlike';
+                $('.like-button[data-post-id="' + post_id + '"]').attr('data-bs-original-title', tooltipTitle);
+                // tooltip('show') 
+                $('.like-button[data-post-id="' + post_id + '"]').tooltip('show');
+                $('.like-button[data-post-id="' + post_id + '"]').tooltip('hide');
+
+                if (response.removefromdislike){
+                  $('.total-dislikes').text(response.total_dislikes);
+                  $('.dislike-button .like-dislike-icon').removeClass('disliked');
+                }
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    });
+  });
+</script>
+
+<!-- Updating dislike form using ajax (icon & counter) -->
+<script>
+  $(document).ready(function() {
+      $('.dislike-button').click(function(e) {
+          e.preventDefault();
+
+          var post_id = $(this).data('post-id');
+          var csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
+
+          $.ajax({
+              type: 'POST',
+              url: '{% url "dislike-view" %}',
+              data: {
+                  'post_id': post_id,
+                  'csrfmiddlewaretoken': csrf_token,
+              },
+              success: function(response) {
+                  
+                  $('.total-dislikes[data-post-id="' + post_id + '"]').text(response.total_dislikes);
+
+                  
+                  $('.dislike-button[data-post-id="' + post_id + '"] .like-dislike-icon').toggleClass('disliked');
+
+                  var tooltipTitle = (response.action === 'added') ? 'Remove from dislike' : 'I dislike this';
+                  $('.dislike-button[data-post-id="' + post_id + '"]').attr('data-bs-original-title', tooltipTitle);
+                  // tooltip('show') 
+                  $('.dislike-button[data-post-id="' + post_id + '"]').tooltip('show');
+                  $('.dislike-button[data-post-id="' + post_id + '"]').tooltip('hide');
+
+                  if (response.removefromlike){
+                    $('.total-likes').text(response.total_likes);
+                    $('.like-button .like-dislike-icon').removeClass('liked');
+                  }
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+      });
+  });
+</script>
+
+<!-- summarizing content (instruction) using api -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById('summarizeForm');
+  const toggleButton = document.getElementById('toggleSummarizedContent');
+  const textprompt = document.getElementById('analyzingtextprompt');
+  const container = document.getElementById('summarizedContentContainer');
+  const responseText = document.getElementById('summarizedtext');
+  const sHeading = document.getElementById('sumheading');
+  const bodyContent = document.querySelector('.summarizecontent');
+  const summarizedContainer = document.querySelector('.summarized-container');
+
+  const dfdas = document.getElementById('buttontext');
+
+  let isSummarized = false;
+
+  toggleButton.addEventListener('click', function () {
+    if (!isSummarized) {
+      bodyContent.classList.add('analyzing');
+      textprompt.innerText = 'Summarizing text...';
+      dfdas.innerHTML = 'Summarizing...'
+
+      const formData = new FormData(form);
+
+      $.ajax({
+        type: 'POST',
+        url: '{% url "summarize_content" %}', 
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+          bodyContent.classList.remove('analyzing');
+          summarizedContainer.classList.add('containercolor')
+          sHeading.style.display = 'block';
+
+          textprompt.innerText = '';
+          dfdas.innerHTML = 'Summarize recipe';
+
+          // responseText.innerHTML = response.summarizedContent;
+
+          const contentLetters = response.summarizedContent.split('');
+          let index = 0;
+
+          const typingInterval = setInterval(function () {
+            responseText.innerHTML += contentLetters[index];
+
+              index++;
+
+              if (index === contentLetters.length) {
+                  clearInterval(typingInterval);
+              }
+          }, 50); 
+        },
+        error: function (error) {
+          console.error('Error:', error);
+        },
+        complete: function () {
+          bodyContent.classList.remove('analyzing');
+        }
+      });
+    }
+
+    container.style.display = isSummarized ? 'none' : 'block';
+    isSummarized = !isSummarized;
+    });
+  });
+
+</script>
+
+<!-- recipe content translation to hindi -->
+<script>
+  $(document).ready(function() {
+      $("#translateButton").on("click", function() {
+          var postContent = $("textarea[name='post_content']").val();
+          var translatedtextheading = $('#translateTextHeading')
+          var translatetextcontainer = $('#translatedTextContainer')
+          var translatedcontainer = $('.translatedcontainer')
+          var translatedtext = $('#translatedContent')
+
+          $('.summarizecontent').addClass('analyzing')
+
+          $.ajax({
+              type: "POST",
+              url: window.location.href,
+              data: {
+                  csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val(),
+                  translate_content: 1,
+                  post_content: postContent 
+              },
+              success: function(data) {
+                  translatedtextheading.show();
+                  translatetextcontainer.show();
+                  translatedcontainer.addClass('containercolor')
+                  $('.summarizecontent').removeClass('analyzing')
+
+                  const contentLetters = data.translated_text.split('');
+                  let index = 0;
+
+                  const typingInterval = setInterval(function () {
+                    translatedtext.html(translatedtext.html() + contentLetters[index]);
+
+                    index++;
+
+                    if (index === contentLetters.length) {
+                        clearInterval(typingInterval);
+                    }
+                  }, 50); 
+
+
+                  // $("#translatedContent").html(data.translated_text);
+              },
+              error: function(error) {
+                  console.log(error);
+              }
+          });
+      });
+  });
+</script>
+
+<!-- Show/hide the audio tag -->
+<script>
+  $(document).ready(function() {
+      $("#listenButton").on("click", function() {
+        $("#audioPlayer").slideToggle(500, function() {
+            if ($("#audioPlayer").is(":visible")) {
+                $("#listenButton").addClass("listenButton-button");
+            } else {
+                $("#listenButton").removeClass("listenButton-button");
+            }
+        });
+      });
+  });
+
+  
+  const translateform = document.getElementById('translateForm');
+  const translateButton = document.getElementById('translateButton');
+
+  translateButton.addEventListener('click', () => {
+      translateform.submit();
+  });
+</script>
+
+<!-- showing comment using ajax -->
+<script>
+  var options = [];
+
+    $( '#commentbutton' ).on( 'click', function( event ) {
+    var comt = $('#inputComment').val();
+    console.log(comt);
+    
+    
+    
+    $.ajax(
+    {
+    method: 'POST',
+    url:'',
+    
+    data:{
+    comt: comt,
+    csrfmiddlewaretoken: '{{ csrf_token }}'
+    },
+    
+    success:function(response)
+    {
+      var data_comments = $.parseJSON(response.cmt);
+      var data_f = data_comments[0].fields;
+      
+      $('#inputComment').val("");
+
+      var formattedDate = new Intl.DateTimeFormat('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+              }).format(new Date(data_f.date_comment));
+
+      $('#comments').prepend('<div class="d-flex position-relative comments-section">'+
+      '<img src="{{ post.author.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="Image" style="width: 40px;height: 40px;border-radius: 100%;">'+
+      '<div class="commented-author"><h6>{{ request.user.first_name }} {{ request.user.last_name }} &#11825; ' + formattedDate + ' </h6>'+
+      
+
+      '<p>'+  data_f.comment +'</p>'+'</div>');
+      '</div>'
+
+                var newCommentsCount = parseInt($('.tot_recipe_badge').text()) + 1;
+                $('.tot_recipe_badge').text(newCommentsCount);
+      },
+      
+      failure: function(data)
+      {
+      alert("error occured ")
+      }
+      
+      });
+      });
+</script> 
+
+<!-- Link copy toast -->
+<script>
+  const toastTrigger = document.getElementById('copylink')
+  const toastLiveExample = document.getElementById('liveToast')
+  if (toastTrigger) {
+    toastTrigger.addEventListener('click', () => {
+    const toast = new bootstrap.Toast(toastLiveExample)
+
+    toast.show()
+  })
+}
+</script>
+
+<!-- share link url when clicked on copy link -->
+<script>
+  var $temp = $("<input>");
+  var $url = $(location).attr('href');
+  $('.clipboard').on('click', function() {
+  $('.alert').hide().show('fast')
+  $("body").append($temp);
+  $temp.val($url).select();
+  document.execCommand("copy");
+  $temp.remove();
+  })
+
+  $(document).ready(function(){
+      $('#copylink').click(function(){
+          $('#myAlert').show('fade');
+
+          setTimeout(function(){
+              $('#myAlert').hide('fade');
+          }, 2000);  
+      });
+
+      $('#linkClose').click(function(){
+          $('#myAlert').hide('fade');
+      })
+  });
+
+
+  function Copy() 
+            {
+                    //var Url = document.createElement("textarea");
+                    urlCopied.innerHTML = window.location.href;
+                    //Copied = Url.createTextRange();
+                    //Copied.execCommand("Copy");
+            }
+</script>
+
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
+    }
+
+    $(document).ready(function(){
+  	$('[data-toggle="tooltip"]').tooltip();   
+	});
+</script>
+
+    
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
+{% endblock %}

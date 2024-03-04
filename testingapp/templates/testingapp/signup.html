@@ -1,0 +1,266 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Signup</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block content %}
+
+
+<body>
+
+  <div class="container-fluid">
+    <div class="row no-gutter">
+        <!-- The image half -->
+        <div class="bg-img-containr"></div>
+        <div class="col-md-7 d-none d-md-flex  signup-img" id="backgroundImageContainer"></div>
+         <!-- <img src="{% static 'testingapp/media/computerloginanimate.svg' %}" alt=""> -->
+      
+
+        <!-- The content half -->
+        <div class="col-md-5 second-half">
+            <div class="login d-flex align-items-center py-5">
+
+                <!-- Demo content-->
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-10 col-xl-8 mx-auto mt-4">
+                            <h3>Signup</h3>
+                            <!-- <p class="text-muted mb-4">Create a login split page using Bootstrap 4.</p> -->
+                            <form method="POST" class="signup-form" enctype="multipart/form-data">
+                              {% csrf_token %}
+
+                              <div class="form-group mb-4">
+                                {% if not form.fname.value is None %}
+                                  <input type="text" name="fname" class="form-control" value="{{ form.fname.value }}" id="id_fname" placeholder="First name" required>
+                                {% else %}
+                                  <input type="text" name="fname" class="form-control login-form-data" id="id_fname" placeholder="First name" required>                                  
+                                {% endif %}
+                              </div>
+
+                              <div class="form-group mb-4">
+                                {% if not form.lname.value is None %}
+                                  <input type="text" name="lname" class="form-control" value={{ form.lname.value }} id="id_lname" placeholder="Last name" required>
+                                {% else %}
+                                  <input type="text" name="lname" class="form-control" id="id_lname" placeholder="Last name" required>
+                                {% endif %}
+                              </div>
+
+                              <div class="form-group mb-4">
+                                {% if not form.email.value is None %}
+                                  <input type="email" name="email" class="form-control login-form-data" value={{ form.email.value }} id="id_email" placeholder="Email" required>
+                                {% else %}
+                                  <input type="email" name="email" class="form-control login-form-data" id="id_email" placeholder="Email" required>
+                                {% endif %}
+                              </div>
+
+                              <div class="form-group mb-4">
+                                <input type="password" name="password1" class="form-control login-form-data" id="id_password1" placeholder="Password" required>
+                              </div>
+
+                              <div class="form-group mb-4">
+                                <input type="password" name ="password2" class="form-control login-form-data" id="id_password2" placeholder="Confirm password" required>
+                              </div>
+
+                              <button type="submit" class="btn btn-primary" id="btnSubmit">Signup</button>
+
+                            </form>
+
+                            <div class="password-rule-container">
+                              <ul class="password-pattern">
+                                  <li>Your password must contain at least 8 characters.</li>
+                                  <li>Your password can't be a commonly used password.</li>
+                                  <li>Your password can't be entirely numeric.</li>
+                              </ul>
+                          </div>
+
+                        </div>
+                    </div>
+                </div><!-- End -->
+
+            </div>
+        </div><!-- End -->
+
+    </div>
+</div>
+
+
+</body>
+
+
+
+<!-- error message if user already exists -->
+{% if messages %}
+                                  
+  <div class="modal fade" id="messagesModal" tabindex="-1" aria-labelledby="messagesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-search">
+      <div class="modal-content logoutmodal deletemodal messagemodal">
+          <div class="modal-header">
+              <h5 class="modal-title" id="messagesModalLabel">Error</h5>
+              <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+          </div>
+          
+          <div class="modal-body">
+          {% for message in messages %}
+          <div class="callout callout-warning">
+              <h5><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> {{ message }}</h5>
+          </div>
+              
+          {% endfor %}
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
+          </div>
+      </div>
+      </div>
+  </div>
+
+  <script>
+      $(document).ready(function() {
+      $('#messagesModal').modal('show');
+      });
+  </script>
+
+{% endif %}
+
+<!-- Bootstrap Modal for Password Mismatch -->
+<div class="modal fade" id="passwordMismatchModal" tabindex="-1" role="dialog" aria-labelledby="passwordMismatchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-search" role="document">
+    <div class="modal-content logoutmodal deletemodal messagemodal">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="passwordMismatchModalLabel">Password Mismatch</h5>
+        <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="callout callout-warning">
+          <h5><span class="material-symbols-rounded warning-icon" id="warning-icon">password</span> Passwords do not match!</h5>
+      </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector(".signup-form").addEventListener("submit", function (event) {
+      const password1 = document.querySelector("input[name='password1']").value;
+      const password2 = document.querySelector("input[name='password2']").value;
+
+      if (password1 !== password2) {
+        event.preventDefault();
+
+        $("#passwordMismatchModal").modal("show");
+      }
+    });
+  });
+</script>
+
+
+<!-- Validation Modal -->
+<div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="validationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-search" role="document">
+    <div class="modal-content logoutmodal deletemodal messagemodal">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="validationModalLabel">Validation Error</h5>
+        <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+      </div>
+
+      <div class="modal-body validation-modal-body">
+        <!-- Validation error message will be displayed here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector(".signup-form").addEventListener("submit", function (event) {
+      const fnameInput = document.querySelector("input[name='fname']");
+      const lnameInput = document.querySelector("input[name='lname']");
+
+      const password1Input = document.querySelector("input[name='password1']");
+      const password2Input = document.querySelector("input[name='password2']");
+
+      if (!isValidName(fnameInput.value)) {
+        event.preventDefault();
+        showModal("Please enter a valid first name without numbers.");
+        fnameInput.focus();
+        return;
+      }
+
+      if (!isValidName(lnameInput.value)) {
+        event.preventDefault();
+        showModal("Please enter a valid last name without numbers.");
+        lnameInput.focus();
+        return;
+      }
+
+      if (!isValidPasswordLength(password1Input.value) || !isValidPasswordLength(password2Input.value)) {
+            event.preventDefault();
+            showModal("Passwords must contain at least 8 characters.");
+            password1Input.focus();
+            return;
+        }
+
+      if (isNumeric(password1Input.value) || isNumeric(password2Input.value)) {
+          event.preventDefault();
+          showModal("Passwords cannot be entirely numeric.");
+          password1Input.focus();
+          return;
+      }
+    });
+
+    function showModal(message) {
+      const modalBody = document.querySelector(".validation-modal-body");
+      modalBody.textContent = message;
+      $("#validationModal").modal("show");
+    }
+
+    function isValidName(name) {
+      return /^[A-Za-z]+$/.test(name);
+    }
+
+    function isValidPasswordLength(password) {
+        return password.length >= 8;
+    }
+
+    function isNumeric(str) {
+        return /^\d+$/.test(str);
+    }
+  });
+</script>
+
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,164 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Trending recipes</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+                   
+            <h1>Sorting and filtering</h1>
+
+
+            {% if recipes %}
+            <ul>
+              {% for recipe in recipes %}
+                <li>{{ recipe.title }}</li>
+                <!-- Display other recipe information as needed -->
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No recipes found.</p>
+          {% endif %}
+                
+              
+                  
+            </div>
+                   
+            </div> 
+        
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+  </div>
+
+{% else %}  <!-- User is unauthenticated then redirect to login page-->
+
+
+
+{% endif %}
+</body>
+
+<!-- tooltip -->
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+
+<!-- quick view offcanvas -->
+{% if all_recipes %} 
+{% for post in all_recipes %}
+<div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="quickviewModalLabel">Yummy Recipes</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body qv-modal-body">
+        <article class="article-featured">
+            <div class="qv-offcanvas-img-container">
+                {% for i in post.photo_set.all %}
+                    {% if forloop.counter0 == 0 %}
+                        <img src="{{ i.image.url }}" class="article-image qv-offcanvas-img" alt="{{post.title}}">
+                    {% endif %}
+                    {% empty %}
+                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
+                {% endfor %}
+            </div>
+            
+            <div class="qv-offcanvas-title-container">
+                <h3 class="article-title">{{post.title}}</h3>
+                <p>
+                    <ul>
+                        <li><img src="{{ post.author.profile.profile_img.url }}" style="width: 30px; height: 30px; border-radius:100px" alt="Image"></li>
+                        <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="qv-offcanvas-table-wrapper">
+                <table class="table">
+                    
+                    <tbody class="qv-table-body">
+                    <tr>
+                        <th scope="row" colspan="2">Type</th>
+                        <td>{{post.type}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Category</th>
+                        <td>{{post.category}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Cuisine</th>
+                        <td>{{post.cuisine}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Prep time</th>
+                        <td>{{post.timing}} min</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Servings</th>
+                        <td>{{post.servings}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" colspan="2">Difficulty</th>
+                      <td>{{post.difficulty}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Likes</th>
+                        <td>{{post.total_likes}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Dislikes</th>
+                        <td>{{post.total_dislikes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            
+        </article>
+
+        <div class="footer-area">
+            <a href="{% url 'viewpost' post.pk %}" class="qv-offcanvas-footer-link">View <span class="material-symbols-rounded qv-offcanvas-link-icon">trending_flat</span></a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+
+{% endblock %}

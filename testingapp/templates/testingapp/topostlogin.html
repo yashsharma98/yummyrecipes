@@ -1,0 +1,116 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Login required</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block content %}
+
+
+<body>
+
+  
+  <div class="container-fluid">
+    <div class="row no-gutter">
+
+      <!-- The image half -->
+      <!-- <div class="col-md-6 d-none d-md-flex login-recipe-img"> -->
+
+      <div class="col-md-6 login-recipe-img">
+        
+        <div class="main-recipe-image">
+
+          {% if img %}
+            <img src="{{ img.image.url }}" class="recipe-img" alt="...">
+          {% else %}
+              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+          {% endif %}
+
+          <div class="login-recipe-name">
+            <h3> {{recipes.title}} </h3>
+          </div>
+
+        </div>        
+
+      </div>
+    
+      <!-- The content half -->
+      <div class="col-md-6 second-half login-recipe-half">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-10 col-xl-7 mx-auto">
+              <h3>Unlock the Recipe</h3>
+              <!-- <p class="text-muted mb-4">Create a login split page using Bootstrap 4.</p> -->
+
+              <form method="POST" class="login-form">
+                {% csrf_token %}
+                <div class="form-group mb-4">
+                  <input type="email" name="email" class="form-control" id="inputEmail3" placeholder="Email" required>
+                </div>
+                <div class="form-group mb-4">
+                  <input type="password" name="password" class="form-control" id="inputPassword3" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" id="btnSubmit">Login</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div
+
+    </div>
+</div>
+
+
+</body>
+
+
+{% if messages %}
+                                  
+  <div class="modal fade" id="messagesModal" tabindex="-1" aria-labelledby="messagesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-search">
+      <div class="modal-content logoutmodal deletemodal messagemodal">
+          <div class="modal-header">
+              <h5 class="modal-title" id="messagesModalLabel">Error</h5>
+              <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+          </div>
+          
+          <div class="modal-body">
+          {% for message in messages %}
+          <div class="callout callout-warning">
+              <h5><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> {{ message }}</h5>
+          </div>
+              
+          {% endfor %}
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
+          </div>
+      </div>
+      </div>
+  </div>
+
+  <script>
+      $(document).ready(function() {
+      $('#messagesModal').modal('show');
+      });
+  </script>
+
+{% endif %}
+
+
+{% endblock %}

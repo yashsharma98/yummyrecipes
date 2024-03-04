@@ -1,0 +1,262 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+{% load i18n %}
+
+{% block title %}
+<title>Profile</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block content%}
+
+<body>
+
+    <div class="primary-wrapper">
+        
+        <div class="secondary-wrapper">
+
+            <div class="container container-flex container-flex-2">
+
+                <main role="main" class="home-main container-main">
+
+                    <div class="dynamic-recipes dynamic-header profile-heading">
+                        
+                        <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button>
+                            My profile
+                        </h1>
+
+                        <div class="dynamic-card-container">
+                            
+                            <div class="top-profile-card">
+                                <article class="article-recent">
+
+                                    <div class="article-recent-main top-profile-data">
+                                        
+                                        <h2 class="article-title">{{ user.first_name}} {{ user.last_name}} </h2>
+                                        <p>{{user.email}}</p>
+                                        <p>{{user.profile.bio}}</p>
+                                    </div>
+
+                                    <div class="article-recent-secondary user-profile-img">
+                                        <img src="{{ user.profile.profile_img.url }}" class="article-imae">
+                                    </div>
+                                    
+                                </article>
+                            </div>
+
+                        </div>
+                        
+                        <div class="user-detail-heading">
+                            <h2>Personal details </h2>
+                        </div>
+
+                        <div class="dynamic-card-container">
+                            
+                            <div class="user-detail-container">
+                                
+                                <div class="user-details">
+
+                                    <div class="user-detail-table">
+
+                                        <table class="table">
+                                            
+                                            <tbody>
+                                            <tr>
+                                                <th scope="row" colspan="2">First name</th>
+                                                
+                                                <td>{{ user.first_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" colspan="2">Last name</th>
+                                                
+                                                <td>{{ user.last_name}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" colspan="2">Email</th>
+                                                
+                                                <td>{{ user.email}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" colspan="2">Dob</th>
+                                                
+                                                <td>
+                                                    {% if user.profile.dob == None %} 
+                                                    <a href="{% url 'updateprofile' %}">Update dob</a>
+                                                    {% else %}
+                                                    {{ user.profile.dob}}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" colspan="2">Gender</th>
+                                                
+                                                <td>
+                                                    {% if user.profile.gender == None %} 
+                                                    <a href="{% url 'updateprofile' %}">Select gender</a>
+                                                    {% else %}
+                                                    {{ user.profile.gender}}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" colspan="2">Last login</th>
+                                                
+                                                <td>{{user.last_login}}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row" colspan="2">Joined on</th>
+                                                
+                                                <td>{{ user.date_joined}}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+
+                        <div class="bottom-links">
+                            <div class="link-child-1 edit-links first-link">
+                                <a href="{% url 'updateprofile' %}"><span class="material-symbols-rounded share-recipe-icon">edit</span> <span>Update profile</span></a>
+                            </div>
+                            
+                            <div class="link-child-2 edit-links">
+                                <a href="{% url 'updatepassword' %}"><span class="material-symbols-rounded share-recipe-icon">password</span> <span>Change password</span></a>
+                            </div>
+                        </div>
+
+
+                        <div class="user-detail-heading">
+                            <h2>Your activity</h2>
+                        </div>
+    
+                        <div class="dynamic-card-container">
+                            
+                            <div class="user-detail-container">
+                                
+                                <div class="user-details">
+    
+                                    <div class="profile-info-cards">
+
+                                        <div class="static-info-cards profile-cards">                      
+                                            <a>
+                                                <div class="static-card-container">
+                                                    <div class="d-flex align-items-start flex-column card-info">
+                                                        <div class="mb-auto p-2 card-header">
+                                                            <span class="material-symbols-rounded header-icon">visibility</span>
+                                                        </div>
+                                                        <div class="p-2 card-text"><span class="pre-text">Total views</span> <br> 
+                                                            {% if total_hits == None %}
+                                                                0
+                                                            {% else %}
+                                                                {{total_hits}}
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <div class="static-info-cards profile-cards" id="credits">                      
+                                            <a href="{% url 'credits' %}">
+                                                <div class="static-card-container">
+                                                    <div class="d-flex align-items-start flex-column card-info">
+                                                        <div class="mb-auto p-2 card-header">
+                                                            <span class="material-symbols-rounded header-icon">account_balance_wallet</span>
+                                                        </div>
+                                                        <div class="p-2 card-text"><span class="pre-text">Total credits</span> <br> 
+                                                            {{ user.profile.credits}} <span class="material-symbols-rounded bottom-arrow">north_east</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <div class="static-info-cards profile-cards">                      
+                                            <a href="{% url 'liked_recipes' %}">
+                                                <div class="static-card-container">
+                                                    <div class="d-flex align-items-start flex-column card-info">
+                                                        <div class="mb-auto p-2 card-header">
+                                                            <span class="material-symbols-rounded header-icon">thumb_up</span>
+                                                        </div>
+                                                        <div class="p-2 card-text">Liked recipes <span class="material-symbols-rounded bottom-arrow">north_east</span></div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <div class="static-info-cards profile-cards">                      
+                                            <a href="{% url 'timeline' %}">
+                                                <div class="static-card-container">
+                                                    <div class="d-flex align-items-start flex-column card-info">
+                                                        <div class="mb-auto p-2 card-header">
+                                                            <span class="material-symbols-rounded header-icon">timeline</span>
+                                                        </div>
+                                                        <div class="p-2 card-text">Timeline <span class="material-symbols-rounded bottom-arrow">north_east</span></div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <div class="static-info-cards profile-cards">                      
+                                            <a href="{% url 'account_settings' %}">
+                                                <div class="static-card-container">
+                                                    <div class="d-flex align-items-start flex-column card-info">
+                                                        <div class="mb-auto p-2 card-header">
+                                                            <span class="material-symbols-rounded header-icon">manage_accounts</span>
+                                                        </div>
+                                                        <div class="p-2 card-text">Account settings <span class="material-symbols-rounded bottom-arrow">north_east</span></div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                    
+                                    </div>
+                                
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    
+
+                </main>
+                
+
+                <!-- <aside class="sidebar sidebar-dashboard profile-sidebar">
+                    
+                </aside> -->
+                
+                
+            </div>
+ 
+        </div>
+
+    {% include 'testingapp/footer.html' %}
+
+    </div>
+    
+    
+</body>
+
+
+
+
+
+{% endblock %}

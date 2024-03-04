@@ -1,0 +1,402 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block title %}
+<title>KitchenAI</title>
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+                KitchenAI
+            </h1>
+
+            <p class="sub-heading">Elevate Your Kitchen with AI Recipes</p>
+
+            <div class="col-11 recipe-form-container main-recipe-form generate-recipe ai-appearance-theme-input">
+
+              <form id="AiImageGenerationForm" class="row m-1 g-4 create-recipe-form" action="{% url 'generate_recipe' %}">
+                {% csrf_token %}
+                
+                <input type="hidden" name="img_type" value="recipeimage">
+
+                <div class="col-12 ai-theme-form-content generate-recipe-form">
+                    <input type="text" name="title" class="form-control" id="id_title" required="required" placeholder="Explore dishes by entering a meal, cuisine, or flavor" autocomplete="off">
+                    <button id="generateRecipeImage" class="btn btn-transparent form-submit generate_ai_img_btn ai-theme-btn"><i class="fa-solid fa-wand-sparkles" style="font-size: 0.8em;margin-right: 10px;"></i> Generate</button>
+                </div>
+
+                <!-- <div class="col-12 first-div">
+                  <label for="id_title" class="form-label">Prompt</label>
+                  <div class="ai_img_input">
+                  <div class="col-sm-11 img_prompt_text">
+                    <input type="text" name="title" class="form-control" id="id_title" required="required" placeholder="Explore dishes by entering a meal, cuisine, or flavor" autocomplete="off" title="Promt for image">
+                  </div>
+                  </div>
+                  <span id="nameError"></span>
+                </div>
+
+                <div class="text-center">
+                  <div class="form-btns">
+                    <button id="generateRecipeImage" class="btn btn-transparent generate_ai_img_btn generate-button"><i class="fa-solid fa-wand-sparkles" style="font-size: 0.8em;margin-right: 5px;"></i> <span>Generate</span></button>
+                  </div>
+                </div> -->
+
+              </form> 
+
+                 <!-- Image preview -->
+                <div class="imgarea">
+                    <div class="gen-img" style="display: none">
+                        <img class="preview-image" src="" alt="Image">
+                        <div class="preview_ai_img_title"></div>
+                    </div>
+                </div> 
+              
+                <div class="col-12 generated-recipe-content">
+                    <p id="generated-recipe">
+                    </p>
+                </div>
+
+
+            </div>
+            
+            
+          </div>
+
+        </main>
+
+        <aside class="sidebar sidebar-dashboard recipe-img-preview-sidebar" id="show-sidebar">
+                    
+          <div class="sidebar-recipes">
+
+              <div class="preview-container">
+                <img class="preview-image" src="" alt="Image" style="display: none;">
+                <div class="recipe-title preview_ai_img_title"></div>
+              </div>
+               
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+
+{% else %} 
+  
+<script>
+  location.href = "{% url 'login' %}";
+</script>
+
+{% endif %}
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+    <div id="imgErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex"> 
+            <div class="toast-body">
+                Can't process request at this moment 
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Sending & getting response of image using openai api -->
+<script>
+  $(document).ready(function() {
+    $('#generateRecipeImage').on('click', function(e) {
+        e.preventDefault(); 
+
+        var emptytitle = $('#id_title').val();
+        if (!emptytitle.trim()) {
+            return;
+        }
+
+        $(this).addClass('loading').text('Generating...');
+
+        var imgType = $('#AiImageGenerationForm [name="img_type"]').val();
+        var title = $('#id_title').val();
+        var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+
+        var formData = {
+            img_type: imgType,
+            title: title, 
+        };
+
+        $.ajax({
+            url: '{% url "generate_recipe" %}', 
+            method: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRFToken': csrfToken  
+            },
+            success: function(response) {
+                if (response.recipe_image_url) {
+                    $('#imageURLField').val(response.recipe_image_url);
+
+                    var previewImage = $('.preview-image');
+                    previewImage.attr('src', response.recipe_image_url);
+                    previewImage.css('display', 'block'); 
+
+                    $('#post_button').css('display', 'block');
+
+                    var title = $('#id_title').val();
+
+                    var recipeTitleElement = $('.recipe-title');
+                    recipeTitleElement.text(title);
+
+                    $('.gen-img').css('display', 'block');
+  
+                    $('.gen-img .preview-image').attr('src', response.recipe_image_url);
+
+                    $('.gen-img .preview_ai_img_title').text(title);
+
+                    sideBar.classList.add('show-sidebar');
+
+                    $('#generateRecipeImage').text('Regenerate');
+
+                    $('#generateRecipeImage').removeClass('loading');
+
+                    if (response.generated_recipe) {
+                        const lines = response.generated_recipe.split('<br>');
+
+                        $('.generated-recipe-content').addClass('ai-content-styles');
+
+                        // Render the first line immediately
+                        $('#generated-recipe').html(lines[0]);
+
+                        let index = 1;
+                        const typingInterval = setInterval(function () {
+                            if (index < lines.length) {
+                                $('#generated-recipe').append('<br>' + lines[index]);
+
+                                index++;
+                            } else {
+                                clearInterval(typingInterval);
+                            }
+                        }, 300);
+
+                    }
+
+
+                }
+
+
+                else if (response.error){
+                  var successToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
+                  successToast.show();
+                  $('#generateRecipeImage').removeClass('loading').text('Generate');
+                }
+
+                else if (response.form_error){
+                  var successToast = new bootstrap.Toast(document.getElementById('testsToast'));
+                  successToast.show();
+                }
+                
+            },
+            error: function(error) {
+                console.error('Error:', error);
+
+                $('#generateRecipeImage').removeClass('loading').text('Generate Image');
+            }
+        });
+    });
+  });
+</script>
+
+
+
+
+
+<script>
+function validateForm() {
+  const form = document.getElementById('myForm');
+
+  for (const input of form.elements) {
+    if (input.required && input.value.trim() === '') {
+      alert(`${input.name} is required`);
+      return false;
+    }
+  }
+}
+</script>
+
+
+<script>
+   const previewContainers = document.querySelector('.new-container');
+   const imagesInput = document.getElementById('images');
+   const previewContainer = document.querySelector('.preview-container');
+   const imgcounter = document.getElementById('counter');
+   const sideBar = document.getElementById('show-sidebar');
+
+   let counterValue = 0;
+   
+   const ttpreviewContainer = document.querySelector('.preview-counter');
+   
+   imagesInput.addEventListener('change', () => {
+     previewContainer.innerHTML = '';
+     previewContainers.innerHTML = '';
+   
+     for (const file of imagesInput.files) {
+       const reader = new FileReader();
+   
+       reader.addEventListener('load', () => {
+         const image = document.createElement('img');
+         image.classList.add('preview-image');
+         image.src = reader.result;
+   
+     
+         sideBar.classList.add('show-sidebar');
+   
+         const name = document.createElement('div');
+         name.classList.add('preview-name');
+         name.textContent = file.name;
+   
+         const removeButtonNew = document.createElement('button');
+         removeButtonNew.textContent = 'x';   
+         removeButtonNew.classList.add('img-remove-button');
+   
+         // Create remove buttons for preview-container
+         const removeButtonPreview = document.createElement('button');
+         removeButtonPreview.textContent = 'x';   
+         removeButtonPreview.classList.add('img-remove-button');
+   
+         const preview1 = document.createElement('div');
+         preview1.classList.add('new-container');
+         preview1.appendChild(copyElementWithChildren(image));
+         preview1.appendChild(copyElementWithChildren(name));
+         preview1.appendChild(removeButtonNew);
+   
+         const preview = document.createElement('div');
+         preview.classList.add('preview-container');
+         preview.appendChild(image);
+         preview.appendChild(name);
+         preview.appendChild(removeButtonPreview);
+   
+         previewContainers.appendChild(preview1);
+         previewContainer.appendChild(preview);
+   
+         removeButtonNew.addEventListener('click', () => {
+           preview1.remove();
+           preview.remove();
+   
+     updateCounter();
+   
+       updateFileList(file);
+         });
+   
+         removeButtonPreview.addEventListener('click', () => {
+           preview1.remove();
+           preview.remove();
+   
+     updateCounter();
+   
+       updateFileList(file);
+         });
+       });
+   
+       reader.readAsDataURL(file);
+     }
+     sideBar.classList.add('show-sidebar');
+   });
+   
+   function copyElementWithChildren(element) {
+     const htmlContent = element.outerHTML;
+     const newElement = document.createElement('div');
+     newElement.innerHTML = htmlContent;
+     return newElement.firstChild;
+   }
+   
+   function updateCounter() {
+     const numFiles = imagesInput.files.length;
+   
+     if (numFiles === 1) {
+       const counter = document.createElement('span');
+       counter.classList.add('preview-counter');
+       counter.textContent = `${numFiles} file selected`;
+   
+       ttpreviewContainer.innerHTML = '';
+       ttpreviewContainer.appendChild(counter);
+     } 
+     else if (numFiles > 1) {
+       const counter = document.createElement('span');
+       counter.classList.add('preview-counter');
+       counter.textContent = `${numFiles} files selected`;
+   
+       ttpreviewContainer.innerHTML = '';
+       ttpreviewContainer.appendChild(counter);
+     } 
+     else {
+       
+       ttpreviewContainer.innerHTML = 'Select images';
+       sideBar.classList.remove('show-sidebar');
+     }
+   }
+   
+   imagesInput.addEventListener('change', () => {
+     updateCounter();
+   });
+   
+   document.addEventListener('click', (event) => {
+     const target = event.target;
+     if (target.classList.contains('img-remove-button')) {
+       updateCounter();
+     }
+   });
+   
+   
+   updateCounter();
+   
+   function updateFileList(fileToRemove) {
+     const files = Array.from(imagesInput.files);
+     const updatedFiles = files.filter(file => file !== fileToRemove);
+   
+     const newFileList = new DataTransfer();
+     updatedFiles.forEach(file => newFileList.items.add(file));
+   
+     imagesInput.files = newFileList.files;
+   }
+   
+   
+     
+</script>
+
+
+{% endblock %}

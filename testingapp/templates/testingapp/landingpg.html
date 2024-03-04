@@ -1,0 +1,141 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>{{slug}}</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content %}
+<body>
+
+{% if not user.is_authenticated %}
+
+  <div class="parallax-1" data-type="background" data-speed="10">
+      <div class="text-area-1"> 
+          <div class="content-wrapper">
+              <h2 class="main-heading">Yummy Recipe's</h2>
+              <p class="para1">Explore our diverse collection of majestic and delicious food recipes ready to serve you for your next meal.</p>
+              <div class="text-area-links">
+                  <ul class="main-links">
+                      <li><a href="{% url 'explore' %}" id="links-ch1">Explore</a></li>
+                      <li><a href="{% url 'login' %}" id="links-ch2">Login</a></li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  </div>
+    
+    
+  <div class="parallax-2" data-type="background" data-speed="10">
+      <h3 class="card-heading">Keeping the good vibes flowing.Try something new</h3> <!--id="jhg"-->
+      <div class="row carousel-cards">
+          <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+            <!-- Card-->
+            <div class="main-cards">
+              <a href="{% url 'cuisines' slug='Indian Cuisine' %}">
+                <div class="card-block">
+                    <img src="{% static 'testingapp/media/img1.png' %}" alt="" class="img-fluid d-block mx-auto mb-3" id="food-images">
+                    <p>Indian Cuisine</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+              <!-- Card-->
+              <div class="main-cards">
+                <a href="{% url 'cuisines' slug='American Cuisine' %}">
+                  <div class="card-block">
+                      <img src="{% static 'testingapp/media/img2.png' %}" alt="" class="img-fluid d-block mx-auto mb-3" id="food-images">
+                      <p>American Cuisine</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+      
+          <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+            <!-- Card-->
+            <div class="main-cards">
+              <a href="{% url 'cuisines' slug='Italian Cuisine' %}">
+                <div class="card-block">
+                    <img src="{% static 'testingapp/media/img3.png' %}" alt="" class="img-fluid d-block mx-auto mb-3" id="food-images">
+                    <p>Italian Cuisine</p>
+                </div>
+              </a>
+            </div>
+          </div>
+      
+          <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+            <!-- Card-->
+            <div class="main-cards">
+              <div class="card-block">
+                  <img src="{% static 'testingapp/media/img4.png' %}" alt="" class="img-fluid d-block mx-auto mb-3" id="food-images">
+                  <p>And more...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+  </div>
+
+
+  <script>
+    //parallax js
+    $(document).ready(function(){
+      var $window = $(window);
+        $('div[data-type="background"]').each(function(){
+            var $bgobj = $(this); // assigning the object
+        
+            $(window).scroll(function() {
+                var topWin = $(window).scrollTop();
+                var yPos = -((topWin - $bgobj.offset().top) / $bgobj.data('speed'));
+
+                
+                // Put together our final background position
+                var coords = '50% '+ yPos + 'px';
+
+                // Move the background
+                $bgobj.css({ backgroundPosition: coords });
+            }); 
+        });    
+    });
+
+    //menu transition js
+    $(document).ready(function(){
+      $(window).scroll(function(){
+        var scroll = $(window).scrollTop();
+            if (scroll > 0) {
+          $(".navbar").addClass("navbar-scroll");
+            }
+            else{
+          $(".navbar").removeClass("navbar-scroll");  	
+        }
+      })
+    })
+  </script>
+
+{% else %}
+
+<script>
+  location.href = "{% url 'home' %}";
+</script>
+
+{% endif %}
+
+</body>
+
+{% endblock %}

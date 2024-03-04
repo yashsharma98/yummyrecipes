@@ -1,0 +1,71 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="icon" type="image/x-icon" href="{% static 'testingapp/media/logo2.ico' %}">
+
+  
+  <link id="mystylesheet" rel="stylesheet" href="{% static 'testingapp/footer.css' %}">
+
+
+</head>
+
+{% block title %}
+<title>New Navbar Navrail</title>
+{% endblock %}
+
+<body>
+
+    {% block content %}
+
+
+    <footer class="footer" id="footer">
+        <div class="footer-waveline" id="footerwaveline"></div>
+
+        <div class="footer-container">
+            <div class="column">
+                <img src="{% static 'testingapp/media/NewLogo.png' %}" alt="Brand Icon" class="footer-brand-logo">
+                <!-- <h2>Brand Name</h2> -->
+                <p>
+                    Welcome to Yummy Recipes! Indulge your taste buds with our delightful 
+                    collection of mouthwatering recipes from around the world. Whether 
+                    you're a seasoned chef or a home cook, our easy-to-follow recipes 
+                    cater to all skill levels, allowing you to create delicious dishes.
+                </p>
+            </div>
+            <div class="column">
+                <h5>Social</h5>
+                <ul>
+                    <li><a href="#" class="footerlinks">Facebook</a></li>
+                    <li><a href="#" class="footerlinks">Twitter</a></li>
+                    <li><a href="#" class="footerlinks">Instagram</a></li>
+                </ul>
+            </div>
+            <div class="column">
+                <h5>Overview</h5>
+                <ul>
+                    <li><a href="#" class="footerlinks">About Us</a></li>
+                    <!-- <li><a href="#" class="footerlinks">Library 2</a></li> -->
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <div class="hstack gap-1">
+                <div class="p-1"><h3>Yummy Recipes</h3></div>
+                <div class="p-1">&copy; all rights reserved.</div>
+              </div>
+        </div>
+
+    </footer>
+    
+{% endblock %}
+
+</body>
+</html>

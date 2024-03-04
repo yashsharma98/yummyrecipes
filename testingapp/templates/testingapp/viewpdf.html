@@ -1,0 +1,145 @@
+{% load hitcount_tags %}
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{{recipes.title}} </title>
+</head>
+
+<style>
+
+    .recipe-ingre{
+        background: whitesmoke;
+    }
+
+    .pdf-image{
+        text-align: center;
+        height: 300px;
+        width: 300px;
+    }
+
+    .rec-title h2{
+        font-size: 2.2em;
+    }
+
+    .recipe-data{
+        font-size: 1.45em;
+    }
+
+    .recipe-ingre thead th,.recipe-ingre tr{
+        text-align: justify;
+    }
+
+    table {
+        background: whitesmoke;
+        /* border: 2px solid red; */
+    }
+
+    table thead tr{
+        background: rgb(225, 225, 225);
+        /* border-bottom: 1px solid gainsboro; */
+        padding: 9px 7px 4px 7px;
+    }
+
+    table tr{
+        /* background: palegoldenrod; */
+        text-align: center;
+        padding: 7px;
+    }
+
+    .recipe-data .main-content{
+        padding: 0 7px 0 10px;
+    }
+</style>
+
+<body>
+    <h1 style="text-align:center;font-size:3em;margin-bottom: 0;padding-top: 15px;">{{ recipes.title }}</h1>
+    <!-- <hr> -->
+    
+    <!-- <img src="{{ recipes.photo_set.first.image.path }}" alt="Recipe Image"/> -->
+
+    <div class="pdf-image">
+        {% for image in recipes.photo_set.all %}
+            <img src="{{ image.image.path }}" alt="Recipe Image">
+        {% endfor %}
+    </div>
+
+    <br><br>
+
+    <div class="recipe-data">
+
+        <table class="recipe-table">
+            <thead>
+                <tr>
+                    <th>Prep time</th>
+                    <th>Servings</th>
+                    <th>Type</th>
+                    <th>Cuisine</th>
+                    <th>Category</th>
+                    <th>Difficulty</th>
+                    <!-- <th>Views</th> -->
+                </tr>
+            </thead>
+    
+            <tr>
+                <td>{{recipes.timing}} min</td>
+                <td>{{recipes.servings}}</td>
+                <td>{{recipes.type}}</td>
+                <td>{{recipes.cuisine}}</td>
+                <td>{{recipes.category}}</td>
+                <td>{{recipes.difficulty}}</td>
+                <!-- <td>{% get_hit_count for recipes %}</td> -->
+            </tr>
+        </table>
+
+        <br>
+
+        <table class="recipe-ingre">
+            <thead>
+                <tr>
+                    <th><h3>Ingredients</h3></th>
+                </tr>
+            </thead>
+
+            <tr>
+                <td><p>{{recipes.ingredients}}</p></td>
+            </tr>
+        </table>
+
+        <br>        
+
+        <table class="recipe-ingre">
+            <thead>
+                <tr>
+                    <th><h3>Instructions</h3></th>
+                </tr>
+            </thead>
+        </table>
+
+        <div class="main-content">
+            {{recipes.content|safe}}
+        </div>
+        <br>
+
+       <hr>
+
+        <p style="text-align: center;">By : {{ recipes.author.first_name }} {{ recipes.author.last_name }} &nbsp; | &nbsp;
+            
+            Uploaded : {{ recipes.get_date }} &nbsp; | &nbsp; Updated : {{ recipes.get_modified_date }}
+        </p>
+
+    </div>
+    
+
+
+
+
+    
+</body>
+</html>

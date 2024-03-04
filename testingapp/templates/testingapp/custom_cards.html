@@ -1,0 +1,643 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Recipes</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+              {% if slug == 'veg_recipes' %}
+              Veg recipes
+              {% elif slug == 'nonveg_recipes' %}
+              Non-veg recipes
+              {% elif slug == 'new_recipes' %}
+              New recipes
+              {% elif slug == 'under_10_minutes' %}
+              Quick recipes
+              {% endif %}
+            </h1>
+
+            <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
+
+              {% if veg_recipes %} <!-- placeholder -->
+                
+                {% for post in veg_recipes %} 
+          
+                  <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
+                    <a href="{% url 'viewpost' post.pk %}">
+                        <div class="img-container">
+                          {% for i in post.photo_set.all %}
+                          {% if forloop.counter0 == 0 %}
+                              <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                          {% endif %}
+                          {% empty %}
+                              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                          {% endfor %}
+
+                          <div class="readtime-container">
+                            <p>{{ post.read_time }} min read</p>
+                          </div>
+                        </div>
+                        <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
+                            <h4 class="card-title highlight">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                          </div>
+                    </a>
+                    <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+
+                    <div class="favourites">
+                        {% if post in user.favourite.all %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                        </a>
+                        {% else %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon">favorite</span>
+                        </a>
+                        {% endif %}
+                    </div> 
+                  </div>
+
+                {% endfor %}
+
+            {% elif nonveg_recipes %}
+
+                {% for post in nonveg_recipes %} 
+            
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
+                    <a href="{% url 'viewpost' post.pk %}">
+                        <div class="img-container">
+                            {% for i in post.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                            {% endif %}
+                            {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                            {% endfor %}
+
+                            <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                            </div>
+                        </div>
+                        <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
+                            <h4 class="card-title highlight">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                            </div>
+                    </a>
+                    <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+
+                    <div class="favourites">
+                        {% if post in user.favourite.all %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                        </a>
+                        {% else %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon">favorite</span>
+                        </a>
+                        {% endif %}
+                    </div> 
+                    </div>
+                
+                {% endfor %}
+                
+
+            {% elif new_recipes %}
+
+                {% for post in new_recipes %} 
+            
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
+                    <a href="{% url 'viewpost' post.pk %}">
+                        <div class="img-container">
+                            {% for i in post.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                            {% endif %}
+                            {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                            {% endfor %}
+
+                            <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                            </div>
+                        </div>
+                        <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
+                            <h4 class="card-title highlight">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                            </div>
+                    </a>
+                    <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+
+                    <div class="favourites">
+                        {% if post in user.favourite.all %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                        </a>
+                        {% else %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon">favorite</span>
+                        </a>
+                        {% endif %}
+                    </div> 
+                    </div>
+                    
+                {% endfor %}
+
+            {% elif under_10_minutes %}
+
+                {% for post in under_10_minutes %} 
+            
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
+                    <a href="{% url 'viewpost' post.pk %}">
+                        <div class="img-container">
+                            {% for i in post.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                            {% endif %}
+                            {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                            {% endfor %}
+
+                            <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                            </div>
+                        </div>
+                        <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
+                            <h4 class="card-title highlight">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                            </div>
+                    </a>
+                    <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+
+                    <div class="favourites">
+                        {% if post in user.favourite.all %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                        </a>
+                        {% else %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon">favorite</span>
+                        </a>
+                        {% endif %}
+                    </div> 
+                    </div>
+                    
+                {% endfor %}
+
+              {% else %}
+
+              No recipes found :(
+
+              {% endif %} <!-- placeholder ends -->
+                   
+            </div> 
+        
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+
+    <!-- recipes cards & sidebar cards image colors -->
+    <script>
+        // Select the root of the document
+        var root = document.documentElement;
+
+        // Get all recipecards
+        var recipecards = document.querySelectorAll('.recipe-cards');
+        var recipecardbody = document.querySelectorAll('.recipe-info');
+        var favorite = document.querySelectorAll('.favourite-link');
+        var quickview = document.querySelectorAll('.quick-view');
+
+        var sidebarcards = document.querySelectorAll('.sidebar-cards');
+        var sidebarcardbody = document.querySelectorAll('.sidebar-recipe-info');
+        var sidebarquickview = document.querySelectorAll('.sidebar-cards-qv');
+
+        var qvoffcanvas = document.querySelectorAll('.qv-offcanvas');
+
+
+
+        // Loop through each post
+        recipecards.forEach(function(post) {
+            // Get the color from the post's data-bgcolor attribute
+            var bgprimaryColor = post.getAttribute('data-bgcolor');
+
+            // Set the CSS variable on the post
+            post.style.setProperty('--color-1', bgprimaryColor);
+        });
+
+        recipecards.forEach(function(posthover) {
+            // Get the color from the post's data-bgcolor attribute
+            var hoverColor = posthover.getAttribute('data-hovercolor');
+
+            // Set the CSS variable on the post
+            posthover.style.setProperty('--color-5', hoverColor);
+            // Using --color-2 neutral secondary as hover color 
+
+        });
+
+        // Loop through each card body
+        recipecardbody.forEach(function(cardbody) {
+            // Get the color from the card body's data-color attribute
+            var textColor = cardbody.getAttribute('data-color');
+
+            // Set the CSS variable on the card body
+            cardbody.style.setProperty('--color-7', textColor);
+        });
+
+        favorite.forEach(function(favpost) {
+            // Get the color from the post's data-bgcolor attribute
+            var favbgColor = favpost.getAttribute('data-favcolor');
+
+            // Set the CSS variable on the post
+            favpost.style.setProperty('--color-2', favbgColor);
+            // Using --color-2 neutral secondary as hover color 
+
+        });
+
+        quickview.forEach(function(quickviewpost) {
+            // Get the color from the post's data-bgcolor attribute
+            var quickviewbtn = quickviewpost.getAttribute('data-qvcolor');
+
+            // Set the CSS variable on the post
+            quickviewpost.style.setProperty('--color-2', quickviewbtn);
+            // Using --color-2 neutral secondary as hover color 
+
+        });
+
+        // sidebarcards
+        sidebarcards.forEach(function(sidepost) {
+            // Get the color from the post's data-bgcolor attribute
+            var sidebarcardsColor = sidepost.getAttribute('data-bgcolor');
+            // Set the CSS variable on the post
+            sidepost.style.setProperty('--color-1', sidebarcardsColor);
+        });
+
+        sidebarcards.forEach(function(posthover) {
+            // Get the color from the post's data-bgcolor attribute
+            var hoverColor = posthover.getAttribute('data-hovercolor');
+
+            // Set the CSS variable on the post
+            posthover.style.setProperty('--color-2', hoverColor);
+            // Using --color-2 neutral secondary as hover color 
+
+        });
+
+        sidebarcardbody.forEach(function(sidepostcolor) {
+            // Get the color from the post's data-bgcolor attribute
+            var sidebartextColor = sidepostcolor.getAttribute('data-color');
+            // Set the CSS variable on the post
+            sidepostcolor.style.setProperty('--color-7', sidebartextColor);
+        });
+
+        sidebarquickview.forEach(function(quickviewpost) {
+            // Get the color from the post's data-bgcolor attribute
+            var sidebarquickviewbtn = quickviewpost.getAttribute('data-qvcolor');
+
+            // Set the CSS variable on the post
+            quickviewpost.style.setProperty('--color-2', sidebarquickviewbtn);
+            // Using --color-2 neutral secondary as hover color 
+
+        });
+
+        qvoffcanvas.forEach(function(quickviewoffcanvas) {
+            // Get the color from the post's data-bgcolor attribute
+            var sidebarquickviewbtn = quickviewoffcanvas.getAttribute('data-bgcolor');
+
+            // Set the CSS variable on the post
+            quickviewoffcanvas.style.setProperty('--color-1', sidebarquickviewbtn);
+            // Using --color-2 neutral secondary as hover color 
+
+        });
+
+    </script>
+
+    <!-- recipes cards & sidebar cards image colors styles -->
+    <style>
+        .recipe-cards,.all-recipes-cards,.sidebar-cards {
+            background-color: var(--color-1);
+        }
+
+        .recipe-cards::after,.sidebar-cards::after,.sidebar-cards-qv:hover,.quick-view:hover:not(.popular-recipe-qv) {
+            background-color: var(--color-5);
+        }
+
+        .recipe-info,.sidebar-recipe-info{
+            color: var(--color-7);
+        }
+
+        .recipe-cards .favourites a,.quick-view:not(.popular-recipe-qv),
+        .sidebar-cards-qv{
+            background: var(--color-2);
+        }    
+        
+        .recipe-info .highlight,.sidebar-recipe-info .highlight,
+        .dashboard-recipe-cards .dashboard-card-body .highlight{
+            position: relative;
+            text-decoration: none;
+            background: linear-gradient(var(--color-7),var(--color-7)) left bottom no-repeat;
+            background-size:0% 1px;
+            transition: all 0.4s;
+            display: inline;
+        }
+        
+    </style>
+
+{% else %}  <!-- User is unauthenticated then redirect to login page-->
+
+  
+
+{% endif %}
+</body>
+
+<!-- tooltip -->
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+
+<!-- quick view offcanvas -->
+<!-- {% if all_recipes %} 
+{% for post in all_recipes %}
+<div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel" data-bgcolor="{{ post.color_2 }}">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="quickviewModalLabel" data-color="{{ post.color_7 }}">Yummy Recipes</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body qv-modal-body">
+        <article class="article-featured">
+            <div class="qv-offcanvas-img-container">
+                {% for i in post.photo_set.all %}
+                    {% if forloop.counter0 == 0 %}
+                        <img src="{{ i.image.url }}" class="article-image qv-offcanvas-img" alt="{{post.title}}">
+                    {% endif %}
+                    {% empty %}
+                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
+                {% endfor %}
+            </div>
+            
+            <div class="qv-offcanvas-title-container" data-qvbodybgcolor="{{ post.color_1 }}" data-color="{{ post.color_7 }}">
+                <h3 class="article-title">{{post.title}}</h3>
+                <p>
+                    <ul>
+                        <li><img src="{{ post.author.profile.profile_img.url }}" style="width: 30px; height: 30px; border-radius:100px" alt="Image"></li>
+                        <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="qv-offcanvas-table-wrapper" data-qvbodybgcolor="{{ post.color_1 }}" data-color="{{ post.color_7 }}">
+                <table class="table">
+                    
+                    <tbody class="qv-table-body">
+                    <tr>
+                        <th scope="row" colspan="2">Type</th>
+                        <td>{{post.type}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Category</th>
+                        <td>{{post.category}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Cuisine</th>
+                        <td>{{post.cuisine}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Prep time</th>
+                        <td>{{post.timing}} min</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Servings</th>
+                        <td>{{post.servings}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Difficulty</th>
+                        <td>{{post.difficulty}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Likes</th>
+                        <td>{{post.total_likes}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Dislikes</th>
+                        <td>{{post.total_dislikes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+        </article>
+
+        <div class="footer-area" data-offcanvasfooterbgcolor="{{ post.color_3 }}" data-offcanvashovercolor="{{ post.color_2 }}">
+            <a href="{% url 'viewpost' post.pk %}" class="qv-offcanvas-footer-link" data-color="{{ post.color_7 }}">View <span class="material-symbols-rounded qv-offcanvas-link-icon">trending_flat</span></a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %} -->
+
+<!-- Quick view offcanvas image colors -->
+<script>
+// Get all offcanvas elements
+var offcanvasElements = document.querySelectorAll('.qv-offcanvas');
+var offcanvastitle = document.querySelectorAll('#quickviewModalLabel');
+var qvoffcanvasbody = document.querySelectorAll('.qv-offcanvas-title-container');
+var qvoffcanvasbodytable = document.querySelectorAll('.qv-offcanvas-table-wrapper');
+var qvoffcanvasfooter = document.querySelectorAll('.footer-area');
+var qvoffcanvasfooterlink = document.querySelectorAll('.qv-offcanvas-footer-link');
+
+
+
+// Offcanvas
+offcanvasElements.forEach(function(offcanvas) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var bgColor = offcanvas.getAttribute('data-bgcolor');
+
+    // Set the CSS variable on the offcanvas
+    offcanvas.style.setProperty('--offcanvas-bgcolor', bgColor);
+});
+
+// Offcanvas heading
+offcanvastitle.forEach(function(offcanvasheading) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var titleColor = offcanvasheading.getAttribute('data-color');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasheading.style.setProperty('--offcanvas-titlecolor', titleColor);
+});
+
+// Offcanvas title container background color
+qvoffcanvasbody.forEach(function(offcanvasbody) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var qvoffcanvasbodycolor = offcanvasbody.getAttribute('data-qvbodybgcolor');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasbody.style.setProperty('--offcanvas-qvbodybgcolor', qvoffcanvasbodycolor);
+});
+
+// Offcanvas title container text color
+qvoffcanvasbody.forEach(function(offcanvasbody) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var qvoffcanvasbodytextcolor = offcanvasbody.getAttribute('data-color');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasbody.style.setProperty('--offcanvas-qvbodytextcolor', qvoffcanvasbodytextcolor);
+});
+
+// Offcanvas table wrapper background color
+qvoffcanvasbodytable.forEach(function(offcanvasbodytable) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var qvoffcanvasbodytablecolor = offcanvasbodytable.getAttribute('data-qvbodybgcolor');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasbodytable.style.setProperty('--offcanvas-qvbodybgcolor', qvoffcanvasbodytablecolor);
+});
+
+// Offcanvas table wrapper text color
+qvoffcanvasbodytable.forEach(function(offcanvasbodytabletxt) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var qvoffcanvastablecolor = offcanvasbodytabletxt.getAttribute('data-color');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasbodytabletxt.style.setProperty('--offcanvas-qvbodytablecolor', qvoffcanvastablecolor);
+});
+
+// Offcanvas footer background color
+qvoffcanvasfooter.forEach(function(offcanvasfooter) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var qvoffcanvasfooterbg = offcanvasfooter.getAttribute('data-offcanvasfooterbgcolor');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasfooter.style.setProperty('--offcanvas-qvfooterbg', qvoffcanvasfooterbg);
+});
+
+// Offcanvas footer link color
+qvoffcanvasfooterlink.forEach(function(offcanvasfooterlink) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var qvoffcanvasfooterlink = offcanvasfooterlink.getAttribute('data-color');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasfooterlink.style.setProperty('--offcanvas-qvfooterlink', qvoffcanvasfooterlink);
+});
+
+// Offcanvas footer hover color
+qvoffcanvasfooter.forEach(function(offcanvasfooterhover) {
+    // Get the color from the offcanvas's data-bgcolor attribute
+    var qvoffcanvasfooterhover = offcanvasfooterhover.getAttribute('data-offcanvashovercolor');
+
+    // Set the CSS variable on the offcanvas
+    offcanvasfooterhover.style.setProperty('--offcanvas-qvfooterhover', qvoffcanvasfooterhover);
+});
+
+</script>
+
+<!-- Quick view offcanvas image colors styles -->
+<style>
+    .qv-offcanvas {
+    background-color: var(--offcanvas-bgcolor);
+    }
+
+    .qv-offcanvas-title-container,.qv-offcanvas-table-wrapper{
+        background: var(--offcanvas-qvbodybgcolor);;
+    }
+
+    .qv-offcanvas .offcanvas-header h5{
+        color: var(--offcanvas-titlecolor);
+    }
+
+    .qv-offcanvas-title-container{
+        color: var(--offcanvas-qvbodytextcolor);
+    }
+
+    .qv-offcanvas-table-wrapper table th,.qv-offcanvas-table-wrapper table td{
+        color: var(--offcanvas-qvbodytablecolor);
+    }
+
+    .footer-area{
+        background: var(--offcanvas-qvfooterbg);
+    }
+
+    .footer-area a{
+        color: var(--offcanvas-qvfooterlink);
+    }
+
+    .footer-area:hover{
+        background: var(--offcanvas-qvfooterhover);
+    }
+</style>
+
+
+{% endblock %}

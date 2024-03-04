@@ -1,0 +1,206 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Account settings</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper profile-heading">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+              Account settings
+            </h1>
+
+            <div class="dynamic-card-container acc-settings-wrapper">
+
+                <div class="settings-container">
+
+                    <h3>Email notification</h3>
+
+                    <div class="acc-set-child-containers">
+
+                        <div class="child-1">
+
+                            <div class="child-1-col">
+                                <div class="row-container">
+                                    <div class="row">
+                                        <div class="col col-1">
+                                            <span class="material-symbols-rounded">mail</span>
+                                        </div>
+            
+                                        <div class="col-8">
+                                            <h4>Recieve email notification</h4>
+                                            <p class="">Select for email update</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-input-switch">
+                                <form method="POST" action="{% url 'account_settings' %}" id="emailform">
+                                    {% csrf_token %}
+                                    
+                                    {% if user.profile.send_email == False %}
+            
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="send_email" id="id_send_email" role="switch" id="flexSwitchCheckDefault">
+                                        </div>
+            
+                                    {% else %}
+            
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="send_email" id="id_send_email" checked="" role="switch" id="flexSwitchCheckDefault">
+                                        </div>
+            
+                                    {% endif %}
+                                </form> 
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="button-container">
+                            <button id="submitButton" type="button">Save</button>
+                        </div>
+
+                    </div>
+
+                    <br>
+                    
+                    <h3>Delete account</h3>
+
+                    <div class="acc-set-child-containers">
+
+                        <div class="child-1">
+
+                            <div class="child-1-col">
+                                <div class="row-container">
+                                    <div class="row">
+                                        <div class="col col-1">
+                                            <span class="material-symbols-rounded">delete</span>
+                                        </div>
+            
+                                        <div class="col">
+                                          <div class="d-flex">
+                                            <div class="p-2 flex-grow-1">
+                                              <h4>Delete account</h4>
+                                              <p class="">This action cannot be undone</p>
+                                            </div>
+                                            <div class="">
+                                              <div class="button-container">
+                                                <button id="submitButton" data-bs-toggle="modal" data-bs-target="#accountdeleteModal" type="button">Delete</button>
+                                            </div>
+                                            </div>
+                                          </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                
+                </div>
+                   
+            </div> 
+        
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+
+{% else %}  <!-- User is unauthenticated then redirect to login page-->
+
+  <script>
+    location.href = "{% url 'login' %}";
+  </script>
+
+{% endif %}
+</body>
+
+<!-- tooltip -->
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+
+<!-- submit btn outside the form -->
+<script>
+    const form = document.getElementById('emailform');
+    const submitButton = document.getElementById('submitButton');
+  
+    submitButton.addEventListener('click', function() {
+      form.submit();
+    });
+  </script>
+
+<!-- delete account modal -->
+<div class="modal fade Modal-delete" id="accountdeleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content logoutmodal deletemodal">
+          <div class="modal-header">
+              <h5 class="modal-title">Yummy Recipes</h5>
+              <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+          </div>
+
+          <div class="modal-body">
+              <h2>Delete account?</h2>
+              
+              <p2 class="del-te">Are you sure you want to delete your account ?</p2>
+              
+              <div class="callout callout-warning">
+                  <h6><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</h6>
+              </div>
+          </div>
+          
+          <div class="modal-footer delete-modal-footer">
+              <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Cancel</button>
+              
+              <form method="post" action="{% url 'delete_account' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+
+          </div>
+      </div>
+  </div>
+</div>
+
+{% endblock %}

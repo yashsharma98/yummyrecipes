@@ -1,0 +1,384 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Credits</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header profile-heading">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+              Your credits
+            </h1>
+
+            <!-- <p class="sub-heading">Showing recipes for '{{query}}'</p> -->
+
+            <div class="grid-container">
+                <div class="columns">
+                    <div class="column-container">
+                        <div class="column-header">
+                            <span class="material-symbols-rounded column-header-icon">account_balance_wallet</span>
+                            <h4>Total credits</h4>
+                        </div>
+    
+                        <div class="column-content">
+                            {{user.profile.credits}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column-container">
+                        <div class="column-header">
+                            <span class="material-symbols-rounded column-header-icon">monetization_on</span>
+                            <h4>Credits earned</h4>
+                        </div>
+
+                        <div class="column-content">
+                            {{user.profile.earned_credits}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column-container">
+                        <div class="column-header">
+                            <span class="material-symbols-rounded column-header-icon">redeem</span>
+                            <h4>Credits redeemed</h4>
+                        </div>
+
+                        <div class="column-content">
+                            {{user.profile.redeemed_credits}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column-container">
+                        <div class="column-header">
+                            <span class="material-symbols-rounded column-header-icon">request_quote</span>
+                            <h4>Credits spent</h4>
+                        </div>
+
+                        <div class="column-content">
+                            {{user.profile.credits_spent}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column-container">
+                        <div class="column-header">
+                            <span class="material-symbols-rounded column-header-icon">request_quote</span>
+                            <h4>Average spent</h4>
+                        </div>
+
+                        <div class="column-content">
+                            {{average_credit_spent|floatformat:2}}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="columns">
+                    <div class="column-container">
+                        <div class="column-header">
+                            <span class="material-symbols-rounded column-header-icon">payments</span>
+                            <h4>Redeem credits</h4>
+                        </div>
+
+                        <div class="column-content">
+                            <button type="button" class="btn btn-transparent" data-bs-toggle="modal" data-bs-target="#creditModal">
+                                Remeed
+                            </button>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <!-- <div class="columns">
+                </div> -->
+            </div>
+        
+
+            <div class="table-container">
+                <div class="table-column">
+                    <h6>Redeemed history</h6>
+                    {% if user.profile.redeemed_credits != 0 %}
+
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Redeemed</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Time</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for redeemed_credit in redeemed_credits reversed %}
+                            <tr>
+                                <th>{{forloop.counter}}.</th>
+                                <td>{{ redeemed_credit.amount }}</td>
+                                <td>{{ redeemed_credit.redeemed_timestamp.date }}</td>
+                                <td>{{ redeemed_credit.redeemed_timestamp.time }}</td>
+                            </tr>
+                            {% endfor %}
+            
+                            </tbody>
+                        </table>
+                    
+                    {% else %}
+                        <p>No redeemed history</p>
+                    {% endif %}
+                </div>
+
+                <div class="table-column">
+                    <h6>Credit earned</h6>
+                    {% if user.profile.earned_credits != 0 %}
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Earned</th>
+                                    <th scope="col">Removed</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for history in credit_history reversed %}
+                                    <tr>
+                                        <th>{{forloop.counter}}.</th>
+                                        <td>
+                                            {% if history.credit_action == 'new_recipe' %}
+                                                New recipe 
+                                            {% elif history.credit_action == 'deleted' %}
+                                                Deleted recipe
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if history.amount == -2 %}
+                                            0
+                                            {% else %}
+                                            {{ history.amount }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if history.amount == -2 %}
+                                            {{ history.amount }}
+                                            {% else %}
+                                            0
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ history.earned_timestamp.date }}</td>
+                                        <td>{{ history.earned_timestamp.time }}</td>
+                                    </tr>
+                                {% endfor %}
+            
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No earned history</p>
+                    {% endif %}
+                </div>
+
+                <div class="table-column">
+                    <h6>Spent history</h6>
+                    {% if user.profile.credits_spent != 0 %}
+                        <table class="table table-borderless">
+                            <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Cr. spent</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Time</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for history in credit_spent_history reversed %}
+                            <tr>
+                                <th>{{forloop.counter}}.</th>
+                                <th>{{ history.recipename.title }}</th>
+                                <td>{{ history.amount }}</td>
+                                <td>{{ history.spent_timestamp.date }}</td>
+                                <td>{{ history.spent_timestamp.time }}</td>
+                            </tr>
+                            {% endfor %}
+            
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No spent history</p>
+                    {% endif %}
+                </div>
+
+                <div class="table-column">
+                    <h6>Average credit spent</h6>
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+
+            
+
+          </div>
+
+        </main>
+
+        <!-- <aside class="sidebar">
+                    
+          <div class="sidebar-recipes">
+            <div class="sidebar-header" id="sidebar-header-h1">
+                <h1>More info</h1>
+            </div>
+
+            <div class="dynamic-card-container side-recipes-card-container">
+              {% for post in results %}
+              {% if query == post.title %}
+              {{post.title}}
+              {{post.ingredients}}
+              {% endif %}
+              {% endfor %}
+            </div>
+
+          </div>
+
+        </aside> -->
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+
+{% else %}  <!-- User is unauthenticated then redirect to login page-->
+
+  
+
+{% endif %}
+</body>
+
+<!-- tooltip -->
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const creditSpentByMonth = JSON.parse('{{ credit_spent_by_month_json|safe }}');
+    const averageCreditSpent = JSON.parse('{{ average_credit_spent_json|safe }}');
+</script>
+    
+<script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    
+    const labels = creditSpentByMonth.map(entry => monthNames[entry.month - 1]);
+    const data = creditSpentByMonth.map(entry => entry.total_credits_spent);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+        labels: labels,
+        datasets: [{
+            label: 'Total Credits Spent',
+            data: data,
+            borderWidth: 1
+        }]
+        },
+        options: {
+        scales: {
+            y: {
+            beginAtZero: true
+            }
+        }
+        }
+    });
+</script>
+        
+
+<div class="modal fade" id="creditModal" tabindex="-1" aria-labelledby="creditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-search">
+        <div class="modal-content logoutmodal modal-search weathermodal creditmodal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Redmeem credits</h5>
+                <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+            </div>
+
+            <div class="modal-body">
+                
+                <form method="post" id="">
+                    {% csrf_token %}
+                    <input type="number" class="form-control" id="redeem_amount" name="redeem_amount" min="1" max="{{ user.profile.earned_credits }}" placeholder="Enter credits" required>
+                    
+                    <br>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-light footerbtn">Redeem</button>
+                    </div>
+
+                </form>
+                       
+                <!-- <h4>{{ user.profile.earned_credits }}</h4> -->
+
+                <!-- <form method="post">
+                    {% csrf_token %}
+                    <label for="redeem_amount">Redeem Amount (1 to {{ user.profile.earned_credits }}):</label>
+                    <input type="number" id="redeem_amount" name="redeem_amount" min="1" max="{{ user.profile.earned_credits }}" required>
+                    <button type="submit" class="btn btn-primary">Redeem Credits</button>
+                </form> -->
+                                   
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const myForm = document.getElementById('creditform');
+    const submitButton = document.getElementById('creditbtn');
+  
+    submitButton.addEventListener('click', () => {
+      myForm.submit();
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,2845 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+{% block title %}
+<title>Explore</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block content%}
+
+<body>
+
+  {% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button>
+              Explore
+            </h1>
+
+            <div class="explore-tab">
+              <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'All')">All</button>
+              <button class="tablinks" onclick="recipes(event, 'Breakfast')">Breakfast</button>
+              <button class="tablinks" onclick="recipes(event, 'Lunch')">Lunch</button>
+              <button class="tablinks" onclick="recipes(event, 'Snacks')">Snacks</button>
+              <button class="tablinks" onclick="recipes(event, 'Dinner')">Dinner</button>
+              <button class="tablinks" onclick="recipes(event, 'Veg')">Veg</button>
+              <button class="tablinks" onclick="recipes(event, 'Non-veg')">Non-veg</button>
+            </div>
+
+            <div id="All" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                  {% if not all %}
+                  No recipe available :( 
+                  {% else %}
+                  <span class="tot_recipe_badge badge">{{all.count}}</span> recipes available
+                  {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if all %}
+                  {% for post in all %} 
+
+                  {% if post.pk in historys_pk %}
+                  
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+
+                        <div class="cards-footer">
+
+                        </div>
+                    </div>
+
+                  {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                            {% for i in post.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                            {% endif %}
+                            {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                            {% endfor %}
+
+                            <div class="readtime-container">
+                              <p>{{ post.read_time }} min read</p>
+                            </div>
+                          </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+                      
+                      <div class="favourites">
+                        {% if post in user.favourite.all %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
+                        </a>
+                        {% else %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon">favorite</span>
+                        </a>
+                        {% endif %}
+                      </div>  
+
+                    </div>
+
+                  {% endif %}
+
+                  {% endfor %}
+                {% endif %}
+                    
+              </div> 
+
+            </div>
+
+            <div id="Breakfast" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not brkfst %}
+                  No breakfast recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{brkfst.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if brkfst %}
+                  {% for post in brkfst %} 
+                  
+                    {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+  
+                          
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+
+                    {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+                      </div>
+
+                    {% endif %}
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+            </div>
+
+            <div id="Lunch" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not lnch %}
+                  No lunch recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{lnch.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if lnch %}
+                  {% for post in lnch %} 
+                  
+                    {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+  
+
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+
+                    {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+                      </div>
+
+                    {% endif %}
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+              
+            </div>
+
+            <div id="Snacks" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not snack %}
+                  No snacks recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{snack.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if snack %}
+                  {% for post in snack %} 
+                  
+                  {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+                        <div class="cards-footer">
+                          
+                        </div>
+                    </div>
+
+                  {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                            {% for i in post.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                            {% endif %}
+                            {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                            {% endfor %}
+
+                            <div class="readtime-container">
+                              <p>{{ post.read_time }} min read</p>
+                            </div>
+                          </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+
+                      <div class="favourites">
+                        {% if post in user.favourite.all %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                        </a>
+                        {% else %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon">favorite</span>
+                        </a>
+                        {% endif %}
+                      </div>  
+
+                    </div>
+
+                  {% endif %}
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+              
+            </div>
+
+            <div id="Dinner" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not dnr %}
+                  No dinner recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{dnr.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if dnr %}
+                  {% for post in dnr %} 
+                  
+                  {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+                        <div class="cards-footer">
+                          
+                        </div>
+                    </div>
+
+                  {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                            {% for i in post.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                            {% endif %}
+                            {% empty %}
+                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                            {% endfor %}
+
+                            <div class="readtime-container">
+                              <p>{{ post.read_time }} min read</p>
+                            </div>
+                          </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+
+                      <div class="favourites">
+                        {% if post in user.favourite.all %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                        </a>
+                        {% else %}
+                        <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                            <span class="material-symbols-rounded favourite-icon">favorite</span>
+                        </a>
+                        {% endif %}
+                      </div>  
+                    </div>
+
+                  {% endif %}
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+              
+            </div>
+
+            <div id="Veg" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not veg %}
+                  No veg recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{veg.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+                
+              <div class="explore-tab veg-sub-tab">
+                <button class="vegtab active" id="vegopen" onclick="veg(event, 'allveg')">All ({{veg.count}}) </button>
+                <button class="vegtab" onclick="veg(event, 'vegBreakfast')">Breakfast ({{vegbrkfst.count}})</button>
+                <button class="vegtab" onclick="veg(event, 'vegLunch')">Lunch ({{veglnch.count}})</button>
+                <button class="vegtab" onclick="veg(event, 'vegSnacks')">Snacks ({{vegsnck.count}})</button>
+                <button class="vegtab" onclick="veg(event, 'vegDinner')">Dinner ({{vegdnr.count}})</button>
+              </div>
+
+              <div id="allveg" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if veg %}
+                    {% for post in veg %} 
+                    
+                    {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+
+                    {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+                      </div>
+
+                    {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegBreakfast" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if vegbrkfst %}
+                    {% for post in vegbrkfst %} 
+                    
+                    {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+
+                    {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+                      </div>
+
+                    {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegLunch" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if veglnch %}
+                    {% for post in veglnch %} 
+                    
+                    {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+
+                    {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+                      </div>
+
+                    {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegSnacks" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if vegsnck %}
+                    {% for post in vegsnck %} 
+                    
+                      {% if post.pk in historys_pk %}
+                    
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                            <a href="{% url 'viewpost' post.pk %}">
+                                <div class="img-container">
+                                  {% for i in post.photo_set.all %}
+                                  {% if forloop.counter0 == 0 %}
+                                      <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                  {% endif %}
+                                  {% empty %}
+                                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                  {% endfor %}
+
+                                  <div class="readtime-container">
+                                    <p>{{ post.read_time }} min read</p>
+                                  </div>
+                                </div>
+                                <div class="card-body recipe-info">
+                                    <h4 class="card-title highlight">{{post.title}}</h4>
+                                    <p class="card-text">
+                                        <ul>
+                                            <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                            <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                        </ul>
+                                    </p>
+                                  </div>
+                            </a>
+                            <div class="quick-view">
+                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                </button>
+                            </div>
+
+                            <div class="favourites">
+                              {% if post in user.favourite.all %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                              </a>
+                              {% else %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon">favorite</span>
+                              </a>
+                              {% endif %}
+                            </div>  
+
+                            <div class="cards-footer">
+                              
+                            </div>
+                        </div>
+
+                      {% else %}
+
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+                        </div>
+
+                      {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegDinner" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if vegdnr %}
+                    {% for post in vegdnr %} 
+                    
+                    {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+
+                    {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+                      </div>
+
+                    {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+            </div>
+
+            <div id="Non-veg" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not non_veg %}
+                  No non_veg recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{non_veg.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+                
+              <div class="explore-tab veg-sub-tab">
+                <button class="nonvegtab" id="nonvegopen" onclick="nonveg(event, 'allnon_veg')">All ({{non_veg.count}}) </button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegBreakfast')">Breakfast ({{non_vegbrkfst.count}})</button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegLunch')">Lunch ({{non_veglnch.count}})</button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegSnacks')">Snacks ({{non_vegsnck.count}})</button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegDinner')">Dinner ({{non_vegdnr.count}})</button>
+              </div>
+
+              <div id="allnon_veg" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_veg %}
+                    {% for post in non_veg %} 
+                    
+                    {% if post.pk in historys_pk %}
+                    
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+  
+
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+
+                    {% else %}
+
+                    <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+                      </div>
+
+                    {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegBreakfast" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_vegbrkfst %}
+                    {% for post in non_vegbrkfst %} 
+                    
+                      {% if post.pk in historys_pk %}
+                      
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                            <a href="{% url 'viewpost' post.pk %}">
+                                <div class="img-container">
+                                  {% for i in post.photo_set.all %}
+                                  {% if forloop.counter0 == 0 %}
+                                      <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                  {% endif %}
+                                  {% empty %}
+                                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                  {% endfor %}
+
+                                  <div class="readtime-container">
+                                    <p>{{ post.read_time }} min read</p>
+                                  </div>
+                                </div>
+                                <div class="card-body recipe-info">
+                                    <h4 class="card-title highlight">{{post.title}}</h4>
+                                    <p class="card-text">
+                                        <ul>
+                                            <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                            <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                        </ul>
+                                    </p>
+                                  </div>
+                            </a>
+                            <div class="quick-view">
+                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                </button>
+                            </div>
+
+                            <div class="favourites">
+                              {% if post in user.favourite.all %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                              </a>
+                              {% else %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon">favorite</span>
+                              </a>
+                              {% endif %}
+                            </div>  
+
+                            <div class="cards-footer">
+                              
+                            </div>
+                        </div>
+
+                      {% else %}
+
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+                        </div>
+
+                      {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegLunch" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_veglnch %}
+                    {% for post in non_veglnch %} 
+                    
+                      {% if post.pk in historys_pk %}
+                      
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                            <a href="{% url 'viewpost' post.pk %}">
+                                <div class="img-container">
+                                  {% for i in post.photo_set.all %}
+                                  {% if forloop.counter0 == 0 %}
+                                      <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                  {% endif %}
+                                  {% empty %}
+                                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                  {% endfor %}
+
+                                  <div class="readtime-container">
+                                    <p>{{ post.read_time }} min read</p>
+                                  </div>
+                                </div>
+                                <div class="card-body recipe-info">
+                                    <h4 class="card-title highlight">{{post.title}}</h4>
+                                    <p class="card-text">
+                                        <ul>
+                                            <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                            <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                        </ul>
+                                    </p>
+                                  </div>
+                            </a>
+                            <div class="quick-view">
+                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                </button>
+                            </div>
+
+                            <div class="favourites">
+                              {% if post in user.favourite.all %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                              </a>
+                              {% else %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon">favorite</span>
+                              </a>
+                              {% endif %}
+                            </div>  
+
+                            <div class="cards-footer">
+                              
+                            </div>
+                        </div>
+
+                      {% else %}
+
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+                        </div>
+
+                      {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegSnacks" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_vegsnck %}
+                    {% for post in non_vegsnck %} 
+                    
+                      {% if post.pk in historys_pk %}
+                      
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                            <a href="{% url 'viewpost' post.pk %}">
+                                <div class="img-container">
+                                  {% for i in post.photo_set.all %}
+                                  {% if forloop.counter0 == 0 %}
+                                      <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                  {% endif %}
+                                  {% empty %}
+                                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                  {% endfor %}
+
+                                  <div class="readtime-container">
+                                    <p>{{ post.read_time }} min read</p>
+                                  </div>
+                                </div>
+                                <div class="card-body recipe-info">
+                                    <h4 class="card-title highlight">{{post.title}}</h4>
+                                    <p class="card-text">
+                                        <ul>
+                                            <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                            <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                        </ul>
+                                    </p>
+                                  </div>
+                            </a>
+                            <div class="quick-view">
+                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                </button>
+                            </div>
+
+                            <div class="favourites">
+                              {% if post in user.favourite.all %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                              </a>
+                              {% else %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon">favorite</span>
+                              </a>
+                              {% endif %}
+                            </div>  
+
+                            <div class="cards-footer">
+                              
+                            </div>
+                        </div>
+
+                      {% else %}
+
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+                        </div>
+
+                      {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegDinner" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_vegdnr %}
+                    {% for post in non_vegdnr %} 
+                    
+                      {% if post.pk in historys_pk %}
+                      
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                            <a href="{% url 'viewpost' post.pk %}">
+                                <div class="img-container">
+                                  {% for i in post.photo_set.all %}
+                                  {% if forloop.counter0 == 0 %}
+                                      <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                  {% endif %}
+                                  {% empty %}
+                                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                  {% endfor %}
+
+                                  <div class="readtime-container">
+                                    <p>{{ post.read_time }} min read</p>
+                                  </div>
+                                </div>
+                                <div class="card-body recipe-info">
+                                    <h4 class="card-title highlight">{{post.title}}</h4>
+                                    <p class="card-text">
+                                        <ul>
+                                            <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                            <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                        </ul>
+                                    </p>
+                                  </div>
+                            </a>
+                            <div class="quick-view">
+                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                </button>
+                            </div>
+
+                            <div class="favourites">
+                              {% if post in user.favourite.all %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                              </a>
+                              {% else %}
+                              <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                  <span class="material-symbols-rounded favourite-icon">favorite</span>
+                              </a>
+                              {% endif %}
+                            </div>  
+
+                            <div class="cards-footer">
+                              
+                            </div>
+                        </div>
+
+                      {% else %}
+
+                      <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+
+                          <div class="favourites">
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+  
+                        </div>
+
+                      {% endif %}
+  
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+            </div>
+
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+
+{% else %}  <!-- User is unauthenticated then redirect to login page-->
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes">
+                  
+            <h1>Explore</h1>
+
+            <div class="explore-tab">
+              <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'All')">All</button>
+              <button class="tablinks" onclick="recipes(event, 'Breakfast')">Breakfast</button>
+              <button class="tablinks" onclick="recipes(event, 'Lunch')">Lunch</button>
+              <button class="tablinks" onclick="recipes(event, 'Snacks')">Snacks</button>
+              <button class="tablinks" onclick="recipes(event, 'Dinner')">Dinner</button>
+              <button class="tablinks" onclick="recipes(event, 'Veg')">Veg</button>
+              <button class="tablinks" onclick="recipes(event, 'Non-veg')">Non-veg</button>
+            </div>
+
+            <div id="All" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                  {% if not all %}
+                  No recipe available :( 
+                  {% else %}
+                  <span class="tot_recipe_badge badge">{{all.count}}</span> recipes available
+                  {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if all %}
+                  {% for post in all %} 
+                  
+                  <div class="recipe-cards all-recipes-cards">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+
+                  </div>
+
+                  {% endfor %}
+                {% endif %}
+                    
+              </div> 
+
+            </div>
+
+            <div id="Breakfast" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not brkfst %}
+                  No breakfast recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{brkfst.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if brkfst %}
+                  {% for post in brkfst %} 
+                  
+                  <div class="recipe-cards all-recipes-cards">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+
+                  </div>
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+            </div>
+
+            <div id="Lunch" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not lnch %}
+                  No lunch recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{lnch.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if lnch %}
+                  {% for post in lnch %} 
+                  
+                  <div class="recipe-cards all-recipes-cards">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+
+                  </div>
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+              
+            </div>
+
+            <div id="Snacks" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not snack %}
+                  No snacks recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{snack.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if snack %}
+                  {% for post in snack %} 
+                  
+                  <div class="recipe-cards all-recipes-cards">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+                  </div>
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+              
+            </div>
+
+            <div id="Dinner" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not dnr %}
+                  No dinner recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{dnr.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+              <div class="dynamic-card-container explore-recipes-card-container">
+    
+                {% if dnr %}
+                  {% for post in dnr %} 
+                  
+                  <div class="recipe-cards all-recipes-cards">
+                      <a href="{% url 'viewpost' post.pk %}">
+                          <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                          <div class="card-body recipe-info">
+                              <h4 class="card-title highlight">{{post.title}}</h4>
+                              <p class="card-text">
+                                  <ul>
+                                      <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                      <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                  </ul>
+                              </p>
+                            </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+
+                  </div>
+
+                  {% endfor %}
+                {% endif %}
+              </div>
+              
+            </div>
+
+            <div id="Veg" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not veg %}
+                  No veg recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{veg.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+                
+              <div class="explore-tab veg-sub-tab">
+                <button class="vegtab active" id="vegopen" onclick="veg(event, 'allveg')">All ({{veg.count}}) </button>
+                <button class="vegtab" onclick="veg(event, 'vegBreakfast')">Breakfast ({{vegbrkfst.count}})</button>
+                <button class="vegtab" onclick="veg(event, 'vegLunch')">Lunch ({{veglnch.count}})</button>
+                <button class="vegtab" onclick="veg(event, 'vegSnacks')">Snacks ({{vegsnck.count}})</button>
+                <button class="vegtab" onclick="veg(event, 'vegDinner')">Dinner ({{vegdnr.count}})</button>
+              </div>
+
+              <div id="allveg" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if veg %}
+                    {% for post in veg %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegBreakfast" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if vegbrkfst %}
+                    {% for post in vegbrkfst %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegLunch" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if veglnch %}
+                    {% for post in veglnch %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegSnacks" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if vegsnck %}
+                    {% for post in vegsnck %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="vegDinner" class="defveg veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if vegdnr %}
+                    {% for post in vegdnr %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+            </div>
+
+            <div id="Non-veg" class="tabcontent main-tabcontent">
+
+              <h5>
+                <span class="tab-heading">
+                {% if not non_veg %}
+                  No non_veg recipe available :(
+                {% else %}
+                  <span class="tot_recipe_badge badge">{{non_veg.count}}</span> recipes available
+                {% endif %}
+                </span>
+              </h5>
+
+                
+              <div class="explore-tab veg-sub-tab">
+                <button class="nonvegtab" id="nonvegopen" onclick="nonveg(event, 'allnon_veg')">All ({{non_veg.count}}) </button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegBreakfast')">Breakfast ({{non_vegbrkfst.count}})</button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegLunch')">Lunch ({{non_veglnch.count}})</button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegSnacks')">Snacks ({{non_vegsnck.count}})</button>
+                <button class="nonvegtab" onclick="nonveg(event, 'non_vegDinner')">Dinner ({{non_vegdnr.count}})</button>
+              </div>
+
+              <div id="allnon_veg" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_veg %}
+                    {% for post in non_veg %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+                                                
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegBreakfast" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_vegbrkfst %}
+                    {% for post in non_vegbrkfst %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegLunch" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_veglnch %}
+                    {% for post in non_veglnch %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegSnacks" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_vegsnck %}
+                    {% for post in non_vegsnck %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+              <div id="non_vegDinner" class="nonvegcontent veg-sub-content">
+
+                <div class="dynamic-card-container explore-recipes-card-container">
+      
+                  {% if non_vegdnr %}
+                    {% for post in non_vegdnr %} 
+                    
+                    <div class="recipe-cards all-recipes-cards">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                                                {% for i in post.photo_set.all %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                                {% endif %}
+                                                {% empty %}
+                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                {% endfor %}
+
+                                                <div class="readtime-container">
+                                                  <p>{{ post.read_time }} min read</p>
+                                                </div>
+                                            </div>
+                            <div class="card-body recipe-info">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+                  {% endif %}
+                </div>
+                
+              </div>
+
+            </div>
+
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+  </div>  
+
+{% endif %}
+
+</body>
+
+
+quick view offcanvas
+<!-- {% if all %}
+{% for post in all %}
+<div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="quickviewModalLabel">Yummy Recipes</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body qv-modal-body">
+        <article class="article-featured">
+            <div class="qv-offcanvas-img-container">
+                {% for i in post.photo_set.all %}
+                    {% if forloop.counter0 == 0 %}
+                        <img src="{{ i.image.url }}" class="article-image qv-offcanvas-img" alt="{{post.title}}">
+                    {% endif %}
+                    {% empty %}
+                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
+                {% endfor %}
+            </div>
+            
+            <div class="qv-offcanvas-title-container">
+                <h3 class="article-title">{{post.title}}</h3>
+                <p>
+                    <ul>
+                        <li><img src="{{ post.author.profile.profile_img.url }}" style="width: 30px; height: 30px; border-radius:100px" alt="Image"></li>
+                        <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
+                    </ul>
+                </p>
+                
+            </div>
+
+            <div class="qv-offcanvas-table-wrapper">
+                <table class="table">
+                    
+                    <tbody class="qv-table-body">
+                    <tr>
+                        <th scope="row" colspan="2">Type</th>
+                        <td>{{post.type}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Category</th>
+                        <td>{{post.category}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Cuisine</th>
+                        <td>{{post.cuisine}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Prep time</th>
+                        <td>{{post.timing}} min</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Servings</th>
+                        <td>{{post.servings}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Difficulty</th>
+                        <td>{{post.difficulty}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Likes</th>
+                        <td>{{post.total_likes}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Dislikes</th>
+                        <td>{{post.total_dislikes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            
+        </article>
+
+        <div class="footer-area">
+            <a href="{% url 'viewpost' post.pk %}" class="qv-offcanvas-footer-link">View <span class="material-symbols-rounded qv-offcanvas-link-icon">trending_flat</span></a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %} -->
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+
+<script>
+$( function() {
+  var titles = 
+  [
+    "{% for tlist in titles %}",
+    "{{tlist.title}}{% endfor %}"
+  ];
+
+$( "#product" ).autocomplete({
+  source: titles,
+  autoFocus: false,
+  delay: 0,
+  minLength: 2
+});
+} );
+
+
+  function recipes(evt, type) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(type).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+  document.getElementById("defaultOpen").click();
+
+
+  function veg(cat, subc) {
+    var i,defveg, vegtab;
+
+    defveg = document.getElementsByClassName("defveg");
+    for (i = 0; i < defveg.length; i++) {
+      defveg[i].style.display = "none";
+    }    
+
+    vegtab = document.getElementsByClassName("vegtab");
+    for (i = 0; i < vegtab.length; i++) {
+      vegtab[i].className = vegtab[i].className.replace(" active", "");
+    }
+
+    document.getElementById(subc).style.display = "block";
+    cat.currentTarget.className += " active";
+  }
+
+  document.getElementById("vegopen").click();
+
+
+  function nonveg(cat, subc) {
+    var i,nonvegcontent, nonvegtab;
+
+    nonvegcontent = document.getElementsByClassName("nonvegcontent");
+    for (i = 0; i < nonvegcontent.length; i++) {
+      nonvegcontent[i].style.display = "none";
+    }    
+
+    nonvegtab = document.getElementsByClassName("nonvegtab");
+    for (i = 0; i < nonvegtab.length; i++) {
+      nonvegtab[i].className = nonvegtab[i].className.replace(" active", "");
+    }
+
+    document.getElementById(subc).style.display = "block";
+    cat.currentTarget.className += " active";
+  }
+
+  document.getElementById("nonvegopen").click();
+
+
+  function months(mon, eachmon) {
+    var i, monview,j,month, newtab;
+    monview = document.getElementsByClassName("monview");
+    for (i = 0; i < monview.length; i++) {
+      monview[i].style.display = "none";
+    }
+
+    month = document.getElementsByClassName("month");
+    for (j = 0; j < month.length; j++) {
+      month[j].style.display = "none";
+      
+    }    
+    mon.currentTarget.className += " ";
+
+    newtab = document.getElementsByClassName("newtab");
+    for (i = 0; i < newtab.length; i++) {
+      newtab[i].className = newtab[i].className.replace(" active", "");
+    }
+
+    document.getElementById(eachmon).style.display = "block";
+    mon.currentTarget.className += " active";
+  }
+
+  document.getElementById("monthOpen").click();
+
+
+</script>
+
+
+{% endblock %}

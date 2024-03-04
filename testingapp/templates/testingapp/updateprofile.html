@@ -1,0 +1,181 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+{% block title %}
+<title>Update profile</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+    <div class="primary-wrapper">
+        
+        <div class="secondary-wrapper">
+
+            <div class="container container-flex container-flex-2">
+
+                <main role="main" class="home-main container-main">
+
+                    <div class="dynamic-recipes dynamic-header profile-heading">
+                        
+                        <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button>
+                            Update profile
+                        </h1>
+
+
+                        <div class="dynamic-card-container">
+                            
+                            <div class="update-profile-card">
+
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="row mb-3 upro-first-row">
+                                  <label for="inputEmail3" class="col-md-5 col-form-label uprofile-form-label uprofile-first-label">Currently:</label>
+
+                                    <div class="col">
+                                        <div class="profile-form-input profile-header uprofile-img">
+                                            
+                                            <div class="container text-center">
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <img src="{{ user.profile.profile_img.url }}" alt="" srcset="" class="profile-image">
+                                                    </div>
+
+                                                    <div class="col">
+                                                        <img id="display-image" class="new-image">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            
+
+                                <div class="row upro-second-row">
+                                    <div class="row mb-3 upro-input-container">
+                                        <label for="id_profile_img" class="col-md-5 col-form-label uprofile-form-label">Change</label>
+    
+                                        <div class="col">
+                                            <input type="file" class="form-control uprofile-input" name="profile_img" accept="image/*" id="id_profile_img">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3 upro-input-container">
+                                        <label for="inputEmail3" class="col-md-5 col-form-label uprofile-form-label">First Name</label>
+                                        
+                                        <div class="col">
+                                          <input type="text" class="form-control uprofile-input" name="first_name" value="{{ user.first_name }}" id="id_first_name">
+                                        </div>
+                                      </div>
+      
+                                      <div class="row mb-3 upro-input-container">
+                                        <label for="inputPassword3" class="col-md-5 col-form-label uprofile-form-label">Last Name</label>
+                                        
+                                        <div class="col">
+                                          <input type="text" name="last_name" class="form-control uprofile-input" value="{{ user.last_name }}" id="id_last_name">
+                                        </div>
+                                      </div>
+      
+                                      <div class="row mb-3 upro-input-container">
+                                          <label for="inputPassword3" class="col-md-5 col-form-label uprofile-form-label">Email</label>
+      
+                                          <div class="col">
+                                              <input type="text" class="form-control uprofile-input" name="email" value="{{ user.email }}" id="id_email">
+                                          </div>
+                                      </div>
+                      
+                                      <div class="row mb-3 upro-input-container">
+                                          <label for="id_gender" class="col-md-5 col-form-label uprofile-form-label">Gender</label>
+      
+                                          <div class="col">
+                                              <!-- <input type="text" class="form-control uprofile-input" name="gender" maxlength="10" value="{{user.profile.gender}}" required="" id="id_gender"> -->
+                                            
+                                              <select name="gender" class="form-control uprofile-input" id="id_gender">
+                                                {% for choice in gender_choices %}
+                                                    {% if user.profile.gender == choice.0 %}
+                                                        <option value="{{ choice.0 }}" selected>{{ choice.1 }}</option>
+                                                    {% else %}
+                                                        <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                              </select>
+                                          </div>
+                                      </div>
+                      
+                                      <div class="row mb-3 upro-input-container">
+                                          <label for="id_dob" class="col-md-5 col-form-label uprofile-form-label">Dob</label>
+      
+                                          <div class="col">
+                                              <input type="date" class="form-control uprofile-input" name="dob" maxlength="20" onfocus="(this.type='date')" onblur="(this.type='date')" value="{{user.profile.dob|date:"Y-m-d"}}" placeholder="{{user.profile.dob}}" required id="id_dob">
+                                          </div>
+                                          <p class="card-text"><small class="text-muted">** mm / dd / yyyy</small>
+                                      </div>
+                      
+                                      <div class="row mb-3 upro-input-container">
+                                          <label for="id_bio" class="col-md-5 col-form-label uprofile-form-label">Bio</label>
+                                          
+                                          <div class="col">
+                                                <textarea name="bio" class="form-control uprofile-input" maxlength="114" required="" value="{{ user.profile.bio }}" id="id_bio">{{ user.profile.bio }}</textarea>                                        
+                                          </div>
+                                          <p class="card-text"><small class="text-muted">** maximum 100 characters</small>
+                                      </div>
+                                </div>
+
+                                <div class="bottom-links upro-btm-lnk">
+                                    <div class="child-1 edit-links">
+                                        <button id="update-profile-btn"><span class="material-symbols-rounded share-recipe-icon">check</span> <span>Update</span></button>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            </div>
+
+                        </div>
+                    </div>
+
+                </main>
+                
+            </div>
+ 
+        </div>
+
+    </div>
+    
+    
+</body>
+
+
+
+<script>
+    const image_input = document.querySelector("#id_profile_img");
+
+    image_input.addEventListener("change", function() {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+        const uploaded_image = reader.result;
+        document.querySelector("#display-image").style.backgroundImage = `url(${uploaded_image})`;
+    });
+    reader.readAsDataURL(this.files[0]);
+    });
+
+
+    $(document).ready(function(){
+  	$('[data-toggle="tooltip"]').tooltip();   
+	});
+</script>
+
+
+{% endblock %}

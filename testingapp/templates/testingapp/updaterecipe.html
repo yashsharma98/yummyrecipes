@@ -1,0 +1,754 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Update recipe</title>
+<!-- <title>Update '{{form.title.value}}'</title> -->
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+              Update recipe
+            </h1>
+
+            <p class="sub-heading">Recipe : ' {{form.title.value}} '</p>
+            <!-- <p>something goes here</p> -->
+
+            <div class="recipe-form-container updrecipe-container">
+
+              
+              {% for i in recipes.photo_set.all %}
+                {% if recipes.photo_set.count == 1 %}    
+                  <label for="id_form-0-image" class="form-label current-img-label d-flex justify-content-center">Currently</label>
+                {% else %}
+              
+                {% endif %}
+              {% endfor %}
+
+              <div class="recipe-img-grid">    
+
+                {% for i in recipes.photo_set.all %}
+
+                  <div class="responsive">
+                    <div class="gallery">
+                      <a target="_blank" href="{{ i.image.url }}">
+                        <img src="{{ i.image.url }}" alt="{{ i.image.url }}">
+                      </a>
+                      
+                      <!-- <div class="desc">Add a description of the image here</div> -->
+                    </div>
+                  </div>
+                  
+                  
+                {% endfor %}
+
+                
+                
+              </div>
+              <div class="updateimg-container img-del-btn">
+                {% for i in recipes.photo_set.all %}
+
+                  <div class="image-field">
+                    <form method="post" action="{% url 'delete_image' i.pk %}" class="image-delete-form">
+                      {% csrf_token %}
+                      <button type="submit" class="form-control image-input"><span class="material-symbols-rounded upload-img-icon">delete</span> Delete</button>
+                    </form>
+                  </div>
+                  
+                {% endfor %}
+
+                </div>
+
+              <form class="row mt-1 g-0 create-recipe-form" method="POST" id="myForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                  
+                    <div class="" style="display: none;">
+                       {{ formset.management_form }}
+                      
+                      {{formset}}
+                    </div>       
+
+                    <!-- {% for f in formset %}
+  
+                      {{ f.as_p }}
+
+                    {% endfor %} -->
+
+                    <div class="updateimg-container">
+
+                      {% for i in recipes.photo_set.all %}
+
+                        {% if forloop.counter0 == 0 %}
+
+                          <div class="image-field">
+                            <label for="id_form-0-image" name="form-0-image" class="border form-label img-input-btn">
+                              <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter">Change image</span>
+                            </label>
+                            <div class="col-sm-11 input-field">
+                              <input class="form-control image-input" type="file" name="form-0-image" accept="image/*" id="id_form-0-image">
+                            </div>
+                          </div>   
+
+                            {% if recipes.photo_set.count == 1 %}
+                            
+                              <div class="image-field">
+                                <label for="id_form-1-image" name="form-1-image" class="border form-label img-input-btn">
+                                  <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter2">Add another image</span>
+                                </label>
+                                <div class="col-sm-11 input-field">
+                                  <input class="form-control image-input" type="file" name="form-1-image" accept="image/*" id="id_form-1-image">
+                                </div>
+                              </div>
+
+                            {% endif %}
+                          
+                        {% elif forloop.counter0 == 1 %}
+                        
+                          <div class="image-field">
+                            <label for="id_form-1-image" name="form-1-image" class="border form-label img-input-btn">
+                              <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter2">Change image</span>
+                            </label>
+                            <div class="col-sm-11 input-field">
+                              <input class="form-control image-input" type="file" name="form-1-image" accept="image/*" id="id_form-1-image">
+                            </div>
+                          </div>
+
+                        {% endif %}
+
+                      {% empty %}
+                      
+                        <div class="image-field">
+                          <div class="empty-image">
+                            <img src="{% static 'testingapp/media/empty4.jpg' %}" alt="placeholder image">
+                          </div>  
+                          <label for="id_form-0-image" name="form-0-image" class="border form-label img-input-btn">
+                            <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter">Add image</span>
+                          </label>
+                          <div class="col-sm-11 input-field">
+                            <input class="form-control image-input" type="file" name="form-0-image" accept="image/*" id="id_form-0-image">
+                          </div>
+                        </div>
+
+                      {% endfor %}
+
+                    </div>
+
+
+                <div class="imgarea" style="padding-right: 20px;">
+                  <!-- <div class="testpreview"></div> -->
+                    <div class="new-container">
+                      
+                    </div>
+
+                </div>
+                
+
+                <div class="col-12 first-div">
+                  <label for="inputTitle" class="form-label">Title</label>
+                  <div class="col-sm-11 input-field">
+                    <input type="text" name="title" class="form-control" id="inputTitle" value="{{ form.title.value }}" placeholder="Title of the recipe" required="required" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                  </div>
+                  <span id="nameError"></span>
+                </div>
+
+                <div class="row mx-0 g-2 select-options updateselectoptions1">
+
+                  <div class="col-md-4">
+                    <label for="inputTyoe" class="col col-form-label">Type of recipe</label>
+                    <select class="form-select" id="specificSizeSelect" name="type" required>
+                      <option value="{{ form.type.value }}">{{ form.type.value }}</option>
+                      <option value="Breakfast"> &#9749; Breakfast</option>
+                      <option value="Lunch">&#127790; Lunch</option>
+                      <option value="Evening Snack">&#127861; Evening Snack</option>
+                      <option value="Dinner">&#127858; Dinner</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="inputCuisine" class="col col-form-label">Cuisine</label>
+                    <select class="form-select" id="specificSizeSelect" name="cuisine" required>
+                      <option value="{{ form.cuisine.value }}">{{ form.cuisine.value }}</option>
+                      <option value="Indian">&#127835; Indian Cuisine</option>
+                      <option value="American">&#127850; American Cuisine</option>
+                      <option value="Italian">&#127829; Italian Cuisine</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-md-3">
+                    <label for="inputTime" class="col col-form-label">Preparation time</label>
+                    <input type="number" class="form-control" name="timing" id="inputTime" value="{{ form.timing.value }}" placeholder="Time (in min)" required="required" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Preparation time">
+                  </div>
+
+                </div>
+                
+                <div class="row mx-0 g-2 select-options updateselectoptions2">
+                  
+                  <div class="col-md-4">
+                    <label for="inputCategory" class="col col-form-label">Category</label>
+                    <select class="form-select" id="specificSizeSelect" name="category" required>
+                      <option value="{{ form.category.value }}">{{ form.category.value }}</option>
+                      <option value="Veg">Veg</option>
+                      <option value="Non-Veg">Non-veg</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label for="inputDifficulty" class="col col-form-label">Difficulty</label>
+                    <select class="form-select" id="specificSizeSelect" name="difficulty" required>
+                      <option value="{{ form.difficulty.value }}">{{ form.difficulty.value }}</option>
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Hard">Hard</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-3">
+                    <label for="inputServings" class="col col-form-label">Number of servings</label>
+                    <input type="number" name="servings" class="form-control" id="inputServings" value="{{ form.servings.value }}" placeholder="Serves" required="required" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Serves">
+                  </div>
+
+                </div>
+
+
+                <div class="col-12 updateingredients">
+                  <label for="inputIngredients" class="form-label">Ingredients</label>
+                  <div class="col-sm-11 input-field">
+                    <textarea class="form-control" name="ingredients" id="inputIngredients" placeholder="Ingredients" rows="6" required="required">{{ form.ingredients.value }}</textarea>
+                  </div>
+                </div>
+
+                <div class="col-12 updaterecipe">
+                  <label for="inputRecipe" class="form-label">Main recipe</label>
+                  <div class="col-sm-11 input-field">
+                    <textarea class="form-control" name="content" id="id_content" placeholder="Instructions for the recipe" rows="10" cols="" required="required">{{ form.content.value }} </textarea>
+                    
+                    {{form.media}}
+                  </div>
+                  
+                  <div class="recipe-instruction-text mt-2">Enter recipe instructions in a numeric list format <b>(e.g. 1. Preheat the oven...)</b></div>
+
+                </div> 
+
+
+                <div class="text-center">
+                  <div class="form-btns">
+                    <button type="submit" class="btn btn-transparent"><span>Save changes</span></button>
+                    <!-- <button type="submit" class="btn btn-transparent" onclick="formsubmit()"><span>Save changes</span></button> -->
+                    
+                  </div>
+                </div>
+
+
+              </form>
+
+              <div style="display: none;">
+                {{form.as_p}}
+                </div>
+                   
+            </div> 
+        
+          </div>
+
+        </main>
+
+        <aside class="sidebar sidebar-dashboard recipe-img-preview-sidebar" id="show-sidebar">
+                    
+          <div class="sidebar-recipes">
+              
+            <!-- <h2></h2> -->
+
+              <!-- Image preview -->
+              <div class="preview-container">
+                <img class="preview-image" src="" alt="Image" style="display: none;">
+                <div class="recipe-title preview_ai_img_title"></div>
+              </div>
+               
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+  </div>
+
+{% else %}  <!-- User is unauthenticated then redirect to login page-->
+
+
+{% endif %}
+</body>
+
+<!-- tooltip -->
+<script>
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+
+
+
+
+<script>
+  function validateForm() {
+    const form = document.getElementById('myForm');
+  
+    for (const input of form.elements) {
+      if (input.required && input.value.trim() === '') {
+        alert(`${input.name} is required`);
+        return false;
+      }
+    }
+  }
+  </script>
+  
+<script>
+  function formsubmit() 
+  {
+    var image = document.forms["myForm"]["image"].value;
+    var timing = document.forms["myForm"]["timing"].value;
+    var servings = document.forms["myForm"]["servings"].value;
+    var type = document.getElementById("inputGroupSelect01").value;
+    var cuisine = document.forms["myForm"]["cuisine"].value;
+    var category = document.forms["myForm"]["category"].value;
+    var title = document.forms["myForm"]["title"].value;
+    var ingredients = document.forms["myForm"]["ingredients"].value;
+    var content = document.forms["myForm"]["content"].value;
+    if (image == "")
+    {
+      alert("Please choose a image")
+      return false;
+    }
+    else if (timing == "") 
+    {
+      alert("Please provide preparation time");
+      return false;
+    }
+    else if (servings == "") 
+    {
+      alert("Please provide number of serving");
+      return false;
+    }
+    else if (type == "") 
+    {
+      alert("Please select type from list");
+      return false;
+    }
+    else if (cuisine == "") 
+    {
+      alert("Please select cuisine");
+      return false;
+    }
+    else if (category == "") 
+    {
+      alert("Please select category");
+      return false;
+    }
+    else if (difficulty == "") 
+    {
+      alert("Please select difficulty");
+      return false;
+    }
+    else if (title == "") 
+    {
+      alert("Title field cannot be empty");
+      return false;
+    }
+    else if (ingredients == "")
+    {
+      alert("Ingredient field cannot be empty");
+      return false;
+    }
+    else if (content == "")
+    {
+      alert("Recipe field cannot be empty");
+      return false;
+    }  
+    alert("Your recipe has been posted suceesfully 😊");
+    // location.href = "{% url 'home' %}";
+  }
+
+  // Form reset
+  function myFunction() {
+document.getElementById("output").reset();
+}
+
+</script>
+  
+
+
+<!-- image preview with name of the file (input id=id_form-0-image) -->
+<script>
+ const previewContainers = document.querySelector('.new-container');
+ const imagesInput = document.getElementById('id_form-0-image');
+ const previewContainer = document.querySelector('.preview-container');
+ const imgcounter = document.getElementById('counter');
+ const sideBar = document.getElementById('show-sidebar');
+
+ let counterValue = 0;
+ 
+ const ttpreviewContainer = document.querySelector('.preview-counter');
+ 
+ imagesInput.addEventListener('change', () => {
+   previewContainer.innerHTML = '';
+   previewContainers.innerHTML = '';
+ 
+   for (const file of imagesInput.files) {
+     const reader = new FileReader();
+ 
+     reader.addEventListener('load', () => {
+       const image = document.createElement('img');
+       image.classList.add('preview-image');
+       image.src = reader.result;
+ 
+       sideBar.classList.add('show-sidebar');
+ 
+       const name = document.createElement('div');
+       name.classList.add('preview-name');
+       name.textContent = file.name;
+ 
+       const removeButtonNew = document.createElement('button');
+       removeButtonNew.textContent = 'x';   
+       removeButtonNew.classList.add('img-remove-button');
+ 
+       const removeButtonPreview = document.createElement('button');
+       removeButtonPreview.textContent = 'x';   
+       removeButtonPreview.classList.add('img-remove-button');
+ 
+       const preview1 = document.createElement('div');
+       preview1.classList.add('new-container');
+       preview1.appendChild(copyElementWithChildren(image));
+       preview1.appendChild(copyElementWithChildren(name));
+       preview1.appendChild(removeButtonNew);
+ 
+       const preview = document.createElement('div');
+       preview.classList.add('preview-container');
+       preview.appendChild(image);
+       preview.appendChild(name);
+       preview.appendChild(removeButtonPreview);
+ 
+       previewContainers.appendChild(preview1);
+       previewContainer.appendChild(preview);
+ 
+       removeButtonNew.addEventListener('click', () => {
+         preview1.remove();
+         preview.remove();
+ 
+   updateCounter();
+ 
+     updateFileList(file);
+       });
+ 
+       removeButtonPreview.addEventListener('click', () => {
+         preview1.remove();
+         preview.remove();
+ 
+   updateCounter();
+ 
+     updateFileList(file);
+       });
+     });
+ 
+     reader.readAsDataURL(file);
+   }
+   sideBar.classList.add('show-sidebar');
+ });
+ 
+ function copyElementWithChildren(element) {
+   const htmlContent = element.outerHTML;
+   const newElement = document.createElement('div');
+   newElement.innerHTML = htmlContent;
+   return newElement.firstChild;
+ }
+ 
+ function updateCounter() {
+   const numFiles = imagesInput.files.length;
+ 
+   if (numFiles === 1) {
+     const counter = document.createElement('span');
+     counter.classList.add('preview-counter');
+     counter.textContent = `${numFiles} file selected`;
+ 
+     ttpreviewContainer.innerHTML = '';
+     ttpreviewContainer.appendChild(counter);
+   } else if (numFiles > 1) {
+     const counter = document.createElement('span');
+     counter.classList.add('preview-counter');
+     counter.textContent = `${numFiles} files selected`;
+ 
+     ttpreviewContainer.innerHTML = '';
+     ttpreviewContainer.appendChild(counter);
+   } else {
+     
+     ttpreviewContainer.innerHTML = 'Change image';
+     sideBar.classList.remove('show-sidebar');
+   }
+ }
+ 
+ imagesInput.addEventListener('change', () => {
+   updateCounter();
+ });
+ 
+ document.addEventListener('click', (event) => {
+   const target = event.target;
+   if (target.classList.contains('img-remove-button')) {
+     updateCounter();
+   }
+ });
+ 
+ 
+ updateCounter();
+ 
+ function updateFileList(fileToRemove) {
+   const files = Array.from(imagesInput.files);
+   const updatedFiles = files.filter(file => file !== fileToRemove);
+ 
+   const newFileList = new DataTransfer();
+   updatedFiles.forEach(file => newFileList.items.add(file));
+ 
+   imagesInput.files = newFileList.files;
+ }
+ 
+ 
+   
+</script>
+
+<!-- image preview with name of the file (input id=id_form-1-image) -->
+<script>
+ const previewContainers1 = document.querySelector('.new-container');
+ const imagesInput1 = document.getElementById('id_form-1-image');
+ const previewContainer1 = document.querySelector('.preview-container');
+ const imgcounter1 = document.getElementById('counter');
+ const sideBar1 = document.getElementById('show-sidebar');
+ 
+ let counterValue1 = 0;
+ 
+ const ttpreviewContainer1 = document.querySelector('.preview-counter');
+ 
+ imagesInput1.addEventListener('change', () => {
+   previewContainer1.innerHTML = '';
+   previewContainers1.innerHTML = '';
+ 
+   for (const file of imagesInput1.files) {
+     const reader = new FileReader();
+ 
+     reader.addEventListener('load', () => {
+       const image = document.createElement('img');
+       image.classList.add('preview-image');
+       image.src = reader.result;
+ 
+       sideBar1.classList.add('show-sidebar');
+ 
+       const name = document.createElement('div');
+       name.classList.add('preview-name');
+       name.textContent = file.name;
+ 
+       const removeButtonNew = document.createElement('button');
+       removeButtonNew.textContent = 'x';   
+       removeButtonNew.classList.add('img-remove-button');
+ 
+       const removeButtonPreview = document.createElement('button');
+       removeButtonPreview.textContent = 'x';   
+       removeButtonPreview.classList.add('img-remove-button');
+ 
+       const preview1 = document.createElement('div');
+       preview1.classList.add('new-container');
+       preview1.appendChild(copyElementWithChildren(image));
+       preview1.appendChild(copyElementWithChildren(name));
+       preview1.appendChild(removeButtonNew);
+ 
+       const preview = document.createElement('div');
+       preview.classList.add('preview-container');
+       preview.appendChild(image);
+       preview.appendChild(name);
+       preview.appendChild(removeButtonPreview);
+ 
+       previewContainers1.appendChild(preview1);
+       previewContainer1.appendChild(preview);
+ 
+       removeButtonNew.addEventListener('click', () => {
+         preview1.remove();
+         preview.remove();
+ 
+   updateCounter();
+ 
+     updateFileList(file);
+       });
+ 
+       removeButtonPreview.addEventListener('click', () => {
+         preview1.remove();
+         preview.remove();
+ 
+   updateCounter();
+ 
+     updateFileList(file);
+       });
+     });
+ 
+     reader.readAsDataURL(file);
+   }
+   sideBar1.classList.add('show-sidebar');
+ });
+ 
+ function copyElementWithChildren(element) {
+   const htmlContent = element.outerHTML;
+   const newElement = document.createElement('div');
+   newElement.innerHTML = htmlContent;
+   return newElement.firstChild;
+ }
+ 
+ function updateCounter() {
+   const numFiles = imagesInput1.files.length;
+ 
+   if (numFiles === 1) {
+     const counter = document.createElement('span');
+     counter.classList.add('preview-counter');
+     counter.textContent = `${numFiles} file selected`;
+ 
+     ttpreviewContainer1.innerHTML = '';
+     ttpreviewContainer1.appendChild(counter);
+   } else if (numFiles > 1) {
+     const counter = document.createElement('span');
+     counter.classList.add('preview-counter');
+     counter.textContent = `${numFiles} files selected`;
+ 
+     ttpreviewContainer1.innerHTML = '';
+     ttpreviewContainer1.appendChild(counter);
+   } else {
+     
+     ttpreviewContainer1.innerHTML = 'Change image';
+     sideBar1.classList.remove('show-sidebar');
+   }
+ }
+ 
+ imagesInput1.addEventListener('change', () => {
+   updateCounter();
+ });
+ 
+ document.addEventListener('click', (event) => {
+   const target = event.target;
+   if (target.classList.contains('img-remove-button')) {
+     updateCounter();
+   }
+ });
+ 
+ 
+ updateCounter();
+ 
+ function updateFileList(fileToRemove) {
+   const files = Array.from(imagesInput1.files);
+   const updatedFiles = files.filter(file => file !== fileToRemove);
+ 
+   const newFileList = new DataTransfer();
+   updatedFiles.forEach(file => newFileList.items.add(file));
+ 
+   imagesInput1.files = newFileList.files;
+ }
+ 
+ 
+   
+</script>
+  
+  
+  <!-- increasing the counter inside textarea by pressing enter -->
+  <script>
+    const textarea = document.getElementById('inputRecipe');
+    let counter = 2; 
+    let lastCounter = 1; 
+    textarea.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const value = this.value;
+        const selectionStart = this.selectionStart;
+        const selectionEnd = this.selectionEnd;
+        const beforeCursor = value.substring(0, selectionStart);
+        const afterCursor = value.substring(selectionEnd);
+        const newLine = `\n${counter}. `;
+        this.value = beforeCursor + newLine + afterCursor;
+        this.selectionStart = selectionEnd + newLine.length;
+        this.selectionEnd = selectionEnd + newLine.length;
+        lastCounter = counter; 
+        counter++;
+      }
+    });
+  
+    textarea.addEventListener('keyup', function(event) {
+      if (event.key === 'Backspace') {
+        const value = this.value;
+        const cursorPosition = this.selectionStart;
+        const lastCounterIndex = value.lastIndexOf('\n', cursorPosition - 2);
+        const lastCounterValue = parseInt(value.substring(lastCounterIndex + 1, cursorPosition - 2));
+        if (!isNaN(lastCounterValue)) {
+          lastCounter = lastCounterValue; 
+          counter = lastCounter + 1; 
+        }
+      }
+    });
+  </script>
+  
+  <!-- same above counter for ingredients -->
+  <script>
+    const ingredientstextarea = document.getElementById('inputIngredients');
+    let newcounter = 2; 
+    let prevcounter = 1; 
+    ingredientstextarea.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const value = this.value;
+        const selectionStart = this.selectionStart;
+        const selectionEnd = this.selectionEnd;
+        const beforeCursor = value.substring(0, selectionStart);
+        const afterCursor = value.substring(selectionEnd);
+        const newLine = `\n${newcounter}. `;
+        this.value = beforeCursor + newLine + afterCursor;
+        this.selectionStart = selectionEnd + newLine.length;
+        this.selectionEnd = selectionEnd + newLine.length;
+        lastCounter = newcounter; 
+        newcounter++;
+      }
+    });
+  
+    ingredientstextarea.addEventListener('keyup', function(event) {
+      if (event.key === 'Backspace') {
+        const value = this.value;
+        const cursorPosition = this.selectionStart;
+        const lastCounterIndex = value.lastIndexOf('\n', cursorPosition - 2);
+        const lastCounterValue = parseInt(value.substring(lastCounterIndex + 1, cursorPosition - 2));
+        if (!isNaN(lastCounterValue)) {
+          prevcounter = lastCounterValue; 
+          newcounter = prevcounter + 1; 
+        }
+      }
+    });
+  </script>
+
+{% endblock %}

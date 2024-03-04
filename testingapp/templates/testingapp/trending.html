@@ -1,0 +1,422 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>Trending recipes</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+{% block content%}
+
+<body>
+
+{% if user.is_authenticated %}
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+              Trending recipes
+            </h1>
+
+            <!-- <p>something goes here</p> -->
+
+            <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
+
+              {% if counts %} <!-- placeholder -->
+                
+                {% for post in counts %} 
+          
+                  {% get_hit_count for post as check %} 
+      
+                  {% if check == '0' or check == '1' %}
+      
+                  {% else %}  
+                  
+                    {% if post.pk in historys_pk %}
+
+                      <div class="recipe-cards all-recipes-cards trending-cards" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
+                          <a href="{% url 'viewpost' post.pk %}">
+                              <div class="img-container">
+                                {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                                {% endif %}
+                                {% empty %}
+                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                {% endfor %}
+
+                                <div class="readtime-container">
+                                  <p>{{ post.read_time }} min read</p>
+                                </div>
+                              </div>
+                              <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
+                                  <h4 class="card-title highlight">{{post.title}}</h4>
+                                  <p class="card-text">
+                                      <ul>
+                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                      </ul>
+                                  </p>
+                                </div>
+                          </a>
+                          <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
+                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                              </button>
+                          </div>
+                          
+                          <div class="favourites">
+                            <!-- {% if post in user.favourite.all %}
+                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %} -->
+                            {% if post in user.favourite.all %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                            </a>
+                            {% else %}
+                            <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                <span class="material-symbols-rounded favourite-icon">favorite</span>
+                            </a>
+                            {% endif %}
+                          </div>  
+
+
+                          <div class="cards-footer">
+                            
+                          </div>
+                      </div>
+                    
+                    {% else %}  
+                    
+                      <div class="recipe-cards all-recipes-cards trending-cards" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
+                        <a href="{% url 'viewpost' post.pk %}">
+                            <div class="img-container">
+                              {% for i in post.photo_set.all %}
+                              {% if forloop.counter0 == 0 %}
+                                  <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              {% endif %}
+                              {% empty %}
+                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              {% endfor %}
+
+                              <div class="readtime-container">
+                                <p>{{ post.read_time }} min read</p>
+                              </div>
+                            </div>
+                            <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
+                                <h4 class="card-title highlight">{{post.title}}</h4>
+                                <p class="card-text">
+                                    <ul>
+                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                    </ul>
+                                </p>
+                              </div>
+                        </a>
+                        <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
+                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            </button>
+                        </div>
+
+                        <div class="favourites">
+                          <!-- {% if post in user.favourite.all %}
+                          <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %} -->
+                          {% if post in user.favourite.all %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                          </a>
+                          {% else %}
+                          <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                              <span class="material-symbols-rounded favourite-icon">favorite</span>
+                          </a>
+                          {% endif %}
+                        </div>  
+
+
+
+                      </div>
+
+                    {% endif %}
+
+                  {% endif %}
+
+                {% endfor %}
+
+              {% else %}
+                <div class="recipe-cards recipe-card-placeholder placeholder">
+                    <img src="https://via.placeholder.com/600x400/cccccc/545252?text=No+image+:(" class="recipe-img placeholder" loading="lazy" alt="..." >
+
+                    <div class="recipe-info">
+                        <h4 class="placeholder-glow">
+                            <span class="placeholder col-8" style="border-radius: 100px;"></span>
+                        </h4>
+                        
+                        <p>
+                            <ul>
+                                <li>
+                                    <h4 class="placeholder-glow">
+                                        <span class="placeholder" style="padding: 10px;border-radius: 100px;"></span>
+                                    </h4> 
+                                </li>
+                                <li>
+                                    <div class="placeholder-glow">
+                                        <span class="placeholder" style="border-radius: 100px;width: 100px;"></span>
+                                        <br>
+                                        <span class="placeholder" style="border-radius: 100px;width: 150px;"></span>
+                                    </div>
+                                
+                                </li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+              {% endif %} <!-- placeholder ends -->
+                   
+            </div> 
+        
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+
+   <!-- recipes cards & sidebar cards image colors -->
+   <script>
+    var root = document.documentElement;
+
+    var recipecards = document.querySelectorAll('.recipe-cards');
+    var recipecardbody = document.querySelectorAll('.recipe-info');
+    var favorite = document.querySelectorAll('.favourite-link');
+    var quickview = document.querySelectorAll('.quick-view');
+
+    var sidebarcards = document.querySelectorAll('.sidebar-cards');
+    var sidebarcardbody = document.querySelectorAll('.sidebar-recipe-info');
+    var sidebarquickview = document.querySelectorAll('.sidebar-cards-qv');
+
+    var qvoffcanvas = document.querySelectorAll('.qv-offcanvas');
+
+
+
+    recipecards.forEach(function(post) {
+        var bgprimaryColor = post.getAttribute('data-bgcolor');
+        post.style.setProperty('--color-1', bgprimaryColor);
+    });
+
+    recipecards.forEach(function(posthover) {
+        var hoverColor = posthover.getAttribute('data-hovercolor');
+
+        // Set the CSS variable on the post
+        posthover.style.setProperty('--color-5', hoverColor);
+        // Using --color-2 neutral secondary as hover color 
+
+    });
+
+    recipecardbody.forEach(function(cardbody) {
+        var textColor = cardbody.getAttribute('data-color');
+        cardbody.style.setProperty('--color-7', textColor);
+    });
+
+    favorite.forEach(function(favpost) {
+        var favbgColor = favpost.getAttribute('data-favcolor');
+        favpost.style.setProperty('--color-2', favbgColor);
+    });
+
+    quickview.forEach(function(quickviewpost) {
+        var quickviewbtn = quickviewpost.getAttribute('data-qvcolor');
+        quickviewpost.style.setProperty('--color-2', quickviewbtn);
+    });
+
+    // sidebarcards
+    sidebarcards.forEach(function(sidepost) {
+        var sidebarcardsColor = sidepost.getAttribute('data-bgcolor');
+        sidepost.style.setProperty('--color-1', sidebarcardsColor);
+    });
+
+    sidebarcards.forEach(function(posthover) {
+        var hoverColor = posthover.getAttribute('data-hovercolor');
+        posthover.style.setProperty('--color-2', hoverColor);
+         
+
+    });
+
+    sidebarcardbody.forEach(function(sidepostcolor) {
+        var sidebartextColor = sidepostcolor.getAttribute('data-color');
+        sidepostcolor.style.setProperty('--color-7', sidebartextColor);
+    });
+
+    sidebarquickview.forEach(function(quickviewpost) {
+        var sidebarquickviewbtn = quickviewpost.getAttribute('data-qvcolor');
+        quickviewpost.style.setProperty('--color-2', sidebarquickviewbtn);
+         
+
+    });
+
+    qvoffcanvas.forEach(function(quickviewoffcanvas) {
+        var sidebarquickviewbtn = quickviewoffcanvas.getAttribute('data-bgcolor');
+        quickviewoffcanvas.style.setProperty('--color-1', sidebarquickviewbtn);
+         
+
+    });
+
+  </script>
+
+  <!-- recipes cards & sidebar cards image colors styles -->
+  <style>
+      .recipe-cards,.all-recipes-cards,.sidebar-cards {
+          background-color: var(--color-1);
+      }
+
+      .recipe-cards::after,.sidebar-cards::after,.sidebar-cards-qv:hover,.quick-view:hover:not(.popular-recipe-qv) {
+          background-color: var(--color-5);
+      }
+
+      .recipe-info,.sidebar-recipe-info{
+          color: var(--color-7);
+      }
+
+      .recipe-cards .favourites a,.quick-view:not(.popular-recipe-qv),
+      .sidebar-cards-qv{
+          background: var(--color-2);
+      }    
+      
+      .recipe-info .highlight,.sidebar-recipe-info .highlight,
+      .dashboard-recipe-cards .dashboard-card-body .highlight{
+          position: relative;
+          text-decoration: none;
+          background: linear-gradient(var(--color-7),var(--color-7)) left bottom no-repeat;
+          background-size:0% 1px;
+          transition: all 0.4s;
+          display: inline;
+      }
+      
+  </style>
+
+
+{% else %}  <!-- User is unauthenticated then redirect to login page-->
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="container-main">
+
+          <div class="dynamic-recipes">
+                  
+            <h1>Trending recipes</h1>
+
+            <!-- <p>something goes here</p> -->
+
+            <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
+                
+              {% for post in counts %} 
+        
+                {% get_hit_count for post as check %} 
+    
+                {% if check == '0' or check == '1' %}
+                    
+                  <!-- <p>Hide- {% get_hit_count for post%}</p> -->
+    
+                {% else %}  
+                
+                  <div class="recipe-cards all-recipes-cards">
+                      <a href="{% url 'viewpost' post.pk %}"> <!-- {% url 'topostlogin' post.pk %} -->
+                        <div class="img-container">
+                          {% for i in post.photo_set.all %}
+                          {% if forloop.counter0 == 0 %}
+                              <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                          {% endif %}
+                          {% empty %}
+                              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                          {% endfor %}
+
+                          <div class="readtime-container">
+                            <p>{{ post.read_time }} min read</p>
+                          </div>
+                        </div>
+                        <div class="card-body recipe-info">
+                            <h4 class="card-title highlight">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{ post.author.profile.profile_img.url }}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                          </div>
+                      </a>
+                      <div class="quick-view">
+                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                          </button>
+                      </div>
+
+
+                  </div>
+
+                {% endif %}
+
+              {% endfor %}
+                  
+            </div> 
+        
+          </div>
+
+        </main>
+
+      </div>
+
+    </div>
+
+  </div>
+
+{% endif %}
+</body>
+
+
+
+
+
+
+{% endblock %}

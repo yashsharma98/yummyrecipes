@@ -1,0 +1,466 @@
+{% extends 'testingapp/newnavbar_navrail.html' %}
+
+{% load hitcount_tags %}
+
+{% load static %}
+
+
+{% block css %}
+{% endblock %}
+
+
+{% block title %}
+<title>
+  {% for i in user_profiles %}
+    {% if profile_details.email == i.user.email %}
+  
+      {{ i.user.first_name}} {{ i.user.last_name}}
+
+    {% endif %}
+  {% endfor %}
+</title>
+{% endblock %}
+
+{% block weather_widget %}
+{% endblock %}
+
+{% block sm_weather %}
+{% endblock %}
+
+
+{% block content%}
+
+<body>
+
+
+  <div class="primary-wrapper">
+
+    <div class="secondary-wrapper">
+
+      <div class="container container-flex container-flex-2">
+
+        <main role="main" class="home-main container-main">
+
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper profile-heading">
+                   
+            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
+              
+              {{profile_details.first_name}}
+              {{profile_details.last_name}} 
+              
+              <!-- Back -->
+              
+            </h1>
+
+            <div class="dynamic-card-container all-recipes-card-container">
+            
+              {% for i in user_profiles %}
+
+                {% if profile_details.email == i.user.email %}
+
+                  <div class="top-profile-card recipe-author-card">
+                    <article class="article-recent">
+
+                        <div class="article-recent-main top-profile-data recipe-author-data">
+                            
+                            <h2 class="article-title">{{ i.user.first_name}} {{ i.user.last_name}} </h2>
+                            <p>{{i.user.email}}</p>
+                            <p>{{i.bio}}</p>
+                          
+                        </div>
+
+                        <div class="article-recent-secondary user-profile-img recipe-author-img">
+                            <img src="{{ i.user.profile.profile_img.url }}" class="article-imae">
+                        </div>
+                        
+                    </article>
+                  </div>
+
+                {% endif %}
+
+              {% endfor %}
+                                 
+            </div> 
+
+            <div class="explore-tab userchnl-tabs">
+              <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'All')">All 
+                {% if total_user_recipes %}&nbsp;{{total_user_recipes.count}} {% else %}  &nbsp;0 {% endif %}
+              </button>
+
+              <button class="tablinks" onclick="recipes(event, 'Breakfast')">Breakfast 
+                {% if brkfst_recipes %}&nbsp;{{brkfst_recipes.count}} {% else %}  &nbsp;0 {% endif %}
+              </button>
+
+              <button class="tablinks" onclick="recipes(event, 'Lunch')">Lunch 
+                {% if lnch_recipes %} &nbsp;{{lnch_recipes.count}} {% else %}  &nbsp;0 {% endif %}
+              </button>
+
+              <button class="tablinks" onclick="recipes(event, 'Snacks')">Snacks 
+                {% if evesnck_recipes %} &nbsp;{{evesnck_recipes.count}} {% else %}  &nbsp;0 {% endif %}
+              </button>
+
+              <button class="tablinks" onclick="recipes(event, 'Dinner')">Dinner 
+                {% if dnr_recipes %} &nbsp;{{dnr_recipes.count}} {% else %}  &nbsp;0 {% endif %}
+              </button> 
+            </div>
+
+        
+            <div id="All" class="tabcontent main-tabcontent">
+              <div class="dynamic-card-container all-recipes-card-container">
+
+                {% for post in total_user_recipes %}
+
+                  <div class="recipe-cards all-recipes-cards userchnl-cards">
+                    <a href="{% url 'viewpost' post.pk %}">
+                      <div class="img-container">
+                        {% for i in post.photo_set.all %}
+                        {% if forloop.counter0 == 0 %}
+                            <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                        {% endif %}
+                          {% empty %}
+                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                        {% endfor %}
+                      </div>
+                        <div class="card-body recipe-info">
+                            <h4 class="card-title">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                          </div>
+                    </a>
+                    <div class="quick-view">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+                  </div>
+
+                {% endfor %}
+
+              </div>
+            </div>
+
+            <div id="Breakfast" class="tabcontent main-tabcontent">
+
+              <div class="dynamic-card-container all-recipes-card-container">
+
+                {% for post in brkfst_recipes %}
+
+                  <div class="recipe-cards all-recipes-cards userchnl-cards">
+                    <a href="{% url 'viewpost' post.pk %}">
+                      <div class="img-container">
+                        {% for i in post.photo_set.all %}
+                        {% if forloop.counter0 == 0 %}
+                            <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                        {% endif %}
+                          {% empty %}
+                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                        {% endfor %}
+                      </div>
+                        <div class="card-body recipe-info">
+                            <h4 class="card-title">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                          </div>
+                    </a>
+                    <div class="quick-view">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+                  </div>
+
+                {% endfor %}
+                
+              </div>
+
+            </div>
+
+            <div id="Lunch" class="tabcontent main-tabcontent">
+
+              <div class="dynamic-card-container all-recipes-card-container">
+
+                {% for post in lnch_recipes %}
+
+                  <div class="recipe-cards all-recipes-cards userchnl-cards">
+                    <a href="{% url 'viewpost' post.pk %}">
+                      <div class="img-container">
+                        {% for i in post.photo_set.all %}
+                        {% if forloop.counter0 == 0 %}
+                            <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                        {% endif %}
+                          {% empty %}
+                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                        {% endfor %}
+                      </div>
+                        <div class="card-body recipe-info">
+                            <h4 class="card-title">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                          </div>
+                    </a>
+                    <div class="quick-view">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+                  </div>
+
+                {% endfor %}
+                
+              </div>
+
+            </div>
+
+            <div id="Snacks" class="tabcontent main-tabcontent">
+
+              <div class="dynamic-card-container all-recipes-card-container">
+
+                {% for post in evesnack_recipes %}
+
+                  <div class="recipe-cards all-recipes-cards userchnl-cards">
+                    <a href="{% url 'viewpost' post.pk %}">
+                      <div class="img-container">
+                        {% for i in post.photo_set.all %}
+                        {% if forloop.counter0 == 0 %}
+                            <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                        {% endif %}
+                          {% empty %}
+                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                        {% endfor %}
+                      </div>
+                        <div class="card-body recipe-info">
+                            <h4 class="card-title">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                          </div>
+                    </a>
+                    <div class="quick-view">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+                  </div>
+
+                {% endfor %}
+                
+              </div>
+
+            </div>
+
+            <div id="Dinner" class="tabcontent main-tabcontent">
+
+              <div class="dynamic-card-container all-recipes-card-container">
+
+                {% for post in dnr_recipes %}
+
+                  <div class="recipe-cards all-recipes-cards userchnl-cards">
+                    <a href="{% url 'viewpost' post.pk %}">
+                      <div class="img-container">
+                        {% for i in post.photo_set.all %}
+                        {% if forloop.counter0 == 0 %}
+                            <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                        {% endif %}
+                          {% empty %}
+                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                        {% endfor %}
+                      </div>
+                        <div class="card-body recipe-info">
+                            <h4 class="card-title">{{post.title}}</h4>
+                            <p class="card-text">
+                                <ul>
+                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
+                                </ul>
+                            </p>
+                          </div>
+                    </a>
+                    <div class="quick-view">
+                        <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                        </button>
+                    </div>
+                  </div>
+
+                {% endfor %}
+                
+              </div>
+
+            </div>
+
+          </div>
+
+        </main>
+
+        <aside class="sidebar profile-sidebar">
+                    
+          <div class="sidebar-recipes">
+            <div class="sidebar-header">
+                <h1>Details</h1>
+            </div>
+
+              
+            <div class="sidebar-usr-pro-dash">
+              <h4>Joined</h4>
+
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  {% for i in user_profiles %}
+
+                    {% if profile_details.email == i.user.email %}
+
+                      {{i.user.date_joined.date}}
+
+                    {% endif %}
+
+                  {% endfor %}
+                </li>
+                
+              </ul>
+
+              <br> 
+
+              <h4>Links</h4>
+            
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item"><a href="">Facebook</a></li>
+                <li class="list-group-item"><a href="">Instagram</a></li>
+                <li class="list-group-item"><a href="">Twitter</a></li>
+              </ul>
+            </div>
+
+          </div>
+          
+      </aside>
+
+      </div>
+
+    </div>
+
+    {% include 'testingapp/footer.html' %}
+
+  </div>
+  
+
+
+
+
+
+</body>
+<!-- quick view offcanvas -->
+{% if all_recipes %} 
+{% for post in all_recipes %}
+<div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="quickviewModalLabel">Quick View</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body qv-modal-body">
+        <article class="article-featured">
+            <div class="qv-offcanvas-img-container">
+                {% for i in post.photo_set.all %}
+                    {% if forloop.counter0 == 0 %}
+                        <img src="{{ i.image.url }}" class="article-image qv-offcanvas-img" alt="{{post.title}}">
+                    {% endif %}
+                    {% empty %}
+                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
+                {% endfor %}
+            </div>
+            
+            <div class="qv-offcanvas-title-container">
+                <h3 class="article-title">{{post.title}}</h3>
+                <p>
+                    <ul>
+                        <li><img src="{{ post.author.profile.profile_img.url }}" style="width: 30px; height: 30px; border-radius:100px" alt="Image"></li>
+                        <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
+                    </ul>
+                </p>
+            </div>
+
+            <div class="qv-offcanvas-table-wrapper">
+                <table class="table">
+                    
+                    <tbody class="qv-table-body">
+                    <tr>
+                        <th scope="row" colspan="2">Type</th>
+                        <td>{{post.type}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Category</th>
+                        <td>{{post.category}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Cuisine</th>
+                        <td>{{post.cuisine}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Prep time</th>
+                        <td>{{post.timing}} min</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Servings</th>
+                        <td>{{post.servings}}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" colspan="2">Difficulty</th>
+                      <td>{{post.difficulty}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Likes</th>
+                        <td>{{post.total_likes}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row" colspan="2">Dislikes</th>
+                        <td>{{post.total_dislikes}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+          
+        </article>
+
+        <div class="footer-area">
+            <a href="{% url 'viewpost' post.pk %}" class="qv-offcanvas-footer-link">View <span class="material-symbols-rounded qv-offcanvas-link-icon">trending_flat</span></a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+
+<script>
+  function recipes(evt, type) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(type).style.display = "block";
+    evt.currentTarget.className += " active";
+  }
+  document.getElementById("defaultOpen").click();
+</script>
+
+
+{% endblock %}
