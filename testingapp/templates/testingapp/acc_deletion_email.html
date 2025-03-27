@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Deletion Confirmation</title>
+  <style>
+    body {
+        font-family: "Comfortaa", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+        margin: 0;
+        padding: 0;
+        background-color: #ffffff;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+    }
+
+    .container {
+        background-color: #efeeee;
+        border-radius: 30px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+        width: 94%;
+        margin: auto;
+        text-align: center;
+    }
+
+    h1 {
+        color: #224055;
+        margin-bottom: 24px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .container > h1 + p{
+        font-size: 1.4em;
+    }
+
+    p {
+        font-size: 1.2em;
+        line-height: 25px;
+        margin-bottom: 16px;
+    }
+
+    .footer {
+        margin-top: 32px;
+        text-align: center;
+        color: #797878;
+        font-size: 1em;
+    }
+
+    .footer p:first-child{
+        margin-bottom: 10px;
+    }
+
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>Account Deletion Confirmation</h1>
+    <p>Dear <b>{{name}}</b>,</p>
+    <p>This is to confirm that your <b>Yummy recieps</b> account has been permanently closed. </p>
+    <p>Your account has been permanently deleted and all associated data will be removed and cannot be recovered.</p>
+    <br>
+    <div class="footer">
+      <p>Thank you,</p>
+      <p><b>Yummy Recipes team</b></p>
+    </div>
+  </div>
+</body>
+</html>

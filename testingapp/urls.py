@@ -3,8 +3,8 @@ from django.urls import path
 from . import views 
 from django.contrib.auth import views as auth_views
 from .models import post,photo
-from .views import postDetailView, postListView,dashpostview,post_chart,save_location,add_to_favorites,favorite_list,liked_recipes,disliked_recipes,delete_image,Updaterecipeview,Deletepost,UpdatePassword,acc_settings, UpdateProfile,trendingview,customer_render_pdf_view,like_view,dislike_view
-from .views import custom_cards,delete_account,year_recap,credits,cuisines,scroll,summarize_content,generate_recipe_with_ai_image,generate_recipe,email_template,remove_notification,delete_all_blog_history,clear_all_notifications,total_views,compare_recipes,compare_view,compare_recipes_new,feedback_view
+from .views import postDetailView, postListView,dashpostview,post_chart,save_location,add_to_favorites,favorite_list,liked_recipes,disliked_recipes,Updaterecipeview,Deletepost,UpdatePassword,acc_settings, UpdateProfile,trendingview,customer_render_pdf_view,like_view,dislike_view
+from .views import custom_cards,delete_account,year_recap,credits,cuisines,scroll,summarize_content,generate_recipe_with_ai_image,generate_recipe,email_template,remove_notification,delete_all_blog_history,clear_all_notifications,total_views,compare_recipes,compare_view,compare_recipes_new,feedback_view,translate_content
 from .views import CustomPasswordResetView,CustomPasswordResetDoneView,CustomPasswordResetConfirmView,CustomPasswordResetCompleteView,CustomSocialSignupView,CustomLoginView
 from django.views.i18n import set_language
 from django.urls import re_path
@@ -46,11 +46,13 @@ urlpatterns = [
     
     path('searchresults/',views.searchresults_view,name="searchresults"),
     
-    path('aa/',views.aa_view,name="aa"), 
+    path('weather_forecast/',views.weather_forecast_view,name="weather_forecast"), 
     
     path('recipe/<pk>/',postDetailView.as_view(),name="viewpost"), 
     
     path('post/comment',postDetailView.as_view(),name="comment"),
+
+    path('translate-content/', views.translate_content, name="translate_content"),
 
     path('like-view/',views.like_view,name="like-view"),
     
@@ -68,9 +70,7 @@ urlpatterns = [
 
     path('delete/<int:pk>/',Deletepost.as_view(),name="delete"),
 
-    path('updaterecipe/<title>/<pk>/',views.Updaterecipeview,name="updaterecipe"),
-    
-    path('delete_image/<int:image_pk>/', views.delete_image, name='delete_image'),
+    path('editrecipe/<title>/<pk>/',views.Updaterecipeview,name="updaterecipe"),
 
     path('updateprofile/',views.UpdateProfile,name="updateprofile"),
     
@@ -160,5 +160,8 @@ urlpatterns = [
 
     path('<title>/<pk>/shopping list/',views.shopping_list_pdf,name="shopping_list"),
 
+    path('export-data/', views.export_user_data, name='export_data'),
+
+    path("dynamic.css/", views.dynamic_css, name="dynamic_css"),
 
 ]

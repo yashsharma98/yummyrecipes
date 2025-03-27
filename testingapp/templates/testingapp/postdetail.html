@@ -53,11 +53,11 @@
                   <div class="carousel-inner">
                     {% for post in post.photo_set.all %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                      <img src="{{ post.image.url }}" class="d-block carousel-image" alt="{{ post.title }}">
+                      <img src="{{ post.image.url }}" class="d-block carousel-image w-100" alt="{{ post.title }}">
                     </div>
                     {% empty %}
                     <div>
-                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image" alt="{{ post.title }}">
+                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image w-100" alt="{{ post.title }}">
                     </div>
                     {% endfor %}
                   </div>
@@ -143,13 +143,13 @@
                                 
                                   {% for followed_user in is__following %}
 
-                                    {% if followed_user is False %} <!-- if user is not following the targeted user -->
+                                    {% if followed_user is False %} {# if user is not following the targeted user #}
                                       <form method="post" action="{% url 'follow_unfollow_user' i.user.username %}">
                                           {% csrf_token %}
                                           <button type="submit">Follow</button>
                                       </form>
 
-                                    {% else %}  <!-- if user is following the targeted user -->
+                                    {% else %}  {# if user is following the targeted user #}
                                       <form method="post" action="{% url 'follow_unfollow_user' i.user.username %}">
                                           {% csrf_token %}
                                           <button type="submit">Unfollow</button>
@@ -198,37 +198,6 @@
   
                   <div class="like-dislike-div">
                     <div class="like-div">
-                      <!-- <form action="{% url 'like-view' %}" method="POST">
-                        {% csrf_token %}
-                        
-                        {% if request.user.profile in post.likes.all %}
-  
-                          <button type="submit" class="" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="Unlike">
-                            <span class="material-symbols-rounded like-dislike-icon liked">thumb_up</span>  
-                          </button>
-  
-                          <div class="total-likes">{{post.total_likes}}</div>
-                        {% else %}
-  
-                          {% if post.total_likes == 0 %}
-  
-                            <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I like this">
-                              <span class="material-symbols-rounded like-dislike-icon">thumb_up</span>  
-                            </button>
-                              <div class="total-likes">{{post.total_likes}}</div>
-  
-                          {% else %}
-  
-                            <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I like this">
-                              <span class="material-symbols-rounded like-dislike-icon">thumb_up</span>  
-                            </button>
-                              <div class="total-likes">{{post.total_likes}}</div>
-  
-                          {% endif %}
-  
-                        {% endif %}
-                        
-                      </form> -->
                       <form action="{% url 'like-view' %}" method="POST">
                         {% csrf_token %}
                     
@@ -248,38 +217,6 @@
   
                   <div class="like-dislike-div">
                     <div class="dislike-div">
-                      <!-- <form action="{% url 'dislike-view' %}" method="POST">
-                        {% csrf_token %}
-  
-                        {% if request.user.profile in post.dislikes.all %}
-  
-                          <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="Disliked">
-                            <span class="material-symbols-rounded like-dislike-icon disliked">thumb_down</span>  
-                          </button>
-                          <div class="total-dislikes">{{post.total_dislikes}}</div>
-  
-                        {% else %}
-  
-                        {% if post.total_dislikes == 0 %}
-  
-                          <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I dislike this">
-                            <span class="material-symbols-rounded like-dislike-icon">thumb_down</span>
-                          </button>
-                          <div class="total-dislikes">{{post.total_dislikes}}</div>
-  
-                        {% else %}
-  
-                          <button type="submit" class="btn btn-light" name="post_id" value="{{post.id}}" data-toggle="tooltip" data-placement="top" title="I dislike this">
-                            <span class="material-symbols-rounded like-dislike-icon">thumb_down</span>
-                          </button>
-                          <div class="total-dislikes">{{post.total_dislikes}}</div>
-  
-                        {% endif %}
-  
-                        {% endif %}
-  
-                      </form> -->
-                    
                       <form action="{% url 'dislike-view' %}" method="POST">
                         {% csrf_token %}
                     
@@ -339,7 +276,7 @@
   
                 </div>                
 
-                <!-- views, trending text & read time -->
+                {# views, trending text & read time #}
                 <div class="recipe-trending-text">
 
                   <div class="d-flex justify-content-start">
@@ -386,7 +323,13 @@
                           <tr>
                               <th scope="row" colspan="2">Prep time</th>
                               <td>:</td>
-                              <td>{{post.timing}} min</td>
+                              <td>
+                                {% if post.timing > 1 %}
+                                    {{post.timing}} mins
+                                {% else %}
+                                    {{post.timing}} min
+                                {% endif %}
+                              </td>
                           </tr>
                           <tr>
                               <th scope="row" colspan="2">Servings</th>
@@ -398,11 +341,6 @@
                             <td>:</td>
                             <td>{{post.difficulty}}</td>
                           </tr>
-                            <!-- <tr>
-                              <th scope="row" colspan="2">Views</th>
-                              <td>:</td>
-                              <td>{% get_hit_count for post %}</td>
-                          </tr> -->
                           <tr>
                               <th scope="row" colspan="2">Posted</th>
                               <td>:</td>
@@ -419,96 +357,6 @@
                               {% endif %}
                             </td>
                           </tr>
-                          <!-- <tr>
-                              <th scope="row" colspan="2">Popularity </th>
-                              <td>:</td>
-                              <td>
-                                {% if post.type == 'Breakfast' %}
-
-                                  {% if fetched_recipe|join:"" in post.title %}
-
-                                    {% for post in breakfast.all %}
-
-                                      {% if fetched_recipe|join:"" in post.title %}
-
-                                        {{forloop.counter| ordinal }} in breakfast recipes
-
-                                      {% endif %}
-
-                                    {% endfor %}
-
-                                  {% else %}
-                                    0
-                                  {% endif %}
-
-                                {% elif post.type == 'Lunch' %} 
-                                
-                                {% if fetched_recipe|join:"" in post.title %}
-
-                                  {% for post in lunch.all %}
-
-                                    {% if fetched_recipe|join:"" in post.title %}
-
-                                      {{forloop.counter| ordinal }} in lunch recipes
-
-                                    {% endif %}
-
-                                  {% endfor %}
-                                
-                                {% else %}
-                                  0
-                                {% endif %}
-
-                                {% elif post.type == 'Evening Snack' %} 
-
-                                  {% if fetched_recipe|join:"" in post.title %}
-
-                                    {% for post in evesnack.all %}
-                                    
-                                      {% if fetched_recipe|join:"" in post.title %}
-
-                                        {{forloop.counter| ordinal }} in evening snack recipes
-                                      
-                                      {% endif %}
-                                
-                                    {% endfor %}
-
-                                  {% else %}
-                                    0
-                                  {% endif %}
-
-                                {% else %}
-
-                                {% if fetched_recipe|join:"" in post.title %}
-                                  
-                                  {% for post in dinner.all %}
-                                  
-                                    {% if fetched_recipe|join:"" in post.title %}
-
-                                      {{forloop.counter| ordinal }} in dinner recipes
-
-                                    {% endif %}
-
-                                  {% endfor %}
-
-                                {% else %}
-                                  0
-                                {% endif %}
-
-
-                                {% endif %}
-                              </td>
-                          </tr> -->
-                            <!-- <tr>
-                                <th scope="row" colspan="2">Likes</th>
-                                <td>:</td>
-                                <td>{{post.total_likes}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row" colspan="2">Dislikes</th>
-                                <td>:</td>
-                                <td>{{post.total_dislikes}}</td>
-                            </tr> -->
                         </tbody>
                       </table>
                     </div>
@@ -546,11 +394,11 @@
                 </div>
 
                 <div class="recipe-content-actions">
-                  <!-- <button id="listenButton"><span class="material-symbols-rounded recipe-action-icons">graphic_eq</span>Audio</button> -->
+                  {# <button id="listenButton"><span class="material-symbols-rounded recipe-action-icons">graphic_eq</span>Audio</button> #}
 
-                  <!-- <a href="#translated-text-wrapper">
+                  <a href="#translatedContainer">
                     <button type="button" id="translateButton"><span class="material-symbols-rounded recipe-action-icons">translate</span>Translate in hindi</button>
-                  </a> -->
+                  </a>
 
                   <a class="compare-recipe-collpase" href="{% url 'compare_recipes' post.pk %}">
                     <span class="material-symbols-rounded recipe-action-icons">compare</span>Compare recipe
@@ -562,7 +410,7 @@
                     <span class="material-symbols-rounded recipe-action-icons">shopping_cart</span>Shopping list
                   </button> 
 
-                  <div class="dropdown-menu body-detail-dropdown-content">
+                  <div class="dropdown-menu body-detail-dropdown-content recipe-detail-dropdown-content">
                     <div class="body-detail-dropdown-list">
                       <div class="dropdown-first-child">
                         <button class="dropdown-links" data-bs-toggle="modal" data-bs-target="#shoppinglistModal">
@@ -582,60 +430,62 @@
 
                 </div>
 
-                <!-- gtts library audio -->
+                {# gtts library audio #}
                 <audio controls  id="audioPlayer" preload="none" style="display: none;">
                   <source src="{{ audio_file_new }}" type="audio/mp3">
                 </audio>
 
-                <!-- Open ai api audio -->
-                <!-- <audio controls id="audioPlayer" preload="none" style="display: none;">
-                  <source src="{{ audio_file_name }}" type="audio/mp3">
-                </audio> -->
+                {# Open ai api audio #}
+                {% comment %}
+                  <audio controls id="audioPlayer" preload="none" style="display: none;">
+                      <source src="{{ audio_file_name }}" type="audio/mp3">
+                  </audio>
+                {% endcomment %}
 
                 <div data-spy="scroll" data-target="#navbar-example2" data-offset="50">
 
                 <div class="recipe-body-content ingred-body" id="ingredients">
                   <h4 id="instructions-heading">Ingredients</h4>
-                  
-                  <div class="recipe-data recipe-data-ingred">
+                  <div class="recipedetail-copy-btn">
+                    <button class="copy-btn" onclick="copyToClipboard('ingredients-content', this)" title="Copy Ingredients"><span class="material-symbols-rounded upload-img-icon">content_copy</span></button>
+                  </div> 
+
+                  <div class="recipe-data recipe-data-ingred" id="ingredients-content">
                     {{post.ingredients|safe}}
                   </div>
+                               
                 </div>
 
                 <div class="recipe-body-content summarizecontent" id="instructions">
                   <h4>Instructions</h4>
-
-                  <div class="recipe-data">
-                    {{post.content|safe}}
+                  <div class="recipedetail-copy-btn">
+                    <button class="copy-btn" onclick="copyToClipboard('content-text', this)" title="Copy Instructions"><span class="material-symbols-rounded upload-img-icon">content_copy</span></button>
                   </div>
 
-                  <!-- <p>
-                    <pre>{{post.content|safe}}</pre>
-                  </p> -->
-                  
+                  <div class="recipe-data" id="content-text">
+                    {{post.content|safe}}
+                  </div>
                 </div>
 
-                <div id="translated-text-wrapper">
-                  <div class="recipe-body-content translatedcontainer" id="translatedTextContainer" style="display: none;">
-                    <span id="translateTextHeading" style="display: none;">Translated to hindi</span>
-
+                <div id="translatedContainer">
+                  <div class="recipe-body-content recipe-body-content-secondary translatedcontainer" id="translatedTextContainer" style="display: none;">
+                    <span id="translateTextHeading" style="display: none;"><h4>Translated to hindi</h4></span>
                     <p id="translatedContent">
                       
                     </p>
-                    
                   </div>
                 </div>
 
                 <form class="translate-form" id="translateForm">
                   {% csrf_token %}
-                  <textarea type="text" name="post_content">{{post.content|safe}}</textarea>
+                  <textarea type="text" name="post_content">{{ post.content|safe }}</textarea>
                   <input type="hidden" name="translate_content" value="1">
-                </form>
+              </form>
 
               </div>
                 
-                <!-- Summarized text will be displayed here -->
-                <div class="recipe-body-content summarized-container" id="summarizedContentContainer" style="display: none;">
+                {# Summarized text will be displayed here #}
+                <div class="recipe-body-content recipe-body-content-secondary summarized-container" id="summarizedContentContainer" style="display: none;">
                   <span id="sumheading" style="display: none;"><h4>Summarized recipe</h4></span>
 
                   <p id="summarizedtext"></p>
@@ -643,8 +493,7 @@
 
               </div>
               
-
-              <!-- Comments -->
+              {# Comments #}
               <div class="accordion accordion-flush comments-accordian" id="accordionFlushExample">
                 <div class="accordion-item">
                   <h2 class="accordion-header">
@@ -654,7 +503,6 @@
                   </h2>
                 </div>
               </div>
-
             
               <div class="postdetail-recipe-container">
 
@@ -940,9 +788,9 @@
       <div class="dropdown-menu body-detail-dropdown-content bottom-navigation-dropdown-content">
         <div class="body-detail-dropdown-list">
           <div class="dropdown-second-child">
-            <a class="dropdown-links bottom-navlinks" href="#ingredients">Ingredients</a>
+            <a class="dropdown-links bottom-navlinks" onclick="scrolltosection('ingredients')">Ingredients</a>
       
-            <a class="dropdown-links bottom-navlinks" href="#instructions">Instructions</a>
+            <a class="dropdown-links bottom-navlinks" onclick="scrolltosection('instructions')">Instructions</a>
             
             <a class="dropdown-links" href="#summarizedtext">
               <form id="summarizeForm">
@@ -1131,7 +979,7 @@
   
                 </div>                
 
-                <!-- views, trending text & read time -->
+                {# views, trending text & read time #}
                 <div class="recipe-trending-text">
 
                   <div class="d-flex justify-content-start">
@@ -1177,7 +1025,13 @@
                           <tr>
                               <th scope="row" colspan="2">Prep time</th>
                               <td>:</td>
-                              <td>{{post.timing}} min</td>
+                              <td>
+                                {% if post.timing > 1 %}
+                                  {{post.timing}} mins
+                                {% else %}
+                                  {{post.timing}} min
+                                {% endif %}
+                              </td>
                           </tr>
                           <tr>
                               <th scope="row" colspan="2">Servings</th>
@@ -1205,16 +1059,6 @@
                               {% endif %}
                             </td>
                           </tr>
-                            <!-- <tr>
-                                <th scope="row" colspan="2">Likes</th>
-                                <td>:</td>
-                                <td>{{post.total_likes}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row" colspan="2">Dislikes</th>
-                                <td>:</td>
-                                <td>{{post.total_dislikes}}</td>
-                            </tr> -->
                         </tbody>
                       </table>
                     </div>
@@ -1267,19 +1111,13 @@
                   <div class="recipe-data">
                     {{post.content|safe}}
                   </div>
-
-                  <!-- <p>
-                    <pre>{{post.content|safe}}</pre>
-                  </p> -->
-                  
                 </div>
 
               </div>
 
               </div>
-              
 
-              <!-- Comments -->
+              {# Comments #}
               <div class="accordion accordion-flush comments-accordian" id="accordionFlushExample">
                 <div class="accordion-item">
                   <h2 class="accordion-header">
@@ -1575,17 +1413,41 @@
 
   </div>
 
-
-    <!-- <script>
-      location.href = "{% url 'topostlogin' post.pk %}";
-    </script> -->
-
   {% endif %}
         
 
 </body>
 
-<!-- parallax effect to carousel images -->
+<script>
+  function copyToClipboard(elementId, buttonElement) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    const tempTextArea = document.createElement("textarea");
+    tempTextArea.value = element.textContent.trim();
+    document.body.appendChild(tempTextArea);
+
+    tempTextArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempTextArea);
+
+    let copiedText = "Copied!";
+    if (elementId === "ingredients-content") {
+      copiedText = "Ingredients copied!";
+    } else if (elementId === "content-text") {
+      copiedText = "Instructions copied!";
+    }
+
+    const originalText = buttonElement.innerHTML;
+    buttonElement.innerHTML = `<span class="material-symbols-rounded upload-img-icon">done</span>${copiedText}`;
+
+    setTimeout(() => {
+      buttonElement.innerHTML = originalText;
+    }, 2000);
+  }
+</script>
+
+{# parallax effect to carousel images #}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const primaryWrapper = document.querySelector('.primary-wrapper');
@@ -1601,8 +1463,7 @@
   });
 </script>
 
-<!-- following toast message -->
-
+{# following toast message #}
 {% if messages %}
   {% for message in messages %}
     {% if 'follow_message' in message.tags %}   
@@ -1630,8 +1491,7 @@
 {% endif %}
 
 
-<!-- if authenticated user tries to following itself -->
-
+{# if authenticated user attempts to following itself #}
 {% if messages %}
   {% for message in messages %}
     {% if 'same_user' in message.tags %}   
@@ -1737,7 +1597,7 @@
 
 {% endif %}
 
-<!-- recipe images modal -->
+{# recipe images modal #}
 <div class="modal fade modal-xl" id="spotlightModal{{post.pk}}" tabindex="-1" aria-labelledby="spotlightModalLabel" aria-hidden="true">
   <div class="modal-dialog spotlight-modal-dialog">
     <div class="modal-content spotlight-modal-content">
@@ -1776,8 +1636,7 @@
 </div>
 
 
-<!-- quick view offcanvas -->
-
+{# quick view offcanvas #}
 {% if all_recipes %} 
 {% for post in all_recipes %}
 <div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
@@ -1805,7 +1664,6 @@
                       <li>
                         <img src="{{ post.author.profile.profile_img.url }}" alt="Image" style="width: 30px; height: 30px; border-radius:100px">
                       </li>
-                        <!-- <li><img src="{{ user.profile.profile_img.url }}" style="width: 30px; height: 30px; border-radius:100px" alt="Image"></li> -->
                         <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
                     </ul>
                 </p>
@@ -1829,7 +1687,13 @@
                     </tr>
                     <tr>
                         <th scope="row" colspan="2">Prep time</th>
-                        <td>{{post.timing}} min</td>
+                        <td>
+                          {% if post.timing > 1 %}
+                            {{post.timing}} mins
+                          {% else %}
+                            {{post.timing}} min
+                          {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row" colspan="2">Servings</th>
@@ -1863,7 +1727,7 @@
 {% endfor %}
 {% endif %}
 
-<!-- Simple view modal only for ingredients and instructions -->
+{# Simple view modal only for ingredients and instructions #}
 <div class="offcanvas offcanvas-end qv-offcanvas simple-offcanvas" tabindex="-1" id="simpleViewModal" aria-labelledby="simpleViewModalLabel">
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="quickviewModalLabel">
@@ -1912,7 +1776,7 @@
   </div>
 </div>
 
-<!-- shopping list modal -->
+{# shopping list modal #}
 <div class="modal fade Modal-logout" id="shoppinglistModal" tabindex="-1" aria-labelledby="shoppinglistModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content logoutmodal share-recipe-modal shopping-list-modal">
@@ -1937,7 +1801,7 @@
   </div>
 </div>
 
-<!-- scrolling bottom cards -->
+{# scrolling bottom cards #}
 <script>
   const cardWrapper = document.querySelector('.more-recipes-container');
   const scrollLeftButton = document.getElementById('scroll-left');
@@ -1972,8 +1836,8 @@
   });
 </script>
 
-<!-- showing & hiding the bottom navigation pill on scroll and 
-    Changing the navbar brand name to recipe title on scroll only when url is viewpost -->
+{# showing & hiding the bottom navigation pill on scroll #}
+{# Changing the navbar brand name to recipe title on scroll only when url is viewpost #}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     var bottomNavigation = document.getElementById('navbar-example2');
@@ -2032,7 +1896,7 @@
 
 </script>
   
-<!-- Adding active class to the bottom navigation pill -->
+{# Adding active class to the bottom navigation pill & scroll view function #}
 <script>
 $(document).ready(function () {
     $('.nav-link').click(function () {
@@ -2041,9 +1905,16 @@ $(document).ready(function () {
         $(this).addClass('active');
     });
 });
+
+function scrolltosection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+}
 </script>
 
-<!-- Updating like form using ajax (icon & counter) -->
+{# Updating like form using ajax (icon & counter) #}
 <script>
   $(document).ready(function() {
     $('.like-button').click(function(e) {
@@ -2083,7 +1954,7 @@ $(document).ready(function () {
   });
 </script>
 
-<!-- Updating dislike form using ajax (icon & counter) -->
+{# Updating dislike form using ajax (icon & counter) #}
 <script>
   $(document).ready(function() {
       $('.dislike-button').click(function(e) {
@@ -2125,7 +1996,7 @@ $(document).ready(function () {
   });
 </script>
 
-<!-- summarizing content (instruction) using api -->
+{# summarizing content (instruction) using api #}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById('summarizeForm');
@@ -2159,23 +2030,24 @@ $(document).ready(function () {
             bodyContent.classList.remove('analyzing');
             summarizedContainer.classList.add('containercolor')
             sHeading.style.display = 'block';
-
             btmNavbtn.innerHTML = 'Summarize recipe';
 
-            // responseText.innerHTML = response.summarizedContent;
+            // For directly putting the response text into the summarizedtext
+            responseText.innerHTML = response.summarizedContent;
 
-            const contentLetters = response.summarizedContent.split('');
-            let index = 0;
+            // For typing simulation responses
+            // const contentLetters = response.summarizedContent.split('');
+            // let index = 0;
 
-              const typingInterval = setInterval(function () {
-                responseText.innerHTML += contentLetters[index];
+            //   const typingInterval = setInterval(function () {
+            //     responseText.innerHTML += contentLetters[index];
 
-                  index++;
+            //       index++;
 
-                  if (index === contentLetters.length) {
-                      clearInterval(typingInterval);
-                  }
-              }, 50); 
+            //       if (index === contentLetters.length) {
+            //           clearInterval(typingInterval);
+            //       }
+            //   }, 50); 
           }
           
           else {
@@ -2202,7 +2074,7 @@ $(document).ready(function () {
 
 </script>
 
-<!-- API error toast -->
+{# API error toast #}
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
   <div id="APIerrorToast" class="toast follow-toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex"> 
@@ -2214,63 +2086,51 @@ $(document).ready(function () {
   </div>
 </div>
 
-<!-- recipe content translation to hindi -->
+{# recipe content translation to hindi #}
 <script>
-$(document).ready(function() {
-    $("#translateButton").on("click", function(event) {
-        event.preventDefault();  // Prevent the default form submission or button behavior
+  $(document).ready(function () {
+    const form = document.getElementById('summarizeForm');
+    const sHeading = document.getElementById('translateTextHeading');
+    const bodyContent = document.querySelector('.summarizecontent');
 
-        var postContent = $("textarea[name='post_content']").val();  // Get the textarea content
-        var csrfToken = $("input[name='csrfmiddlewaretoken']").val();  // Get CSRF token
-
-        $('.summarizecontent').addClass('analyzing');
-
-        $.ajax({
-            type: "POST",
-            url: window.location.href,  // Correct URL for the request
-            data: {
-                csrfmiddlewaretoken: csrfToken,
-                translate_content: 1,
-                post_content: postContent  // Send content as data, not in the URL
-            },
-            success: function(data) {
-                // Handle success
-                if (data.error) {
-                    alert(data.error);  // Show error message if there is an error
-                    $('.summarizecontent').removeClass('analyzing');
-                    return;
-                }
-
-                $('#translateTextHeading').show();
-                $('#translatedTextContainer').show();
-                $('.translatedcontainer').addClass('containercolor');
-                $('.summarizecontent').removeClass('analyzing');
-
-                const contentLetters = data.translated_text.split('');
-                let index = 0;
-
-                const typingInterval = setInterval(function () {
-                    $('#translatedContent').html($('#translatedContent').html() + contentLetters[index]);
-
-                    index++;
-
-                    if (index === contentLetters.length) {
-                        clearInterval(typingInterval);
-                    }
-                }, 50); 
-            },
-            error: function(error) {
-                alert("An error occurred. Please try again later.");
-                $('.summarizecontent').removeClass('analyzing');
-                console.log(error);
-            }
-        });
+    $("#translateButton").click(function () {
+      $("#translateForm").submit(); 
+      bodyContent.classList.add('analyzing');
     });
-});
+      
+    $("#translateForm").submit(function (event) {
+      event.preventDefault();
+      var formData = new FormData(this);
+      var csrftoken = $("input[name='csrfmiddlewaretoken']").val();
 
+      $.ajax({
+        url: "{% url 'translate_content' %}",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { "X-CSRFToken": csrftoken },
+        success: function (response) {
+          if (response.translated_text) {
+            $("#translatedContent").html(response.translated_text);
+            $("#translateTextHeading").show();
+            $("#translatedTextContainer").show();
+            bodyContent.classList.remove('analyzing');
+            sHeading.style.display = 'block';
+          }
+        },
+        
+        error: function (xhr, status, error) {
+          bodyContent.classList.remove('analyzing');
+          var errorToast = new bootstrap.Toast(document.getElementById('APIerrorToast'));
+          errorToast.show();
+        }
+      });
+    });
+  });
 </script>
 
-<!-- Show/hide the audio tag -->
+{# Show/hide the audio tag #}
 <script>
   $(document).ready(function() {
       $("#listenButton").on("click", function() {
@@ -2283,25 +2143,14 @@ $(document).ready(function() {
         });
       });
   });
-
-  
-  const translateform = document.getElementById('translateForm');
-  const translateButton = document.getElementById('translateButton');
-
-  translateButton.addEventListener('click', () => {
-      translateform.submit();
-  });
 </script>
 
-<!-- showing comment using ajax -->
+{# showing comment using ajax #}
 <script>
   var options = [];
 
     $( '#commentbutton' ).on( 'click', function( event ) {
     var comt = $('#inputComment').val();
-    console.log(comt);
-    
-    
     
     $.ajax(
     {
@@ -2347,7 +2196,7 @@ $(document).ready(function() {
       });
 </script> 
 
-<!-- scroll progress indicator on navbar with bgcolor and rotating logo svg -->
+{# scroll progress indicator on navbar with bgcolor and rotating logo svg #}
 <script>
   let scrollTimeout;
   document.getElementById('scrollableDiv').addEventListener('scroll', function() {
@@ -2392,8 +2241,7 @@ $(document).ready(function() {
   });
 </script>
 
-<!-- share recipe modal -->
-
+{# share recipe modal #}
 <div class="modal fade Modal-logout" id="shareRecipeModal" tabindex="-1" aria-labelledby="shareRecipeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content logoutmodal share-recipe-modal">
@@ -2410,28 +2258,21 @@ $(document).ready(function() {
               <div class="share-links-container">
                 <div class="share-sheet-links">
                   <a href="https://www.gmail.com/" class="fa-solid fa-envelope" target="_blank"></a>
-                  <p>Gmail</p>
                 </div>
                 <div class="share-sheet-links">
                   <a href="https://www.facebook.com/" class="fa-brands fa-facebook-f" target="_blank"></a>
-                  <p>Facebook</p>
                 </div>
                 <div class="share-sheet-links">
                   <a href="https://www.instagram.com/" class="fa-brands fa-instagram" target="_blank"></a>
-                  <p>Instagram</p>
                 </div>
                 <div class="share-sheet-links">
                   <a href="https://telegram.org/" class="fa-brands fa-telegram" target="_blank"></a>
-                  <p>Telegram</p>
                 </div>
                 <div class="share-sheet-links" id="shoe-div">
-                  <!-- <a href="https://www.whatsapp.com" class="fa-brands fa-whatsapp" target="_blank"></a> -->
                   <a href="" id="whatsapp-share-button" class="fa-brands fa-whatsapp"></a>
-                  <p>WhatsApp</p>
                 </div>
                 <div class="share-sheet-links">
                   <a href="https://x.com/?lang=en" class="fa-brands fa-x-twitter" target="_blank"></a>
-                  <p>X</p>
                 </div>
               </div>
             </div>
@@ -2460,7 +2301,7 @@ $(document).ready(function() {
   </div>
 </div>
     
-<!-- open whatsapp desktop app if installed to share link -->
+{# open whatsapp desktop app if installed to share link #}
 <script>
   $(document).ready(function() {
     $("#whatsapp-share-button").click(function(e) {
@@ -2482,68 +2323,41 @@ $(document).ready(function() {
   });
 </script>
 
-
-<!-- link copied toast message -->
-
-<!-- <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-  <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-      <div class="d-flex"> 
-          <div class="toast-body" id="urlCopied">
-              
-          </div>
-          <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-  </div>
-</div> -->
-
-<!-- Link copy toast -->
-<!-- <script>
-  const toastTrigger = document.getElementById('copylink')
-  const toastLiveExample = document.getElementById('liveToast')
-  if (toastTrigger) {
-    toastTrigger.addEventListener('click', () => {
-    const toast = new bootstrap.Toast(toastLiveExample)
-
-    toast.show()
-  })
-}
-</script> -->
-
-<!-- share link url when clicked on copy link -->
+{# share link url when clicked on copy link #}
 <script>
   $(document).ready(function(){
     $('#copylink').click(function(){
-    
-      var url = window.location.href;
-      navigator.clipboard.writeText(url);
-      var $buttonText = $('#copylink .button-text');
-      var $linkicon = $('.share-recipe-icon');
-      var $linktext = $('#linktext');
+        var url = window.location.href;
+        navigator.clipboard.writeText(url); 
 
+        var $buttonText = $('#copylink .button-text');
+        var $linkicon = $('.share-recipe-icon');
+        var $linktext = $('#linktext');
 
-      $buttonText.text('Link Copied :');
-      $buttonText.css("font-weight", "bold");
-      $linkicon.addClass('link-icon-active');
+        $buttonText.text('Link Copied');
+        $buttonText.css("font-weight", "bold");
+        $linkicon.addClass('link-icon-active');
 
-      setTimeout(function(){
-        $buttonText.text('Copy link');
-        $buttonText.css("font-weight", "normal");
-        $linktext.text('');
-        $linkicon.removeClass('link-icon-active');
-      }, 3000);  
+        setTimeout(() => {
+          let modalElement = bootstrap.Modal.getInstance(document.getElementById('shareRecipeModal'));
+          if (modalElement) {
+              modalElement.hide();
+          }
+
+          setTimeout(() => {
+              showToast(url);
+          }, 300);
+      }, 800);
+
+        setTimeout(function(){
+            $buttonText.text('Copy link');
+            $buttonText.css("font-weight", "normal");
+            $linktext.text('');
+            $linkicon.removeClass('link-icon-active');
+        }, 3000);
     });
+});
 
-  });
-    
-  function Copy() {
-    //var Url = document.createElement("textarea");
-
-    // urlCopied.innerHTML = window.location.href;
-    linktext.innerHTML = window.location.href;
-    
-    //Copied = Url.createTextRange();
-    //Copied.execCommand("Copy");
-  }
 </script>
     
 {% endblock %}

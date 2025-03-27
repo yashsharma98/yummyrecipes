@@ -38,7 +38,6 @@
 {% if user.is_authenticated %}
 
 
-
 <div class="primary-wrapper" id="primary-wrapper">
     <div class="secondary-wrapper">
 
@@ -57,362 +56,167 @@
               <nav class="appearance-theme-nav">
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                   <div class="tabs">
-                    <button class="nav-link tab nav_link_btn no-animation" id="nav-light-theme" data-bs-toggle="tab" data-bs-target="#light_theme" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Light</button>
-                    
+                    <button class="nav-link tab nav_link_btn no-animation" id="nav-light-theme" data-bs-toggle="tab" data-bs-target="#light_theme"
+                      type="button" role="tab" aria-controls="nav-profile" aria-selected="false">
+                      <div class="d-block">
+                        <div>
+                        <span class="material-symbols-rounded nav-theme-icons">wb_sunny</span>
+
+                        </div>
+                        <div>Day</div>
+                      </div>
+                    </button>
+                   
                     <button class="nav-link tab nav_link_btn no-animation" id="dark_theme_tab_btn" 
-                    data-bs-toggle="tab" data-bs-target="#dark_theme_tab" type="button" 
-                    role="tab" aria-controls="nav-contact" aria-selected="false">Dark</button>
+                      data-bs-toggle="tab" data-bs-target="#dark_theme_tab" type="button" 
+                      role="tab" aria-controls="nav-contact" aria-selected="false">
+                      <div class="d-block">
+                        <div>
+                        <span class="material-symbols-rounded nav-theme-icons">moon_stars</span>
+
+                        </div>
+                        <div>Night</div>
+                      </div>
+                    </button>
+                   
+                    <button class="nav-link tab nav_link_btn no-animation" id="nav-create-theme" 
+                      data-bs-toggle="tab" data-bs-target="#custom_theme" type="button" role="tab" 
+                      aria-controls="nav-home" aria-selected="true">
+                      <div class="d-block">
+                        <div>
+                        <span class="material-symbols-rounded nav-theme-icons">colors</span>
+
+                        </div>
+                        <div>Custom</div>
+                      </div> 
+                    </button>
                     
-                    <button class="nav-link tab nav_link_btn no-animation" id="nav-create-theme" data-bs-toggle="tab" data-bs-target="#custom_theme" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Custom</button>
-                    
-                    <button class="nav-link tab nav_link_btn no-animation" id="nav-generate-theme" data-bs-toggle="tab" data-bs-target="#generate_colors" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">AI theme</button>
+                    <button class="nav-link tab nav_link_btn no-animation" id="nav-generate-theme" 
+                      data-bs-toggle="tab" data-bs-target="#generate_colors" type="button" role="tab" 
+                      aria-controls="nav-contact" aria-selected="false">
+                      <div class="d-block">
+                        <div>
+                        <!-- <span class="material-symbols-rounded nav-theme-icons">wand_stars</span> -->
+                        <span><i class="fa-solid fa-wand-magic-sparkles rounded nav-theme-icons"></i></span>
+
+                        </div>
+                        <div>Generate theme</div>
+                      </div>
+                    </button>
                   </div>
                 </div>
               </nav>  
 
+              <div class="color-form-container" style="display: none;">
+                <!-- Default/reset form -->
+                <form id="default_theme_form" class="form-animation" action="{% url 'reset_colors' %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Default color">
+                    <div class="circle">
+                    
+                      <input type="hidden" name="default_form_type" value="defaultform">
+
+                      <input type="hidden" name="default_theme" value="default_theme">
+
+                      <div class="col color1">
+                        <input type="hidden" id="default_primary_color" name="default_primary_color" value="#DBCBBD" readonly>
+                      </div>
+
+                      <div class="col color2">
+                        <input type="hidden" id="default_secondary_color" name="default_secondary_color" value="#F0ECE3" readonly>
+                      </div>
+
+                      <div class="col color3">
+                        <input type="hidden" id="default_tertiary_color" name="default_tertiary_color" value="#221e20" readonly>
+                      </div>
+
+                      <div class="col color4">
+                        <input type="hidden" id="default_activelink_color" name="default_activelink_color" value="#9F8772" readonly>
+                      </div>
+
+                      <div class="col color5">
+                        <input type="hidden" id="default_hover_color" name="default_hover_color" value="#9C938B" readonly>
+                      </div>
+
+                      <div class="col color6">
+                        <input type="hidden" id="default_neutral_primary" name="default_neutral_primary" value="#DFBB9D" readonly style="display: none;">  
+                      </div>
+
+                      <div class="col color7">
+                        <input type="hidden" id="default_neutral_secondary" name="default_neutral_secondary" value="#DBD7CB" readonly style="display: none;">  
+                      </div>
+                      
+                      <div class="top-half"></div>
+                      <div class="bottom-left-quadrant"></div>
+                      <div class="bottom-right-quadrant"></div>
+
+                    </div>
+
+                    <div class="check-icon" id="check-icon_default" style="display: none;">
+                      <span class="material-symbols-rounded check-circle">
+                        check_circle
+                      </span>
+                    </div>
+
+                  </button>
+                </form>
+              </div>
+
+              <div class="color-form-container" style="display: none;">
+                <form id="default_dark_theme_form" class="dark-theme-form-animation" action="{% url 'reset_dark' %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns dark_button_bgcolor" id="dark_buttons">
+                    <div class="dark_theme_circle1">
+                    
+                      <input type="hidden" name="default_dark_form_type" value="defaultdarkform">
+
+                      <input type="hidden" name="default_dark_theme" value="default_dark_theme">
+
+                      <div class="col color1">
+                        <input type="hidden" id="def_dark_primary_color" name="def_dark_primary_color" value="#414141" readonly>
+                      </div>
+
+                      <div class="col color2">
+                        <input type="hidden" id="def_dark_secondary_color" name="def_dark_secondary_color" value="#4e4e4e" readonly>
+                      </div>
+
+                      <div class="col color3">
+                        <input type="hidden" id="def_dark_tertiary_color" name="def_dark_tertiary_color" value="#D9D9D9" readonly>
+                      </div>
+
+                      <div class="col color4">
+                        <input type="hidden" id="def_dark_activelink_color" name="def_dark_activelink_color" value="#1A5F7A" readonly>
+                      </div>
+
+                      <div class="col color5">
+                        <input type="hidden" id="def_dark_hover_color" name="def_dark_hover_color" value="#526D82" readonly>
+                      </div>
+
+                      <div class="col color6">
+                        <input type="hidden" id="def_dark_neutral_primary" name="def_dark_neutral_primary" value="#4a5eab" readonly style="display: none;">  
+                      </div>
+
+                      <div class="col color7">
+                        <input type="hidden" id="def_dark_neutral_secondary" name="def_dark_neutral_secondary" value="#689ec8" readonly style="display: none;">  
+                      </div>
+                      
+                      <div class="dark_theme_top-half1"></div>
+                      <div class="dark_theme_bottom-left-quadrant1"></div>
+                      <div class="dark_theme_bottom-right-quadrant1"></div>
+
+                    </div>
+
+                    <div class="check-icon" id="check-icon_default_dark" style="display: none;">
+                      <span class="material-symbols-rounded check-circle">
+                        check_circle
+                      </span>
+                    </div>
+
+                  </button>
+                </form> 
+              </div>
+                
               <div class="tab-content appearance-tab-content" id="nav-tabContent">
-                <div class="tab-pane fade active show" id="light_theme" role="tabpanel" aria-labelledby="nav-color-themes" tabindex="0">
-
-                  <div class="color-form-container" style="display: flex;">
-
-                    <!-- Default/reset form -->
-                    <form id="default_theme_form" class="form-animation" action="{% url 'reset_colors' %}" method="POST">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Default color">
-                        <div class="circle">
-                        
-                          <input type="hidden" name="default_form_type" value="defaultform">
-
-                          <input type="hidden" name="default_theme" value="default_theme">
-
-                          <div class="col color1">
-                            <input type="hidden" id="default_primary_color" name="default_primary_color" value="#DBCBBD" readonly>
-                          </div>
-
-                          <div class="col color2">
-                            <input type="hidden" id="default_secondary_color" name="default_secondary_color" value="#F0ECE3" readonly>
-                          </div>
-
-                          <div class="col color3">
-                            <input type="hidden" id="default_tertiary_color" name="default_tertiary_color" value="#221e20" readonly>
-                          </div>
-
-                          <div class="col color4">
-                            <input type="hidden" id="default_activelink_color" name="default_activelink_color" value="#9F8772" readonly>
-                          </div>
-
-                          <div class="col color5">
-                            <input type="hidden" id="default_hover_color" name="default_hover_color" value="#9C938B" readonly>
-                          </div>
-
-                          <div class="col color6">
-                            <input type="hidden" id="default_neutral_primary" name="default_neutral_primary" value="#DFBB9D" readonly style="display: none;">  
-                          </div>
-
-                          <div class="col color7">
-                            <input type="hidden" id="default_neutral_secondary" name="default_neutral_secondary" value="#DBD7CB" readonly style="display: none;">  
-                          </div>
-                          
-                          <div class="top-half"></div>
-                          <div class="bottom-left-quadrant"></div>
-                          <div class="bottom-right-quadrant"></div>
-
-                        </div>
-
-                        <div class="check-icon" id="check-icon_default" style="display: none;">
-                          <span class="material-symbols-rounded check-circle">
-                            check_circle
-                          </span>
-                        </div>
-
-                      </button>
-                    </form>
-                    
-                    <!-- form 1 -->
-                    <form id="colorpaletteform1" class="form-animation" action="{% url 'dcp_1' %}" method="POST">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-light themetext theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Caroon">
-                        <div class="circle1">
-                        
-                          <input type="hidden" name="dcp_form_type" value="dcpcolorform1">
-
-                          <input type="hidden" name="color_scheme_1" value="color_scheme_1">
-
-                          <div class="col color1">
-                            <input type="hidden" id="dcp_primary_color" name="dcp_primary_color" value="#CCD4BF" readonly>
-                          </div>
-
-                          <div class="col color2">
-                            <input type="hidden" id="dcp_secondary_color" name="dcp_secondary_color" value="#F5F3E7" readonly>
-                          </div>
-
-                          <div class="col color3">
-                            <input type="hidden" id="dcp_tertiary_color" name="dcp_tertiary_color" value="#243706" readonly>
-                          </div>
-
-                          <div class="col color4">
-                            <input type="hidden" id="dcp_activelink_color" name="dcp_activelink_color" value="" readonly>
-                          </div>
-
-                          <div class="col color5">
-                            <input type="hidden" id="dcp_hover_color" name="dcp_hover_color" value="" readonly>
-                          </div>
-
-                          <div class="col color6">
-                            <input type="hidden" id="dcp_neutral_primary1" name="dcp_neutral_primary1" value="" readonly style="display: none;">  
-                          </div>
-
-                          <div class="col color7">
-                            <input type="hidden" id="dcp_neutral_secondary1" name="dcp_neutral_secondary1" value="" readonly style="display: none;">  
-                          </div>
-                          
-                          <div class="top-half1"></div>
-                          <div class="bottom-left-quadrant1"></div>
-                          <div class="bottom-right-quadrant1"></div>
-
-                        </div>
-
-                        <div class="check-icon" id="check-icon_one" style="display: none;">
-                          <span class="material-symbols-rounded check-circle">
-                            check_circle
-                          </span>
-                        </div>
-
-                      </button>
-                    </form>
-
-                    <!-- form 2 -->
-                    <form id="colorpaletteform2" class="form-animation" action="{% url 'dcp_1' %}" method="POST">
-                      {% csrf_token %}
-                      
-                      <button type="submit" class="btn btn-light themetext theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Fall">
-
-                        <div class="circle2">
-
-                          <input type="hidden" name="dcp_form_type" value="dcpcolorform2">
-
-                          <input type="hidden" name="color_scheme_2" value="color_scheme_2">
-
-                          <div class="col color1">
-                            <input type="hidden" id="dcp_primary_color2" name="dcp_primary_color2" value="#C2B9B0" readonly>
-                          </div>
-
-                          <div class="col color2">
-                            <input type="hidden" id="dcp_secondary_color2" name="dcp_secondary_color2" value="#F2F2F2" readonly>
-                          </div>
-
-                          <div class="col color3">
-                            <input type="hidden" id="dcp_tertiary_color2" name="dcp_tertiary_color2" value="#1A120B" readonly>
-                          </div>
-
-                          <div class="col color4">
-                            <input type="hidden" id="dcp_activelink_color2" name="dcp_activelink_color2" value="" readonly>
-                          </div>
-
-                          <div class="col color5">
-                            <input type="hidden" id="dcp_hover_color2" name="dcp_hover_color2" value="" readonly>
-                          </div>
-
-                          <div class="col color6">
-                            <input type="hidden" id="dcp_neutral_primary2" name="dcp_neutral_primary2" value="" readonly style="display: none;">  
-                          </div>
-
-                          <div class="col color7">
-                            <input type="hidden" id="dcp_neutral_secondary2" name="dcp_neutral_secondary2" value="" readonly style="display: none;">  
-                          </div>
-
-                          <div class="top-half2" id="top-half"></div>
-                          <div class="bottom-left-quadrant2"></div>
-                          <div class="bottom-right-quadrant2"></div>
-                        </div>
-
-                        <div class="check-icon" id="check-icon_two" style="display: none;">
-                          <span class="material-symbols-rounded check-circle">
-                            check_circle
-                          </span>
-                        </div>
-
-                      </button>    
-
-                    </form>
-
-                    <!-- form 3 -->
-                    <form id="colorpaletteform3" class="form-animation" action="{% url 'dcp_1' %}" method="POST">
-                      {% csrf_token %}
-                      
-                      <button type="submit" class="btn btn-light themetext theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Natural">
-
-                        <div class="circle3">
-
-                          <input type="hidden" name="dcp_form_type" value="dcpcolorform3">
-
-                          <input type="hidden" name="color_scheme_3" value="color_scheme_3">
-
-                          <div class="col color1">
-                            <input type="hidden" id="dcp_primary_color3" name="dcp_primary_color3" value="#CDCAC5" readonly>
-                          </div>
-
-                          <div class="col color2">
-                            <input type="hidden" id="dcp_secondary_color3" name="dcp_secondary_color3" value="#EFECE7" readonly>
-                          </div>
-
-                          <div class="col color3">
-                            <input type="hidden" id="dcp_tertiary_color3" name="dcp_tertiary_color3" value="#001C30" readonly>
-                          </div>
-
-                          <div class="col color4">
-                            <input type="hidden" id="dcp_activelink_color3" name="dcp_activelink_color3" value="" readonly>
-                          </div>
-
-                          <div class="col color5">
-                            <input type="hidden" id="dcp_hover_color3" name="dcp_hover_color3" value="" readonly>
-                          </div>
-
-                          <div class="col color6">
-                            <input type="hidden" id="dcp_neutral_primary3" name="dcp_neutral_primary3" value="" readonly style="display: none;">  
-                          </div>
-
-                          <div class="col color7">
-                            <input type="hidden" id="dcp_neutral_secondary3" name="dcp_neutral_secondary3" value="" readonly style="display: none;">  
-                          </div>
-
-                          <div class="top-half3" id="top-half"></div>
-                          <div class="bottom-left-quadrant3"></div>
-                          <div class="bottom-right-quadrant3"></div>
-                        </div>
-
-                        <div class="check-icon" id="check-icon_three" style="display: none;">
-                          <span class="material-symbols-rounded check-circle">
-                            check_circle
-                          </span>
-                        </div>
-
-                      </button>    
-
-                    </form>
-
-                  </div>
-
-                </div>
-
-
-
-
-                
-
-                
-                <div class="tab-pane fade" id="dark_theme_tab" role="tabpanel" aria-labelledby="nav-dark-theme" tabindex="0">           
-
-                  <div class="color-form-container" style="display: flex;">
-                    <!-- Default dark theme -->
-                    <form id="default_dark_theme_form" class="dark-theme-form-animation" action="{% url 'reset_dark' %}" method="POST">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns dark_button_bgcolor" id="dark_buttons">
-                        <div class="dark_theme_circle1">
-                        
-                          <input type="hidden" name="default_dark_form_type" value="defaultdarkform">
-
-                          <input type="hidden" name="default_dark_theme" value="default_dark_theme">
-
-                          <div class="col color1">
-                            <input type="hidden" id="def_dark_primary_color" name="def_dark_primary_color" value="#414141" readonly>
-                          </div>
-
-                          <div class="col color2">
-                            <input type="hidden" id="def_dark_secondary_color" name="def_dark_secondary_color" value="#4e4e4e" readonly>
-                          </div>
-
-                          <div class="col color3">
-                            <input type="hidden" id="def_dark_tertiary_color" name="def_dark_tertiary_color" value="#D9D9D9" readonly>
-                          </div>
-
-                          <div class="col color4">
-                            <input type="hidden" id="def_dark_activelink_color" name="def_dark_activelink_color" value="#1A5F7A" readonly>
-                          </div>
-
-                          <div class="col color5">
-                            <input type="hidden" id="def_dark_hover_color" name="def_dark_hover_color" value="#526D82" readonly>
-                          </div>
-
-                          <div class="col color6">
-                            <input type="hidden" id="def_dark_neutral_primary" name="def_dark_neutral_primary" value="#4a5eab" readonly style="display: none;">  
-                          </div>
-
-                          <div class="col color7">
-                            <input type="hidden" id="def_dark_neutral_secondary" name="def_dark_neutral_secondary" value="#689ec8" readonly style="display: none;">  
-                          </div>
-                          
-                          <div class="dark_theme_top-half1"></div>
-                          <div class="dark_theme_bottom-left-quadrant1"></div>
-                          <div class="dark_theme_bottom-right-quadrant1"></div>
-
-                        </div>
-
-                        <div class="check-icon" id="check-icon_default_dark" style="display: none;">
-                          <span class="material-symbols-rounded check-circle">
-                            check_circle
-                          </span>
-                        </div>
-
-                      </button>
-                    </form> 
-                    
-
-                    <!-- Dark theme form 1 -->
-                    <form id="dark_theme_form1" class="dark-theme-form-animation" action="{% url 'dcp_1' %}" method="POST">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-light themetext theme_form_btns dark_button_bgcolor" id="dark_buttons">
-                        <div class="dark_theme_circle2">
-                        
-                          <input type="hidden" name="dark_form_type1" value="darkform1">
-
-                          <input type="hidden" name="dark_theme1" value="dark_theme1">
-
-                          <div class="col color1">
-                            <input type="hidden" id="dark_primary_color" name="dark_primary_color" value="#191919" readonly>
-                          </div>
-
-                          <div class="col color2">
-                            <input type="hidden" id="dark_secondary_color" name="dark_secondary_color" value="#413F42" readonly>
-                          </div>
-
-                          <div class="col color3">
-                            <input type="hidden" id="dark_tertiary_color" name="dark_tertiary_color" value="#EEEEEE" readonly>
-                          </div>
-
-                          <div class="col color4">
-                            <input type="hidden" id="dark_activelink_color" name="dark_activelink_color" value="" readonly>
-                          </div>
-
-                          <div class="col color5">
-                            <input type="hidden" id="dark_hover_color" name="dark_hover_color" value="" readonly>
-                          </div>
-
-                          <div class="col color6">
-                            <input type="hidden" id="dark_neutral_primary" name="dark_neutral_primary" value="" readonly style="display: none;">  
-                          </div>
-
-                          <div class="col color7">
-                            <input type="hidden" id="dark_neutral_secondary" name="dark_neutral_secondary" value="" readonly style="display: none;">  
-                          </div>
-                          
-                          <div class="dark_theme_top-half2"></div>
-                          <div class="dark_theme_bottom-left-quadrant2"></div>
-                          <div class="dark_theme_bottom-right-quadrant2"></div>
-
-                        </div>
-
-                        <div class="check-icon" id="check-icon_default_dark2" style="display: none;">
-                          <span class="material-symbols-rounded check-circle">
-                            check_circle
-                          </span>
-                        </div>
-
-                      </button>
-                    </form>
-                  </div>
-                </div>
-                
 
                 <div class="tab-pane fade" id="custom_theme" role="tabpanel" aria-labelledby="nav-create-theme" tabindex="0">
                   
@@ -492,7 +296,6 @@
                           <input type="hidden" name="custom_tertiary_color" value="custom_tertiary_color">
         
                           <div class="col-md-2 theme-color-picker">
-                            <!-- <label for="exampleColorInput" class="form-label">Color picker</label> -->
                             <input type="color" id="tertiary_color" name="tertiary_color" class="form-control form-control-color" title="Choose tertiary color">
                           </div>
         
@@ -528,10 +331,6 @@
       
                     </form> 
                   </div>
-
-                  <!-- <div class="generated-recipe-content">
-                    <p class="generated-color-values"></p>
-                  </div> -->
 
                   <div class="color-form-container mb-1" style="display: flex;">
            
@@ -604,33 +403,31 @@
                   </div>
 
                   <script>
-                     $(document).ready(function() {
-            const userId = "{{ user.id }}";
+                    $(document).ready(function() {
+                        const userId = "{{ user.id }}";
 
-    
-    if (localStorage.getItem(`AIform_${userId}`) === 'default_ai_theme_form') {
-      $(".check-icon").show();
-    }
-                    $("#default_ai_theme_form").submit(function(e) {
-      e.preventDefault();
+                        if (localStorage.getItem(`AIform_${userId}`) === 'default_ai_theme_form') {
+                          $(".check-icon").show();
+                        }
 
-      $.ajax({
-        type: "POST",
-        url: $("#default_ai_theme_form").attr("action"),
-        data: $("#default_ai_theme_form").serialize(),
-        success: function(response) {
-          if (response.theme === "saved_ai_scheme") {
-          
-            $(".check-icon").hide();
-            $("#check-icon_ai_form").show();
-            // Saving the last submitted form to local storage
-            localStorage.setItem(`AIform_${userId}`, "default_ai_theme_form");
-          }
-        }
-      });
-    });
-  });
+                        $("#default_ai_theme_form").submit(function(e) {
+                        e.preventDefault();
 
+                        $.ajax({
+                          type: "POST",
+                          url: $("#default_ai_theme_form").attr("action"),
+                          data: $("#default_ai_theme_form").serialize(),
+                          success: function(response) {
+                            if (response.theme === "saved_ai_scheme") {
+                            
+                              $(".check-icon").hide();
+                              $("#check-icon_ai_form").show();
+                              localStorage.setItem(`AIform_${userId}`, "default_ai_theme_form");
+                            }
+                          }
+                        });
+                      });
+                    });
                   </script>
 
                   <script>
@@ -650,16 +447,14 @@
                             form.style.display = 'none';
                         }
                     });
-                  </script>
-                
+                  </script>  
 
                 </div>
               
               </div>
 
-              <!-- Generating forms with input prompt using ai -->
-              
-              <!-- Enable script for generating color palettes using OpenAI API -->
+              {# Generating forms with input prompt using ai #}
+              {# Enable script for generating color palettes using OpenAI API #}
               <!-- <script>
                 $(document).ready(function() {
                   $('#generateRecipeImage').on('click', function(e) {
@@ -776,7 +571,6 @@
                               
                           },
                           error: function(error) {
-                              console.error('Error:', error);
                               $('#generateRecipeImage').removeClass('loading').text('Generate Image');
                           }
                       });
@@ -784,7 +578,7 @@
                 });
               </script> -->
 
-              <!-- Enable this script for generating color palettes using Gemini API -->
+              {# Enable this script for generating color palettes using Gemini API #}
               <script>
                 $(document).ready(function () {
                     $('#generateRecipeImage').on('click', function (e) {
@@ -905,7 +699,6 @@
                                 }
                             },
                             error: function (error) {
-                                console.error('Error:', error);
                                 $('#generateRecipeImage').removeClass('loading').text('Generate Image');
                             }
                         });
@@ -913,8 +706,8 @@
                 });
               </script>
 
+              {# Showing check icon for ai forms #}
               <script>
-
                 function submitForm(formNumber) {
                   var formData = $('#aiform' + formNumber).serialize();
 
@@ -923,16 +716,13 @@
                       method: 'POST',
                       data: formData,
                       success: function (response) {
-                        
                         $(".check-icon").hide();
-
 
                         $('#check-icon_aiform' + formNumber).show();
         
                         applyColorsFromForm(formNumber);
                       },
                       error: function (error) {
-                          console.error(error);
                       }
                   });
                 }
@@ -942,33 +732,6 @@
           </div>
 
         </main>
-
-        <!-- <aside class="sidebar theme-sidebar">
-                    
-          <div class="sidebar-recipes theme-sidebar">
-            <div class="sidebar-header theme-sidebar-header" id="sidebar-header">
-                <h1 id="sidebar-heading-h1"></h1>
-            </div>
-            
-              <p id="sidebar-subheading"></p>
-
-              <div class="dynamic-card-containe side-recipes-card-container theme-sidebar-container">
-                
-                <div class="sidebar-dcp-form-container">
-
-                <p class="color-hex"></p>
-
-                </div>
-
-                <div class="sidebar-dcp-form-container">
-                  
-                </div>
-
-              </div>
-          
-          </div>
-          
-        </aside> -->
 
       </div>
 
@@ -980,10 +743,7 @@
 
   </div>
     
-
-
-
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
+{% else %}
 
 <script>
   location.href = "{% url 'login' %}";
@@ -992,141 +752,50 @@
 {% endif %}
 </body>
 
-  <!-- Tooltip for ai theme generation error -->
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="imgErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex"> 
-            <div class="toast-body">
-                Unable to generate theme at this moment
-            </div>
-            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-    </div>
-  </div>
-  
-  <div class="position-fixed bottom-0 end-0 p-3">
-    <div id="myToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
-      <div class="d-flex">
+{# Toast for ai theme generation error #}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+  <div id="imgErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex"> 
         <div class="toast-body">
-          Light theme applied
+            Unable to generate theme at this moment
         </div>
-        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+  </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3">
+  <div id="myToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Day mode
       </div>
     </div>
   </div>
+</div>
 
-  <div class="position-fixed bottom-0 end-0 p-3">
-    <div id="defualtToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
-      <div class="d-flex">  
-        <div class="toast-body">
-          Original theme
-        </div>
-        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+<div class="position-fixed bottom-0 end-0 p-3">
+  <div id="defualtToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">  
+      <div class="toast-body">
+        Original theme
       </div>
     </div>
   </div>
+</div>
 
-  <div class="position-fixed bottom-0 end-0 p-3">
-    <div id="darkthemeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
-      <div class="d-flex">
-        <div class="toast-body">
-          Dark theme applied
-        </div>
-        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+<div class="position-fixed bottom-0 end-0 p-3">
+  <div id="darkthemeToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+    <div class="d-flex">
+      <div class="toast-body">
+        Night mode
       </div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
+</div>
 
 
-  <!-- Extracting Color from image toast  -->
-  <div class="position-fixed bottom-0 end-0 p-3">
-    <div id="colorfromimagetoast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
-      <div class="d-flex">
-        <div class="toast-body">
-          Using colors from image
-        </div>
-        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    </div>
-  </div>
-
-<!-- Submitting dynamic image color (extraceting color from image toggle) form using ajax -->
-<script>
-  $(document).ready(function() {
-      $('#id_use_colors_from_image').change(function() {
-           
-        var checkbox = $(this);
-        var formData = $('#colorfromimage').serialize();
-        var csrfToken = $('[name=csrfmiddlewaretoken]').val();
-        var imagecolortoast = $('#colorfromimagetoast')
-
-        
-        $.ajax({
-            url: "{% url 'appearance' %}",
-            type: "POST",
-            data: formData,
-            headers: {
-                'X-CSRFToken': csrfToken  
-            },
-            success: function(response) {
-              if (checkbox.is(':checked')) {
-                const toast = new bootstrap.Toast(imagecolortoast);
-                toast.show();
-              }
-            },
-            error: function(error) {
-                alert('Error occured');
-            }
-        });
-        
-      });
-  });
-</script>
-
-<script>
-  $(document).ready(function () {
-    const userId = "your_user_id"; 
-    const userTheme = localStorage.getItem(`lastSelectedTab_${userId}`);
-    const initialTabId = "nav-light-theme"; 
-
-    // Check if the userTheme is available and associates with a valid tab ID
-    if (userTheme && $(`[data-bs-target="${userTheme}"]`).length) {
-      
-      $(`[data-bs-target="${userTheme}"]`).addClass('active');
-
-     
-      $(`${userTheme}`).addClass('show active');
-    } else {
-      
-      $(`#${initialTabId}`).removeClass('active');
-
-
-      $(`#${initialTabId}`).addClass('show active');
-    }
-
-    
-    setTimeout(() => {
-      $('.no-animation').removeClass('no-animation');
-    }, 1);
-    
-    $('.nav_link_btn').click(function () {
-     
-      $('.nav_link_btn').removeClass('active');
-
-      
-      $(this).addClass('active');
-
-      // Hide all tab panes
-      $('.tab-pane').removeClass('show active');
-      
-      
-      const targetPaneId = $(this).attr('data-bs-target');
-      $(`${targetPaneId}`).addClass('show active');
-    });
-  });
-</script>
-
-<!-- Showing toast based on theme selected -->
+{# Showing toast based on theme selected #}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const toastTrigger = document.getElementById('nav-light-theme');
@@ -1155,7 +824,7 @@
               setTimeout(() => {
                 const toast = new bootstrap.Toast(toastLiveExample);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
 
           else if (
@@ -1165,14 +834,14 @@
               setTimeout(() => {
                 const toast = new bootstrap.Toast(defaulttoast);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
 
           else if (currentTab !== 'nav-create-theme') {
               setTimeout(() => {
                 const toast = new bootstrap.Toast(toastLiveExample);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
 
           else if (customPrimaryColor === '#ffffff' && currentTab === 'nav-create-theme' ||
@@ -1181,16 +850,14 @@
               setTimeout(() => {
                 const toast = new bootstrap.Toast(toastLiveExample);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
           
-          
-
           else {
             setTimeout(() => {
               const toast = new bootstrap.Toast(toastLiveExample);
               toast.hide();
-            }, 1500);
+            }, 500);
           }
         }
 
@@ -1199,7 +866,7 @@
 
           const toast = new bootstrap.Toast(toastLiveExample);
           toast.hide();
-          }, 1500);
+          }, 500);
         }
 
       });
@@ -1215,7 +882,6 @@
         const customSecondaryColor = localStorage.getItem(`custom_secondary_color_${userId}`);
         const customTertiaryColor = localStorage.getItem(`custom_tertiary_color_${userId}`);
         
-        // Check if the currentTab is not 'nav-light-theme'
         if (currentTab !== 'dark_theme_tab_btn') {
           
             if (customPrimaryColor !== '#ffffff' && currentTab !== 'nav-create-theme' ||
@@ -1224,7 +890,7 @@
               setTimeout(() => {
                 const toast = new bootstrap.Toast(darkThemeToast);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
 
           else if (customPrimaryColor !== '#ffffff' && currentTab === 'nav-create-theme' ||
@@ -1233,7 +899,7 @@
               setTimeout(() => {
                 const toast = new bootstrap.Toast(darkThemeToast);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
           
           else if (customPrimaryColor === '#ffffff' && currentTab !== 'nav-create-theme' ||
@@ -1242,7 +908,7 @@
               setTimeout(() => {
                 const toast = new bootstrap.Toast(darkThemeToast);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
 
           else if (customPrimaryColor === '#ffffff' && currentTab === 'nav-create-theme' ||
@@ -1251,14 +917,14 @@
               setTimeout(() => {
                 const toast = new bootstrap.Toast(darkThemeToast);
                 toast.show();
-              }, 1500);
+              }, 500);
           }
 
           else {
             setTimeout(() => {
               const toast = new bootstrap.Toast(darkThemeToast);
               toast.hide();
-            }, 1500);
+            }, 500);
           }
         }
 
@@ -1267,7 +933,7 @@
 
           const toast = new bootstrap.Toast(darkThemeToast);
           toast.hide();
-          }, 1500);
+          }, 500);
         }
 
       });
@@ -1275,16 +941,12 @@
   });
 </script>
 
-
-<!-- Manually setting background color of forms rounded rectangle based on light & dark theme -->
+{# Manually setting background color of forms rounded rectangle based on light & dark theme #}
 <script>
-
   $(document).ready(function () {
-    
     const userId = "{{ user.id }}";
     
     $('#dark_theme_tab_btn').on('click', function () {
-      // Check if there's a previously submitted form for the light theme in local storage
       var lastSubmittedFormDark = localStorage.getItem(`lastSubmittedForm_Dark_${userId}`);
 
       if (lastSubmittedFormDark) {
@@ -1303,7 +965,6 @@
     const userId = "{{ user.id }}";
     
     $('#nav-light-theme').on('click', function () {
-      // Check if there's a previously submitted form for the light theme in local storage
       var lastSubmittedFormLight = localStorage.getItem(`lastSubmittedForm_Light_${userId}`);
 
       if (lastSubmittedFormLight) {
@@ -1313,12 +974,10 @@
       }
     });
   });
-
-
 </script>
 
-<!-- Showing prev check icon to prev tab pane color forms & resetting custom theme color selector value -->
-<!-- Function to check and show the check icon based on local storage -->
+{# Showing prev check icon to prev tab pane color forms & resetting custom theme color selector value #}
+{# Function to check and show the check icon based on local storage #}
 <script>
   $(document).ready(function() {
     
@@ -1333,14 +992,9 @@
       }
     }
 
-    // Check and show the icons on page load
     const userId = "{{ user.id }}";  
     checkAndShowIcon(userId, "default_dark_theme_form", "check-icon_default_dark");
-    checkAndShowIcon(userId, "dark_theme_form1", "check-icon_default_dark2");
     checkAndShowIcon(userId, "default_theme_form", "check-icon_default");
-    checkAndShowIcon(userId, "colorpaletteform1", "check-icon_one");
-    checkAndShowIcon(userId, "colorpaletteform2", "check-icon_two");
-    checkAndShowIcon(userId, "colorpaletteform3", "check-icon_three");
 
     const userTheme = localStorage.getItem(`lastSelectedTab_${userId}`);
     if (userTheme) {
@@ -1348,37 +1002,29 @@
       $(`#${userTheme}`).tab('show');
     }
 
-    
     function setDefaultColor() {
-      
       const customPrimaryColor = localStorage.getItem(`custom_primary_color_${userId}`);
       const customSecondaryColor = localStorage.getItem(`custom_secondary_color_${userId}`);
       const customTertiaryColor = localStorage.getItem(`custom_tertiary_color_${userId}`);
 
-
       // changing background color to whites for all colors when tab is nav-create-theme
       if (userTheme === 'nav-create-theme'){
         $('#color-preview-form1').css('background-color', '#ffffff');
-        $('#primary_color').val('#000000');
-        $('#primaryColor').text('');
+        $('#primary_color').val(customPrimaryColor);
+        $('#primaryColor').text(customPrimaryColor);
 
         $('#color-preview-form2').css('background-color', '#ffffff');
-        $('#secondary_color').val('#000000');
-        $('#secondaryColor').text('');
+        $('#secondary_color').val(customSecondaryColor);
+        $('#secondaryColor').text(customSecondaryColor);
 
         $('#color-preview-form3').css('background-color', '#ffffff');
-        $('#tertiary_color').val('#000000');
-        $('#tertiaryColor').text('');
-
-        $('#color-preview-form4').css('background-color', '#ffffff');
-        $('#active_link_color').val('#000000');
-        $('#activelinkColor').text('');
+        $('#tertiary_color').val(customTertiaryColor);
+        $('#tertiaryColor').text(customTertiaryColor);
       }
 
       
       // Primary Color
       if (userTheme === 'nav-create-theme' && customPrimaryColor) {
-        // Resetting the color of 'color-preview-form1' and 'primary_color' immediately
         $('#color-preview-form1').css('background-color', customPrimaryColor);
         $('#primary_color').val(customPrimaryColor);
         $('#primaryColor').text(customPrimaryColor);
@@ -1489,24 +1135,16 @@
         $('#tertiaryColor').text('');  
       }
       
-      
       checkAndShowIcon(userId, "default_dark_theme_form", "check-icon_default_dark");
-      checkAndShowIcon(userId, "dark_theme_form1", "check-icon_default_dark2");
       checkAndShowIcon(userId, "default_theme_form", "check-icon_default");
-      checkAndShowIcon(userId, "colorpaletteform1", "check-icon_one");
-      checkAndShowIcon(userId, "colorpaletteform2", "check-icon_two");
-      checkAndShowIcon(userId, "colorpaletteform3", "check-icon_three");
 
     }
 
-    // Call the function on page load
     setDefaultColor();
 
     
     $('.nav_link_btn').on('click', function () {
-     
       localStorage.setItem(`lastSelectedTab_${userId}`, this.id);
-      
       
       $(`#${this.id}_form`).submit();
 
@@ -1561,20 +1199,16 @@
     });
 
       
-
-    
     $('#color-form').submit(function (e) {
         e.preventDefault(); 
 
-       
         localStorage.setItem(`custom_primary_color_${userId}`, $('#primary_color').val());
 
         $.ajax({
             type: 'POST',
             url: $(this).attr('action'),
             data: $(this).serialize(),
-            success: function (response) {
-                
+            success: function (response) {   
 
             },
             error: function (xhr, status, error) {
@@ -1586,7 +1220,6 @@
     $('#color-form2').submit(function (e) {
         e.preventDefault(); 
 
-        // Set 'custom_primary_color' to local storage when the form is submitted
         localStorage.setItem(`custom_secondary_color_${userId}`, $('#secondary_color').val());
 
         $.ajax({
@@ -1605,7 +1238,6 @@
     $('#color-form3').submit(function (e) {
         e.preventDefault(); 
 
-        // Set 'custom_primary_color' to local storage when the form is submitted
         localStorage.setItem(`custom_tertiary_color_${userId}`, $('#tertiary_color').val());
 
         $.ajax({
@@ -1622,25 +1254,7 @@
     });
 
 
-
-
-  // Check the user's theme after page reloads
-    // const userTheme = "{{ user.userprofile.theme }}";
-    // if (userTheme === "default_dark_theme") {
-    //   document.getElementById('check-icon_default_dark').style.display = 'block';
-    // } else if (userTheme === "default_theme") {
-    //   // If switching to light theme and the last form was the default theme form,
-    //   // remove the lastSubmittedForm from local storage
-    //   localStorage.setItem(`lastSubmittedForm_${userId}`, "default_theme_form");
-    //   $("#check-icon_default").show();
-    //   $("#check-icon_one").hide();
-    //   $("#check-icon_two").hide();
-    // }
-
-
-
-      // Default dark theme form
-      $("#default_dark_theme_form").submit(function(e) {
+    $("#default_dark_theme_form").submit(function(e) {
       e.preventDefault();
 
       $.ajax({
@@ -1648,7 +1262,6 @@
         url: $("#default_dark_theme_form").attr("action"),
         data: $("#default_dark_theme_form").serialize(),
         success: function(response) {
-          console.log(response);
           if (response.theme === "default_dark_theme") {
             $(".check-icon").hide();
             $("#check-icon_default_dark").show();
@@ -1659,27 +1272,6 @@
       });
     });
 
-    // Dark theme form 1
-    $("#dark_theme_form1").submit(function(e) {
-      e.preventDefault();
-
-      $.ajax({
-        type: "POST",
-        url: $("#dark_theme_form1").attr("action"),
-        data: $("#dark_theme_form1").serialize(),
-        success: function(response) {
-          console.log(response);
-          if (response.theme === "dark_theme1") {
-            $(".check-icon").hide();
-            $("#check-icon_default_dark2").show();
-            // Saving the last submitted form to local storage
-            localStorage.setItem(`lastSubmittedForm_Dark_${userId}`, "dark_theme_form1");
-          }
-        }
-      });
-    });
-
-    // Default light theme form 
     $("#default_theme_form").submit(function(e) {
       e.preventDefault();
 
@@ -1688,7 +1280,6 @@
         url: $("#default_theme_form").attr("action"),
         data: $("#default_theme_form").serialize(),
         success: function(response) {
-          console.log(response);
           if (response.theme === "default_theme") {
             $(".check-icon").hide();
             $("#check-icon_default").show();
@@ -1698,76 +1289,14 @@
         }
       });
     });
-
-    // Form 1
-    $("#colorpaletteform1").submit(function(e) {
-      e.preventDefault();
-
-      $.ajax({
-        type: "POST",
-        url: $("#colorpaletteform1").attr("action"),
-        data: $("#colorpaletteform1").serialize(),
-        success: function(response) {
-          console.log(response);
-          if (response.theme === "color_scheme_1") {
-            $(".check-icon").hide();
-            $("#check-icon_one").show();
-            // Saving the last submitted form to local storage
-            localStorage.setItem(`lastSubmittedForm_Light_${userId}`, "colorpaletteform1");
-          }
-        }
-      });
-    });
-
-    // Form 2
-    $("#colorpaletteform2").submit(function(e) {
-      e.preventDefault();
-      $.ajax({
-        type: "POST",
-        url: $("#colorpaletteform2").attr("action"),
-        data: $("#colorpaletteform2").serialize(),
-        success: function(response) {
-          console.log(response);
-          if (response.theme_two === "color_scheme_2") {
-            $(".check-icon").hide();
-            $("#check-icon_two").show();
-            // Saving the last submitted form to local storage
-            localStorage.setItem(`lastSubmittedForm_Light_${userId}`, "colorpaletteform2");
-          }
-        }
-      });
-    });
-
-      // Form 3
-      $("#colorpaletteform3").submit(function(e) {
-      e.preventDefault();
-      $.ajax({
-        type: "POST",
-        url: $("#colorpaletteform3").attr("action"),
-        data: $("#colorpaletteform3").serialize(),
-        success: function(response) {
-          console.log(response);
-          if (response.theme === "color_scheme_3") {
-            $(".check-icon").hide();
-            $("#check-icon_three").show();
-            // Saving the last submitted form to local storage
-            localStorage.setItem(`lastSubmittedForm_Light_${userId}`, "colorpaletteform3");
-          }
-        }
-      });
-    });
   });
-
-
-
 </script>
 
 
-<!-- firstly converting HEX to HSl then adding variation to HSL then again converting variated HSL into HEX  -->
+{# first converting HEX to HSL then adding variation to HSL then again converting variated HSL into HEX #}
 <script>
 
   function hexToHSLWithVariation(hex, hueAdjust, saturationAdjust, lightnessAdjust) {
-    // Remove the hash if present
     hex = hex.replace(/^#/, '');
   
     // Parse the hex values
@@ -1809,10 +1338,7 @@
     return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(lightness * 100)}%)`;
   }
   
-  
-  
-  
-    // Function to convert HSL to HEX
+
     function hslToHex(h, s, l) {
       h /= 360;
       s /= 100;
@@ -1842,111 +1368,10 @@
       return `#${Math.round(r * 255).toString(16).padStart(2, '0')}${Math.round(g * 255).toString(16).padStart(2, '0')}${Math.round(b * 255).toString(16).padStart(2, '0')}`;
     }
   
-    // Form 1
-    // Function to update and apply accent color
-    function updateAndApplyAccentColor() {
-      const primarycolorHex = $('#dcp_primary_color').val();
-      const secondarycolorHex = $('#dcp_secondary_color').val();
-  
-      // Convert the hover color to HSL
-      const neutral_primaryHSL = hexToHSLWithVariation(primarycolorHex, -0.2, 0.3, -0.2);
-      const neutral_secondaryHSL = hexToHSLWithVariation(primarycolorHex, -0.2, 0, 0.03);
-      // const neutral_secondaryHSL2 = hexToHSLWithVariation(hoverColorHex2, 0.4, -0.2, -0.35);
-      const active_link_colorHSL = hexToHSLWithVariation(secondarycolorHex, 0.4, 0, -0.25);
-      const hover_colorHSL = hexToHSLWithVariation(secondarycolorHex, 0.4, -0.2, -0.35);
-  
-      // Convert HSL to HEX
-      const neutral_primaryHex = hslToHex(...neutral_primaryHSL.match(/\d+(\.\d+)?/g).map(Number));
-      const neutral_secondaryHex = hslToHex(...neutral_secondaryHSL.match(/\d+(\.\d+)?/g).map(Number));
-      const active_link_colorHex = hslToHex(...active_link_colorHSL.match(/\d+(\.\d+)?/g).map(Number));
-      const hover_colorHex = hslToHex(...hover_colorHSL.match(/\d+(\.\d+)?/g).map(Number));
-  
-      // Set the value of the color input with the calculated HEX value
-      $('#dcp_neutral_primary1').val(neutral_primaryHex);
-      $('#dcp_neutral_secondary1').val(neutral_secondaryHex);
-      $('#dcp_activelink_color').val(active_link_colorHex);
-      $('#dcp_hover_color').val(hover_colorHex);
-      
-    }
-  
-    // Form 2
-    // Function to update and apply accent color
-    function updateAndApplyAccentColor2() {
-      const primarycolorHex2 = $('#dcp_primary_color2').val();
-      const secondarycolorHex2 = $('#dcp_secondary_color2').val();
-  
-      // Convert the hover color to HSL
-      const neutral_primaryHSL2 = hexToHSLWithVariation(primarycolorHex2, 0.6, 0.6, -0.05);
-      const neutral_secondaryHSL2 = hexToHSLWithVariation(primarycolorHex2, 0.6, -0.2, 0.1);
-      const active_link_colorHSL2 = hexToHSLWithVariation(secondarycolorHex2, 0.1, 0.3, -0.35);
-      const hover_colorHSL2 = hexToHSLWithVariation(secondarycolorHex2, 0.8, 0, -0.35);
-  
-      // Convert HSL to HEX
-      const neutral_primaryHex2 = hslToHex(...neutral_primaryHSL2.match(/\d+(\.\d+)?/g).map(Number));
-      const neutral_secondaryHex2 = hslToHex(...neutral_secondaryHSL2.match(/\d+(\.\d+)?/g).map(Number));
-      const active_link_colorHex2 = hslToHex(...active_link_colorHSL2.match(/\d+(\.\d+)?/g).map(Number));
-      const hover_colorHex2 = hslToHex(...hover_colorHSL2.match(/\d+(\.\d+)?/g).map(Number));
-  
-      // Set the value of the color input with the calculated HEX value
-      $('#dcp_neutral_primary2').val(neutral_primaryHex2);
-      $('#dcp_neutral_secondary2').val(neutral_secondaryHex2);
-      $('#dcp_activelink_color2').val(active_link_colorHex2);
-      $('#dcp_hover_color2').val(hover_colorHex2);
-    }
-  
-    // Form 3
-    // Function to update and apply accent color
-    function updateAndApplyAccentColor3() {
-      const primarycolorHex3 = $('#dcp_primary_color3').val();
-      const secondarycolorHex3 = $('#dcp_secondary_color3').val();
-  
-      // Convert the hover color to HSL
-      const neutral_primaryHSL3 = hexToHSLWithVariation(primarycolorHex3, -0.1, 0.2, -0.3);
-      const neutral_secondaryHSL3 = hexToHSLWithVariation(primarycolorHex3, 0.9, -0.04, 0.04);
-      const active_link_colorHSL3 = hexToHSLWithVariation(secondarycolorHex3, -0.1, 0.2, -0.5);
-      const hover_colorHSL3 = hexToHSLWithVariation(secondarycolorHex3, -0.6, 0, -0.35);
-  
-      // Convert HSL to HEX
-      const neutral_primaryHex3 = hslToHex(...neutral_primaryHSL3.match(/\d+(\.\d+)?/g).map(Number));
-      const neutral_secondaryHex3 = hslToHex(...neutral_secondaryHSL3.match(/\d+(\.\d+)?/g).map(Number));
-      const active_link_colorHex3 = hslToHex(...active_link_colorHSL3.match(/\d+(\.\d+)?/g).map(Number));
-      const hover_colorHex3 = hslToHex(...hover_colorHSL3.match(/\d+(\.\d+)?/g).map(Number));
-  
-      // Set the value of the color input with the calculated HEX value
-      $('#dcp_neutral_primary3').val(neutral_primaryHex3);
-      $('#dcp_neutral_secondary3').val(neutral_secondaryHex3);
-      $('#dcp_activelink_color3').val(active_link_colorHex3);
-      $('#dcp_hover_color3').val(hover_colorHex3);
-    }
-    
-    // Dark theme form 1
-    // Function to update and apply accent color
-    function updateAndApplyDarkAccentColor1() {
-      const DarkprimarycolorHex1 = $('#dark_primary_color').val();
-      const DarksecondarycolorHex1 = $('#dark_secondary_color').val();
-  
-      // Convert the hover color to HSL
-      const Darkneutral_primaryHSL1 = hexToHSLWithVariation(DarkprimarycolorHex1, 0.9, 0.2, 0.3);
-      const Darkneutral_secondaryHSL1 = hexToHSLWithVariation(DarkprimarycolorHex1, 0.6, 0.2, 0.2);
-      const Darkactive_link_colorHSL1 = hexToHSLWithVariation(DarksecondarycolorHex1, 0.9, 0.5, 0.2);
-      const Darkhover_colorHSL1 = hexToHSLWithVariation(DarksecondarycolorHex1, 0.95, 0.8, 0.4);
-  
-      // Convert HSL to HEX
-      const Darkneutral_primaryHex1 = hslToHex(...Darkneutral_primaryHSL1.match(/\d+(\.\d+)?/g).map(Number));
-      const Darkneutral_secondaryHex1 = hslToHex(...Darkneutral_secondaryHSL1.match(/\d+(\.\d+)?/g).map(Number));
-      const Darkactive_link_colorHex1 = hslToHex(...Darkactive_link_colorHSL1.match(/\d+(\.\d+)?/g).map(Number));
-      const Darkhover_colorHex1 = hslToHex(...Darkhover_colorHSL1.match(/\d+(\.\d+)?/g).map(Number));
-  
-      // Set the value of the color input with the calculated HEX value
-      $('#dark_neutral_primary').val(Darkneutral_primaryHex1);
-      $('#dark_neutral_secondary').val(Darkneutral_secondaryHex1);
-      $('#dark_activelink_color').val(Darkactive_link_colorHex1);
-      $('#dark_hover_color').val(Darkhover_colorHex1);
-    }
-
 
     // Custom theme colors
     function customColors() {
+      const userId = "{{ user.id }}";
       const custom_PrimaryColor = $('#primary_color').val();
       const custom_SecondaryColor = $('#secondary_color').val();
   
@@ -1973,47 +1398,19 @@
       $('#active_link_color').val(custom_link_colorHex);
       $('#hover_color').val(custom_hover_colorHex);
 
-      $('#color-preview-form6').css('background-color', custom_primaryHex);
-      $('#color-preview-form7').css('background-color', custom_secondaryHex);
-      // $('#tertiary_color').val(customTertiaryColorValue);
-    }
-  
-    $(document).ready(function() {
-      
-  
-      // Form 1
-      $('#dcp_primary_color').on('input', updateAndApplyAccentColor);
-      // Initialize the accent color on page load
-      updateAndApplyAccentColor();
-  
-      $('#colorpaletteform1').on('submit', function() {  
-        updateAndApplyAccentColor();
-      });
-  
-      // Form 2
-      $('#dcp_primary_color2').on('input', updateAndApplyAccentColor2);
-      updateAndApplyAccentColor2();
-      
-      $('#colorpaletteform2').on('submit', function() {
-        updateAndApplyAccentColor2();
-      });
-  
-      // Form 3
-      $('#dcp_primary_color3').on('input', updateAndApplyAccentColor3);
-      updateAndApplyAccentColor3();
-      
-      $('#colorpaletteform3').on('submit', function() {
-        updateAndApplyAccentColor3();
-      });
 
-      // Form 3
-      $('#dark_primary_color').on('input', updateAndApplyDarkAccentColor1);
-      updateAndApplyDarkAccentColor1();
-      
-      $('#dark_theme_form1').on('submit', function() {
-        updateAndApplyDarkAccentColor1();
-      });
+      $('#neutral_primary').val(custom_primaryHex);
+      $('#neutral_secondary').val(custom_secondaryHex);
+
+      localStorage.setItem(`custom_neutral_primary_${userId}`, custom_primaryHex);
+      localStorage.setItem(`custom_neutral_secondary_${userId}`, custom_secondaryHex);
+    }
+
+    $('#color-form, #color-form2,#color-form3').on('submit', function() {
+    customColors();
+});
   
+    $(document).ready(function() {  
       // Custom theme colors
       $('#color-form').on('submit', function() {
         customColors();
@@ -2023,9 +1420,12 @@
         customColors();
       });
 
+      $('#color-form3').on('submit', function() {
+        customColors();
+      });
+
     });
 </script>
-
 
 <script>
   const button = document.getElementById('dcp_buttons');
@@ -2049,7 +1449,7 @@
   });
 </script>
 
-<!-- Preview colors -->
+{# Preview custom colors #}
 <script>
   $(document).ready(function() {
     // Updating the color preview when input value changes
@@ -2082,29 +1482,7 @@
   });
 </script>
 
-<script>
-  $(document).ready(function() {
-    
-    $("#active_link_color").change(function() {
-      var color = $(this).val();
-      $("#color-preview-form4").css("background-color", color);
-    });
-  });
-</script>
-
-<script>
-  $(document).ready(function() {
-    
-    $("#hover_color").change(function() {
-      var color = $(this).val();
-      $("#color-preview-form5").css("background-color", color);
-    });
-  });
-</script>
-
-
-<!-- submitting forms using AJAX -->
-
+{# submitting forms using AJAX #}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function() {
@@ -2185,286 +1563,7 @@
   });
 </script>
 
-<script>
-  $(document).ready(function() {
-
-    $('#active_link_color').change(function(event) {
-      const selectedColor = event.target.value;
-      $('#activelinkColor').text(selectedColor);
-    });
-
-      $('#color-form4').on('submit', function(e) {
-          e.preventDefault(); 
-          $.ajax({
-              type: 'POST',
-              url: '{% url "appearance" %}', 
-              data: $(this).serialize(),
-              success: function(response) {
-                 
-              },
-              error: function(xhr, status, error) {
-                  
-              }
-          });
-      });
-  });
-</script>
-
-<script>
-  $(document).ready(function() {
-
-    $('#hover_color').change(function(event) {
-      const selectedColor = event.target.value;
-      $('#hoverColor').text(selectedColor);
-    });
-
-      $('#color-form5').on('submit', function(e) {
-          e.preventDefault(); 
-          $.ajax({
-              type: 'POST',
-              url: '{% url "appearance" %}', 
-              data: $(this).serialize(),
-              success: function(response) {
-                window.location.reload();
-                 
-              },
-              error: function(xhr, status, error) {
-                  
-              }
-          });
-      });
-  });
-</script>
-
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-
-<!-- Default color palettes forms submittin using AJAX -->
-<script>
-
-  // form 1
-  $(document).ready(function() {
-
-    $('#colorpaletteform1').on('submit', function(e) {
-        e.preventDefault(); 
-
-        // Get form data
-        const primary_color = $('#dcp_primary_color').val();
-
-        // This changes the color of the input color picker in the create theme when
-        // color palette selected from light theme or dark theme (for all forms and all colors)
-
-        // $('#primary_color').attr('value', primary_color);
-
-        const secondary_color = $('#dcp_secondary_color').val();
-        // $('#secondary_color').attr('value', secondary_color);
-
-        const tertiary_color = $('#dcp_tertiary_color').val();
-        // $('#tertiary_color').attr('value', tertiary_color);
-
-        const activelink_color = $('#dcp_activelink_color').val();
-        // $('#active_link_color').attr('value', activelink_color);
-
-        const hover_color = $('#dcp_hover_color').val();
-        // $('#hover_color').attr('value', hover_color);
-        
-        $.ajax({
-            type: 'POST',
-            url: '{% url "dcp_1" %}', 
-            data: $(this).serialize(),
-            success: function(response) {
-                // $('#primaryColor').text(response.dcpprimary_color);
-                // $('#secondaryColor').text(response.dcpsecondary_color);
-                // $('#tertiaryColor').text(response.dcptertiaryColor);
-                // $('#activelinkColor').text(response.dcpactivelinkColor);
-                // $('#hoverColor').text(response.dcphover_color);
-              
-            },
-            error: function(xhr, status, error) {
-                
-            }
-        });
-    });
-  });
-
-  
-  // form2
-  $(document).ready(function() {
-
-    $('#colorpaletteform2').on('submit', function(e) {
-        e.preventDefault(); 
-
-        // Get form data
-        const primary_color2 = $('#dcp_primary_color2').val();
-        // $('#primary_color').attr('value', primary_color2);
-
-        const secondary_color2 = $('#dcp_secondary_color2').val();
-        // $('#secondary_color').attr('value', secondary_color2);
-
-        const tertiary_color2 = $('#dcp_tertiary_color2').val();
-        // $('#tertiary_color').attr('value', tertiary_color2);
-
-        const activelink_color2 = $('#dcp_activelink_color2').val();
-        // $('#active_link_color').attr('value', activelink_color2);
-
-        const hover_color2 = $('#dcp_hover_color2').val();
-        // $('#hover_color').attr('value', hover_color2);
-        
-        $.ajax({
-            type: 'POST',
-            url: '{% url "dcp_1" %}', 
-            data: $(this).serialize(),
-            success: function(response) {
-               
-                // $('#primaryColor').text(response.dcpprimary_color2);
-                // $('#secondaryColor').text(response.dcpsecondary_color2);
-                // $('#tertiaryColor').text(response.dcptertiary_color2);
-                // $('#activelinkColor').text(response.dcpactivelink_color2);
-                // $('#hoverColor').text(response.dcphover_color2);
-                
-            },
-            error: function(xhr, status, error) {
-                
-            }
-        });
-    });
-    });
-
-
-  // form3
-  $(document).ready(function() {
-
-    $('#colorpaletteform3').on('submit', function(e) {
-        e.preventDefault(); 
-
-        // Get form data
-        const primary_color3 = $('#dcp_primary_color3').val();
-        // $('#primary_color').attr('value', primary_color3);
-
-        const secondary_color3 = $('#dcp_secondary_color3').val();
-        // $('#secondary_color').attr('value', secondary_color3);
-
-        const tertiary_color3 = $('#dcp_tertiary_color3').val();
-        // $('#tertiary_color').attr('value', tertiary_color3);
-
-        const activelink_color3 = $('#dcp_activelink_color3').val();
-        // $('#active_link_color').attr('value', activelink_color3);
-
-        const hover_color3 = $('#dcp_hover_color3').val();
-        // $('#hover_color').attr('value', hover_color3);
-        
-        $.ajax({
-            type: 'POST',
-            url: '{% url "dcp_1" %}', 
-            data: $(this).serialize(),
-            success: function(response) {
-               
-                // $('#primaryColor').text(response.dcpprimary_color3);
-                // $('#secondaryColor').text(response.dcpsecondary_color3);
-                // $('#tertiaryColor').text(response.dcptertiary_color3);
-                // $('#activelinkColor').text(response.dcpactivelink_color3);
-                // $('#hoverColor').text(response.dcphover_color3);
-
-            },
-            error: function(xhr, status, error) {
-                
-            }
-        });
-    });
-    });
-
-
-  // form4
-  $(document).ready(function() {
-
-  $('#colorpaletteform4').on('submit', function(e) {
-      e.preventDefault(); 
-
-      // Get form data
-      const primary_color4 = $('#dcp_primary_color4').val();
-      // $('#primary_color').attr('value', primary_color4);
-
-      const secondary_color4 = $('#dcp_secondary_color4').val();
-      // $('#secondary_color').attr('value', secondary_color4);
-
-      const tertiary_color4 = $('#dcp_tertiary_color4').val();
-      // $('#tertiary_color').attr('value', tertiary_color4);
-
-      const activelink_color4 = $('#dcp_activelink_color4').val();
-      // $('#active_link_color').attr('value', activelink_color4);
-
-      const hover_color4 = $('#dcp_hover_color4').val();
-      // $('#hover_color').attr('value', hover_color4);
-      
-      $.ajax({
-          type: 'POST',
-          url: '{% url "dcp_1" %}', 
-          data: $(this).serialize(),
-          success: function(response) {
-             
-              // $('#primaryColor').text(response.dcpprimary_color4);
-              // $('#secondaryColor').text(response.dcpsecondary_color4);
-              // $('#tertiaryColor').text(response.dcptertiary_color4);
-              // $('#activelinkColor').text(response.dcpactivelink_color4);
-              // $('#hoverColor').text(response.dcphover_color4);
-
-          },
-          error: function(xhr, status, error) {
-              
-          }
-      });
-  });
-  });
-
-
-
-  // dark color form 1
-  $(document).ready(function() {
-
-$('#darkcolorpaletteform1').on('submit', function(e) {
-e.preventDefault(); 
-
-// Get form data
-const primary_color4 = $('#dcp_primary_color4').val();
-// $('#primary_color').attr('value', primary_color4);
-
-const secondary_color4 = $('#dcp_secondary_color4').val();
-// $('#secondary_color').attr('value', secondary_color4);
-
-const tertiary_color4 = $('#dcp_tertiary_color4').val();
-// $('#tertiary_color').attr('value', tertiary_color4);
-
-const activelink_color4 = $('#dcp_activelink_color4').val();
-// $('#active_link_color').attr('value', activelink_color4);
-
-const hover_color4 = $('#dcp_hover_color4').val();
-// $('#hover_color').attr('value', hover_color4);
-
-$.ajax({
-type: 'POST',
-url: '{% url "dcp_1" %}', 
-data: $(this).serialize(),
-success: function(response) {
-// handle success response, if any
-// $('#primaryColor').text(response.dcpprimary_color4);
-// $('#secondaryColor').text(response.dcpsecondary_color4);
-// $('#tertiaryColor').text(response.dcptertiary_color4);
-// $('#activelinkColor').text(response.dcpactivelink_color4);
-// $('#hoverColor').text(response.dcphover_color4);
-
-},
-error: function(xhr, status, error) {
-
-}
-});
-});
-});
-
-</script>
-
-
-
-<!-- custom theme form submit buttons colors -->
+{# custom theme form submit buttons colors #}
 <script>
   $(document).ready(function() {
       $('#primary_color_btn').on('submit', function(e) {
@@ -2516,44 +1615,9 @@ error: function(xhr, status, error) {
           });
       });
   });
-
-  $(document).ready(function() {
-      $('#activelink_color_btn').on('submit', function(e) {
-          e.preventDefault(); 
-          $.ajax({
-              type: 'POST',
-              url: '{% url "appearance" %}', 
-              data: $(this).serialize(),
-              success: function(response) {
-                 
-              },
-              error: function(xhr, status, error) {
-                  
-              }
-          });
-      });
-  });
-
-  $(document).ready(function() {
-      $('#hover_color_btn').on('submit', function(e) {
-          e.preventDefault(); 
-          $.ajax({
-              type: 'POST',
-              url: '{% url "appearance" %}', 
-              data: $(this).serialize(),
-              success: function(response) {
-                 
-              },
-              error: function(xhr, status, error) {
-                  
-              }
-          });
-      });
-  });
 </script>
 
-
-<!-- Resetting all forms at once -->
+{# Resetting all forms at once #}
 <script>
   $(document).ready(function() {
     $("#reset-colors").click(function() {
@@ -2566,67 +1630,148 @@ error: function(xhr, status, error) {
       });
     });
   });
-
-  $(document).ready(function() {
-    $("#externalButton").click(function() {
-      $.ajax({
-        url: "{% url 'reset_dark' %}",
-        method: "GET",
-        success: function() {
-          // window.location.reload();
-        }
-      });
-    });
-  });
-
-  $(document).ready(function() {
-    $("#reset-colors2").click(function() {
-      $.ajax({
-        url: "{% url 'reset_dark' %}",
-        method: "GET",
-        success: function() {
-          window.location.reload();
-        }
-      });
-    });
-  });
 </script>
 
-
-<!-- tab switcher -->
+{# Restore default values to respective tab & forms if user deletes from localStorage #}
 <script>
-  function recipes(evt, type) {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent");
+  document.addEventListener("DOMContentLoaded", function () {
+    const userId = "{{ user.id }}";
 
-    for (i = 0; i < tabcontent.length; i++) {
-      tabcontent[i].style.display = "none";
-    }
-    
-      if (type === 'dark_theme') {
-      document.getElementById("replacement_div").style.display = "block";
-      // document.getElementById("additionalButton").style.display = "none";
-
-    }
-    
-    else if (type === 'light_theme'){
-      document.getElementById("light_aside").style.display = "block";
-      // document.getElementById("additionalButton").style.display = "block";
-    } 
-    else {
-      document.getElementById(type).style.display = "block";
-      // document.getElementById("additionalButton").style.display = "none";
-
+    function ensureStorageDefaults() {
+        if (!localStorage.getItem(`lastSelectedTab_${userId}`)) {
+            localStorage.setItem(`lastSelectedTab_${userId}`, "nav-light-theme");
+        }
+        if (!localStorage.getItem(`lastSubmittedForm_Light_${userId}`)) {
+            localStorage.setItem(`lastSubmittedForm_Light_${userId}`, "default_theme_form");
+        }
+        if (!localStorage.getItem(`lastSubmittedForm_Dark_${userId}`)) {
+            localStorage.setItem(`lastSubmittedForm_Dark_${userId}`, "default_dark_theme_form");
+        }
     }
 
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
+    ensureStorageDefaults();
+
+    function submitFormAndApplyColors(formId, storageKey) {
+        let form = document.getElementById(formId);
+        if (!form) return; 
+
+        let formData = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            localStorage.setItem(storageKey, formId);
+            localStorage.setItem("currentTheme", storageKey.includes("Light") ? "light" : "dark");
+
+            document.documentElement.style.setProperty('--primary-color', data.defaultprimary_color);
+            document.documentElement.style.setProperty('--secondary-color', data.defaultsecondary_color);
+            document.documentElement.style.setProperty('--tertiary-color', data.defaulttertiary_color);
+            document.documentElement.style.setProperty('--active-link-color', data.defaultactivelink_color);
+            document.documentElement.style.setProperty('--hover-color', data.defaulthover_color);
+        })
+        .catch(error => console.error("Error:", error));
     }
-    document.getElementById(type).style.display = "block";
-    evt.currentTarget.className += " active";
-  }
-    document.getElementById("defaultOpen").click();
+
+    window.onload = function () {
+        let lastSelectedTab = localStorage.getItem(`lastSelectedTab_${userId}`);
+        let lastFormLight = localStorage.getItem(`lastSubmittedForm_Light_${userId}`);
+        let lastFormDark = localStorage.getItem(`lastSubmittedForm_Dark_${userId}`);
+        let currentTheme = localStorage.getItem("currentTheme");
+
+        if (lastSelectedTab === "nav-light-theme" && currentTheme !== "light") {
+            submitFormAndApplyColors(lastFormLight, `lastSubmittedForm_Light_${userId}`);
+        } 
+        else if (lastSelectedTab === "dark_theme_tab_btn" && currentTheme !== "dark") {
+            submitFormAndApplyColors(lastFormDark, `lastSubmittedForm_Dark_${userId}`);
+        }
+    };
+
+    document.getElementById("nav-light-theme").addEventListener("click", function () {
+        localStorage.setItem(`lastSelectedTab_${userId}`, "nav-light-theme");
+
+        let lastFormLight = localStorage.getItem(`lastSubmittedForm_Light_${userId}`);
+        if (!lastFormLight) {
+            localStorage.setItem(`lastSubmittedForm_Light_${userId}`, "default_theme_form");
+            lastFormLight = "default_theme_form";
+        }
+        submitFormAndApplyColors(lastFormLight, `lastSubmittedForm_Light_${userId}`);
+    });
+
+    document.getElementById("dark_theme_tab_btn").addEventListener("click", function () {
+        localStorage.setItem(`lastSelectedTab_${userId}`, "dark_theme_tab_btn");
+
+        let lastFormDark = localStorage.getItem(`lastSubmittedForm_Dark_${userId}`);
+        if (!lastFormDark) {
+            localStorage.setItem(`lastSubmittedForm_Dark_${userId}`, "default_dark_theme_form");
+            lastFormDark = "default_dark_theme_form";
+        }
+        submitFormAndApplyColors(lastFormDark, `lastSubmittedForm_Dark_${userId}`);
+    });
+});
+</script>
+
+{# Show/hide appearance-tab-content based on button & show Applied text #}
+<script>
+  $(document).ready(function () {
+    const userId = "{{ user.id }}";  
+    const userTheme = localStorage.getItem(`lastSelectedTab_${userId}`) || "nav-light-theme";
+    const appearanceTabContent = $(".appearance-tab-content");
+
+    function hideAppearanceContent() {
+        appearanceTabContent.hide();
+    }
+
+    function showAppearanceContent() {
+        appearanceTabContent.show();
+    }
+
+
+    function activateTab(tabButton, isPageLoad = false) {
+        $(".nav_link_btn").removeClass("active");
+        $(tabButton).addClass("active");
+
+        $(".tab-pane").removeClass("show active");
+        const targetPaneId = $(tabButton).attr("data-bs-target");
+        $(targetPaneId).addClass("show active");
+
+        localStorage.setItem(`lastSelectedTab_${userId}`, tabButton.id);
+
+        if (tabButton.id === "nav-create-theme" || tabButton.id === "nav-generate-theme") {
+            showAppearanceContent();
+        } else {
+            hideAppearanceContent();
+        }
+
+
+        if (tabButton.id === "nav-create-theme" || tabButton.id === "nav-generate-theme" || tabButton.id === "nav-light-theme" || tabButton.id === "dark_theme_tab_btn") {
+          tabButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
+    }
+
+    $(".nav_link_btn").removeClass("active");
+    $(".tab-pane").removeClass("show active");
+
+    const lastSelectedTabButton = document.getElementById(userTheme);
+    if (lastSelectedTabButton) {
+        activateTab(lastSelectedTabButton, true);
+    } else {
+        activateTab(document.getElementById("nav-light-theme"), true);
+    }
+
+    setTimeout(() => {
+        $(".no-animation").removeClass("no-animation");
+    }, 1);
+
+    $(".nav_link_btn").click(function () {
+        activateTab(this, false);
+    });
+});
 
 </script>
 

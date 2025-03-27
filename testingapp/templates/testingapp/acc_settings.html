@@ -44,7 +44,7 @@
 
                 <div class="settings-container">
                   
-                  <h3>Delete account</h3>
+                  {# <h3>Delete account</h3> #}
 
                   <div class="acc-set-child-containers">
 
@@ -63,11 +63,11 @@
                                             <h4>Delete account</h4>
                                             <p class="">This action cannot be undone</p>
                                           </div>
-                                          <!-- <div class=""> -->
-                                            <div class="button-container">
-                                              <button data-bs-toggle="modal" data-bs-target="#accountdeleteModal" type="button">Delete</button>
-                                            </div>
-                                          <!-- </div> -->
+
+                                          <div class="button-container">
+                                            <button data-bs-toggle="modal" data-bs-target="#accountdeleteModal" type="button">Delete</button>
+                                          </div>
+                                          
                                         </div>
                                           
                                       </div>
@@ -78,8 +78,6 @@
                       </div>
 
                   </div>
-
-                  <h3>Email notification</h3>
 
                   <div class="acc-set-child-containers">
 
@@ -123,7 +121,7 @@
 
                                         <div class="mx-2">
                                           {% if user.profile.send_email == False %}
-                                          Off
+                                            Off
                                           {% else %}
                                             On
                                           {% endif %}
@@ -131,11 +129,11 @@
                                           
                                       </div>
                                   </div>
-                                  <!-- <div class=""> -->
-                                    <div class="button-container">
-                                      <button id="submitButton" type="button">Save</button>
-                                    </div>
-                                  <!-- </div> -->
+                                  
+                                  <div class="button-container">
+                                    <button id="emailformbtn" type="button">Save</button>
+                                  </div>
+                                  
                                 </div>
 
                               </div>
@@ -145,8 +143,6 @@
                       
                     </div>
                   </div>
-
-                  <h3>Recipe goal</h3>
 
                   <div class="acc-set-child-containers">
 
@@ -175,26 +171,24 @@
                                               <p>Define your cooking target for {{ current_year }}</p>
                                             {% endif %}
 
-                                              <!-- <p> -->
-                                                <div class="recipe-goal-form">
-                                                  <form method="post" action="{% url 'account_settings' %}" id="recipegoalform">
-                                                    {% csrf_token %}
+                                              <div class="recipe-goal-form">
+                                                <form method="post" action="{% url 'account_settings' %}" id="recipegoalform">
+                                                  {% csrf_token %}
 
-                                                    <input type="hidden" name="recipes_goal" value="recipes_goal">
-                                                    {% if goal_form.instance.goal %}
-                                                      <input type="number" name="goal" value="{{goal_form.instance.goal}}" required="" id="id_goal" placeholder="Set a goal">
-                                                    {% else %}
-                                                      <input type="number" name="goal" value="0" required="" id="id_goal" placeholder="Set a goal">
-                                                    {% endif %}
-                                                  </form>
-                                                </div>
-                                              <!-- </p> -->
+                                                  <input type="hidden" name="recipes_goal" value="recipes_goal">
+                                                  {% if goal_form.instance.goal %}
+                                                    <input type="number" name="goal" value="{{goal_form.instance.goal}}" required="" id="id_goal" placeholder="Set a goal">
+                                                  {% else %}
+                                                    <input type="number" name="goal" value="0" required="" id="id_goal" placeholder="Set a goal">
+                                                  {% endif %}
+                                                </form>
+                                              </div>
                                           </div>
-                                          <!-- <div> -->
-                                            <div class="button-container">
-                                              <button type="submit" id="recipegoalformBtn">Mark</button>
-                                            </div>
-                                          <!-- </div> -->
+
+                                          <div class="button-container">
+                                            <button type="submit" id="recipegoalformBtn">Mark</button>
+                                          </div>
+                                          
                                         </div>
                                           
                                       </div>
@@ -206,8 +200,40 @@
 
                   </div>
 
+                  <div class="acc-set-child-containers" id="downloadDataTarget">
 
-                  <h3>Set preference <span class="material-symbols-rounded" data-bs-custom-class="custom-popover" 
+                      <div class="child-1">
+
+                          <div class="child-1-col">
+                              <div class="row-container">
+                                  <div class="row">
+                                      <div class="col col-1">
+                                          <span class="material-symbols-rounded">file_download</span>
+                                      </div>
+          
+                                      <div class="col">
+                                        <div class="d-flex">
+                                          <div class="flex-grow-1">
+                                            <h4>Export your data</h4>
+                                            <p class="">Get a complete archive of your account data</p>
+                                          </div>
+
+                                          <div class="button-container">
+                                            <button form="downloadUserDataForm" type="submit">Download</button>
+                                          </div>
+                                          
+                                        </div>
+                                          
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          
+                      </div>
+
+                  </div>
+
+                  <h3>Set recipe preference <span class="material-symbols-rounded" data-bs-custom-class="custom-popover" 
                     tabindex="0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" 
                     data-bs-content="<span>This will replace the default time based recipes in home page</span>">info</span></h3>
 
@@ -223,9 +249,8 @@
 
                           <div class="row">
 
-                            <!-- type (breakfast,dinner,etc) -->
+                            {# type #}
                             <div class="col-lg-4 col-md-12 col-12 col-sm-12">
-                              <!-- <h6>Type</h6> -->
                               {% if preference_form.preference_type.value %}
                                 <select name="preference_type" id="preference_type" class="custom-select">
                                   {% if preference_form.preference_type.value == 'Evening Snack recipes' %}
@@ -271,9 +296,8 @@
                               {% endif %}
                             </div>
 
-                            <!-- category -->
+                            {# category #}
                             <div class="col-lg-4 col-md-12 col-sm-12">
-                              <!-- <h6>Category</h6> -->
                               {% if preference_form.preference_category.value %}
                                 <select name="preference_category" id="id_preference_category">
                                   <option value="{{preference_form.preference_category.value}}" hidden>{{preference_form.preference_category.value}}</option>
@@ -301,9 +325,8 @@
                               {% endif %}
                             </div>
 
-                            <!-- cuisines -->
-                            <div class="col-lg-4 col-md-12 col-sm-12">                       
-                              <!-- <h6>Cuisine</h6> -->
+                            {# cuisines #}
+                            <div class="col-lg-4 col-md-12 col-sm-12"> 
                               {% if preference_form.preference_cuisine.value %}
                                 <select name="preference_cuisine" id="id_preference_cuisine">
                                   <option value="{{preference_form.preference_cuisine.value}}" hidden>{{preference_form.preference_cuisine.value}}</option>
@@ -346,10 +369,11 @@
                     </div>
                     
                     <div class="col-2 button-container preference-btn-container">
-                      <button type="submit" id="preferenceformBtn">Save</button>
+                      <button type="submit" id="preferenceformBtn">Apply</button>
                     </div>
                   </div>
 
+                  <form action="{% url 'export_data' %}" id="downloadUserDataForm" method="get"></form>
                 </div>
                    
             </div> 
@@ -368,7 +392,7 @@
 
   </div>
 
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
+{% else %}
 
   <script>
     location.href = "{% url 'login' %}";
@@ -377,12 +401,12 @@
 {% endif %}
 </body>
 
-<!-- putting submit button outside for all forms -->
+{# putting submit button outside for all forms #}
 <script>
     const form = document.getElementById('emailform');
-    const submitButton = document.getElementById('submitButton');
+    const emailformbtn = document.getElementById('emailformbtn');
   
-    submitButton.addEventListener('click', function() {
+    emailformbtn.addEventListener('click', function() {
       form.submit();
     });
 
@@ -401,33 +425,57 @@
     });
 </script>
 
-<!-- delete account modal -->
+{# delete account modal #}
 <div class="modal fade Modal-delete" id="accountdeleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content logoutmodal deletemodal">
+    <div class="modal-content logoutmodal deletemodal accountdeletemodal">
+      <div class="modal-body">
+        <div class="modal-body-header">
+          <h2 class="modal-body-text-color">Delete account?</h2>
+          <p class="del-text modal-body-text-color">Consider downloading your data before account deletion</p>
+        </div>
 
-          <div class="modal-body">
-            <div class="modal-body-header">
-
-              <h2 class="modal-body-text-color">Delete account?</h2>
-              <p class="del-text modal-body-text-color">Are you sure you want to delete your account ?</p>
-              
-              <div class="callout callout-warning">
-                  <p><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</p>
-              </div>
+        <div class="modal-body-footer delete-modal-footer">
+          <div class="d-flex justify-content-between">
+            <div>
+              <button type="button" class="btn btn-transparent data-download-btn" id="dataDownloadButton" data-target-id="downloadDataTarget">Download data</button>
             </div>
 
-            <div class="modal-body-footer delete-modal-footer">
+            <div>
               <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-              
-              <form method="post" action="{% url 'delete_account' %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Delete</button>
-              </form>
-
+              <button class="btn btn-transparent" data-bs-target="#confirmAccountDeleteModal" data-bs-toggle="modal">Delete</button>    
+            </div>            
           </div>
-          </div>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
+
+{# Confirming the account deletion #}
+<div class="modal fade Modal-delete" id="confirmAccountDeleteModal" aria-hidden="true" aria-labelledby="confirmAccountDeleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content logoutmodal deletemodal">
+      <div class="modal-body">
+        <div class="modal-body-header">
+          <h2 class="modal-body-text-color">Confirm account deletion!</h2>
+          <p class="del-text modal-body-text-color">You are about to permanently delete your account and all associated data.</p>
+            
+          <div class="callout callout-warning">
+            <p><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</p>
+          </div>
+        </div>
+
+        <div class="modal-body-footer delete-modal-footer">
+          <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+          
+          <form method="post" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -436,39 +484,43 @@
       <div class="d-flex"> 
           <div class="toast-body">
 
-            <!-- for type -->
+            {# for type #}
             {% if preference_form.preference_type.value != 'Select' and preference_form.preference_category.value == 'Select' and preference_form.preference_cuisine.value == 'Select' %}
               Preference set to {{ preference_form.preference_type.value }}
             {% endif %} 
 
-            <!-- for category -->
+            {# for category #}
             {% if preference_form.preference_type.value == 'Select' and preference_form.preference_category.value != 'Select' and preference_form.preference_cuisine.value == 'Select' %}
               Preference set to {{ preference_form.preference_category.value }}
             {% endif %}
 
-            <!-- for cuisine -->
+            {# for cuisine #}
             {% if preference_form.preference_type.value == 'Select' and preference_form.preference_category.value == 'Select' and preference_form.preference_cuisine.value != 'Select' %}
               Preference set to {{ preference_form.preference_cuisine.value }}
             {% endif %}
 
-            <!-- for type and category -->
+            {# for type and category #}
             {% if preference_form.preference_type.value != 'Select' and preference_form.preference_category.value != 'Select' and preference_form.preference_cuisine.value == 'Select' %}
               Preference set to {{ preference_form.preference_category.value|slice:":-8" }} {{ preference_form.preference_type.value }}
             {% endif %}
 
-            <!-- for type and cuisine -->
+            {# for type and cuisine #}
             {% if preference_form.preference_type.value != 'Select' and preference_form.preference_cuisine.value != 'Select' and preference_form.preference_category.value == 'Select' %}
               Preference set to {{ preference_form.preference_type.value }} from {{ preference_form.preference_cuisine.value }}
             {% endif %}
 
-            <!-- for category and cuisine -->
+            {# for category and cuisine #}
             {% if preference_form.preference_type.value == 'Select' and preference_form.preference_category.value != 'Select' and preference_form.preference_cuisine.value != 'Select' %}
               Preference set to {{ preference_form.preference_category.value|slice:":-8" }} {{ preference_form.preference_cuisine.value }}
             {% endif %}
 
-            <!-- for type, category and cuisine -->
+            {# for type, category and cuisine #}
             {% if preference_form.preference_type.value != 'Select' and preference_form.preference_category.value != 'Select' and preference_form.preference_cuisine.value != 'Select' %}
             Preference set to {{ preference_form.preference_category.value|slice:":-8" }} {{ preference_form.preference_type.value }} from {{ preference_form.preference_cuisine.value }}
+            {% endif %}
+
+            {% if preference_form.preference_type.value == 'Select' and preference_form.preference_category.value == 'Select' and preference_form.preference_cuisine.value == 'Select' %}
+            Your preferences have been cleared
             {% endif %}
             
           </div>
@@ -487,6 +539,39 @@
       </div>
   </div>
 </div>
+
+
+<script>
+  const neutral_primary = "{{ user.userprofile.neutral_primary }}";
+
+  document.addEventListener('DOMContentLoaded', function() {
+      const dataDownloadButton = document.getElementById('dataDownloadButton');
+
+      if (dataDownloadButton) {
+          dataDownloadButton.addEventListener('click', function() {
+              const targetId = this.getAttribute('data-target-id');
+              const targetElement = document.getElementById(targetId);
+
+              if (targetElement) {
+                  let bgcolorApplied = true;
+                  const pulseInterval = setInterval(function() {
+                      targetElement.style.backgroundColor = bgcolorApplied ? neutral_primary : '';
+                      bgcolorApplied = !bgcolorApplied;
+                  }, 300);
+
+                  // targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                  setTimeout(function() {
+                      clearInterval(pulseInterval);
+                      targetElement.style.backgroundColor = '';
+                  }, 1400);
+              }
+
+              $('#accountdeleteModal').modal('hide');
+          });
+      }
+  });
+</script>
 
 {% if messages %}
   {% for message in messages %}

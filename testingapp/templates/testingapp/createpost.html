@@ -52,7 +52,7 @@
                 <div class="col-12 first-div">
                   <!-- <label for="inputTitle" class="form-label">Cover image</label> -->
                   <div class="ai_img_input">
-                  <div class="col-sm-11 img_prompt_text">
+                  <div class="col-sm-12 img_prompt_text">
                     <input type="text" name="newtitle" class="form-control" id="inputTitle" required="required" placeholder="Enter promt for image" autocomplete="off" title="Promt for image">
                   </div>
                   </div>
@@ -65,8 +65,6 @@
                     <button type="button" id="uploadImageButton" class="btn btn-transparent"><span>Select image</span></button>
                   </div>
                 </div>
-
-                <!-- <button id="generateImageButton">Generate Image</button> -->
               </form>
 
               <button type="button" id="generateImageToggle" class="btn btn-transparent generate_ai_img_btn gen_img_toggle_btn"><span>Generate image</span></button>
@@ -77,7 +75,7 @@
                 <div id="imageUploadContainer" style="display: none;">
                   <div class="col-lg-12 image-field">
                     <label class="form-label">Cover image</label>
-                    <!-- <div ></div> -->
+                 
                     <br>
                     <label for="images" name="image" class="border form-label img-input-btn">
                       <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter">Select images</span>
@@ -88,9 +86,8 @@
                   </div>
                 </div>
 
-                <!-- Image preview -->
+                {# Image preview #}
                 <div class="imgarea">
-                  <!-- <div class="testpreview"></div> -->
                     <div class="new-container">
                       
                     </div>
@@ -102,16 +99,14 @@
                 
                 </div>  
                 
-                <!-- Hidden input field for image URL -->
+                {# Hidden input field for image URL #}
                 <input type="hidden" name="image_url" id="imageURLField">
 
                 <input type="hidden" name="api_image_title" id="imageTitle">
 
 
-                <br>
                 <div class="col-12 first-div">
-                  <!-- <label for="inputTitle" class="form-label">Title</label> -->
-                  <div class="col-sm-11 input-field">
+                  <div class="col-sm-12 input-field">
 
                     {% if form.title.value %}
                       <input type="text" name="title" class="form-control" value="{{ form.title.value }}" id="inputTitleRecipe" placeholder="Title of the recipe" required="required" title="Title">
@@ -126,7 +121,6 @@
                 <div class="row mx-0 gx-4 gy-2 select-options">
 
                   <div class="col-md-4">
-                    <!-- <label for="inputType" class="col col-form-label">Type of recipe</label> -->
                     {% if form.type.value %}
                       <select class="form-select" id="specificSizeSelect" name="type" required title="Type of the recipe">
                         <option value="{{form.type.value}}">{{form.type.value}}</option>
@@ -147,7 +141,6 @@
                   </div>
 
                   <div class="col-md-4">
-                    <!-- <label for="inputCuisine" class="col col-form-label">Cuisine</label> -->
                     {% if form.cuisine.value %}
                       <select class="form-select" id="specificSizeSelect" name="cuisine" required title="Cuisine">
                         <option value="{{form.cuisine.value}}">{{form.cuisine.value}}</option>
@@ -166,7 +159,6 @@
                   </div>
                   
                   <div class="col-md-3">
-                    <!-- <label for="inputTime" class="col col-form-label">Preparation time</label> -->
                     {% if form.timing.value %}
                       <input type="number" class="form-control" name="timing" value="{{form.timing.value}}" id="inputTime" min="1" placeholder="Time (in min)" required="required" title="Preparation time">
                     {% else %}
@@ -179,7 +171,6 @@
                 <div class="row mx-0 gx-4 gy-2 select-options">
                   
                   <div class="col-md-4">
-                    <!-- <label for="inputCategory" class="col col-form-label">Category</label> -->
                     {% if form.category.value %}
                       <select class="form-select" id="specificSizeSelect" name="category" required title="Category">
                         <option value="{{form.category.value}}">{{form.category.value}}</option>
@@ -196,7 +187,6 @@
                   </div>
 
                   <div class="col-md-4">
-                    <!-- <label for="inputDifficulty" class="col col-form-label">Difficulty</label> -->
                     {% if form.difficulty.value %}
                       <select class="form-select" id="specificSizeSelect" name="difficulty" required title="Difficulty">
                         <option value="{{form.difficulty.value}}">{{form.difficulty.value}}</option>
@@ -215,7 +205,6 @@
                   </div>
 
                   <div class="col-md-3">
-                    <!-- <label for="inputServings" class="col col-form-label">Servings</label> -->
                     {% if form.servings.value %}
                       <input type="number" name="servings" value="{{form.servings.value}}" class="form-control" id="inputServings" min="1" placeholder="Serves" required="required" title="Serving">
                     {% else %}
@@ -262,15 +251,6 @@
                     
                   </div>
                 </div>
-
-                <!-- <div class="text-center">
-                  <div class="form-btns">
-                    <input type="submit" value="Post">
-                    
-                    <button type="reset" class="btn btn-transparent" onclick="removeimg()"><span>Clear</span></button>
-                    
-                  </div>
-                </div> -->
                 
               </form>
 
@@ -287,14 +267,12 @@
         <aside class="sidebar sidebar-dashboard recipe-img-preview-sidebar" id="show-sidebar">
                     
           <div class="sidebar-recipes">
-              
-            <!-- <h2></h2> -->
 
-              <!-- Image preview -->
-              <div class="preview-container">
-                <img class="preview-image" src="" alt="Image" style="display: none;">
-                <div class="recipe-title preview_ai_img_title"></div>
-              </div>
+            {# Image preview #}
+            <div class="preview-container">
+              <img class="preview-image" src="" alt="Image" style="display: none;">
+              <div class="recipe-title preview_ai_img_title"></div>
+            </div>
                
           </div>
 
@@ -319,24 +297,6 @@
 {% endif %}
 </body>
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-<!-- <script>
-  $('#myForm').submit(function (e) {
-    e.preventDefault();
-
-    var formData = new FormData(this);
-
-    // console.log(formData);
-    if (formData){
-    console.log(true);
-    }
-    else{
-      console.log(false);
-    }
-});
-</script> -->
-
 <div class="modal fade Modal-logout" id="recipeFormModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true" data-bs-keyboard="false" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content logoutmodal">
@@ -356,7 +316,7 @@
   </div>
 </div>
 
-<!-- After successful form submission if user clicks navigate back to re-submit form it will redirect -->
+{# After successful form submission if user clicks navigate back to re-submit form it will redirect #}
 <script>
   // if (window.performance.navigation.type === 2){
   // // location.href = "{% url 'home' %}";
@@ -365,8 +325,6 @@
   //   $('#myForm')[0].reset();
 
   //     //   $('#recipeFormModal').modal('show');
-
-  //     //   // Set a timeout to hide the modal and redirect after 3 seconds
   //     //   setTimeout(function () {
   //     //     $('#recipeFormModal').modal('show');
   //     //     location.href = "{% url 'home' %}";
@@ -431,7 +389,7 @@
     });
 </script>
 
-<!-- Tooltip for image generation error -->
+{# Error toast for image generation error #}
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
   <div id="imgErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex"> 
@@ -443,19 +401,7 @@
   </div>
 </div>
 
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-  <div id="testsToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex"> 
-          <div class="toast-body">
-              Test form
-          </div>
-          <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-  </div>
-</div>
-
-
-<!-- Sending & getting response of image using openai api -->
+{# Sending & getting response of image using openai api #}
 <script>
   $(document).ready(function() {
     $('#generateImageButton').on('click', function(e) {
@@ -537,17 +483,14 @@
 </script>
 
 
-<!-- Getting title from Imagegenerationform into myForm (main recipe forms) -->
+{# Getting title from Imagegenerationform into myForm (main recipe forms) #}
 <!-- <script>
   $(document).ready(function() {
-      // Listen to input events in the imageGenerationForm title field
       $('#inputTitle').on('input', function() {
-          // Get the value entered in the imageGenerationForm title field
           var newTitle = $(this).val();
           
-          // Update the myForm title field with the new title
           $('#inputTitleRecipe').val(newTitle);
-          $('#nameError').text(""); // Clear any previous error message
+          $('#nameError').text("");
       });
   });
 </script> -->
@@ -593,7 +536,7 @@
   }
 </script>
 
-<!-- image preview with name of the file -->
+{# image preview with name of the file #}
 <script>
 const previewContainers = document.querySelector('.new-container');
 const imagesInput = document.getElementById('images');
@@ -724,10 +667,6 @@ function updateFileList(fileToRemove) {
 
   imagesInput.files = newFileList.files;
 }
-
-
-  
 </script>
-
 
 {% endblock %}

@@ -28,15 +28,11 @@
     {% if not user.is_authenticated %}
         <div class="container-fluid">
             <div class="row no-gutter">
-                <!-- The image half -->
                 <div class="col-md-7 d-none d-md-flex bg-image"></div>
             
-
-                <!-- The content half -->
                 <div class="col-md-5 second-half">
                     <div class="login d-flex align-items-center py-5">
 
-                        <!-- Demo content-->
                         <div class="container login-container">
                             <div class="row">
                                 <div class="col-lg-10 col-xl-7 mx-auto">
@@ -86,10 +82,10 @@
                                     </form>
                                 </div>
                             </div>
-                        </div><!-- End -->
+                        </div>
 
                     </div>
-                </div><!-- End -->
+                </div>
 
             </div>
         </div>
@@ -104,7 +100,7 @@
 
 </body>
 
-<!-- View password -->
+{# View password #}
 <script>
     function viewpassword() {
     var viewpwd = document.getElementById("inputPassword3");
@@ -139,7 +135,6 @@
           </div>
           <div class="modal-footer">
               <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
-              <!-- <a href="{% url 'profile' %}#credits" class="btn btn-transparent footer-btn delete-btn logout-modal-btn">View credits</a> -->
           </div>
       </div>
       </div>

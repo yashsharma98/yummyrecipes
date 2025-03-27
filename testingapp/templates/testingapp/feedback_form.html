@@ -47,6 +47,9 @@
                                         {% if user_feedback %}
 
                                         <div class="table-column feedback-card-container mb-3">
+                                            <div class="m-3 mx-0 mb-2">
+                                                <h6>Feedback History</h6>
+                                            </div>
                                             {% for feedback in user_feedback reversed %}
                                                 {% if feedback_len == 1 %}
                                                     <div class="card first-fd-card">
@@ -167,7 +170,7 @@
 
 <div class="offcanvas offcanvas-bottom comments-offcanvas feedback-offcanvas h-auto" tabindex="-1" id="Feedbackoffcanvas" aria-labelledby="offcanvasBottomLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Send feedback</h5>
+      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Your feedback</h5>
       <button class="cmt-offcanvas-btn">
         <span class="material-symbols-rounded btn-close cmt-offcanvas-close" data-bs-dismiss="offcanvas" aria-label="Close">close</span>
       </button>
@@ -175,16 +178,23 @@
 
     <div class="offcanvas-body p-0 h-auto">
     
-        <form method="POST" class="row m-0 g-4">
+        <form method="POST" class="row m-0 g-3">
                                             
             {% csrf_token %}
 
-            <div class="col-md-6 exclude">
-                <input type="text" class="form-control" name="name" maxlength="100" required="required" id="id_name" value="{{user.get_full_name}}" readonly>
+            <div class="col-12 col-md-auto col-lg-6 exclude">
+                <div class="row g-2 align-items-center">
+                    <div class="col-auto">
+                        <img src="{{ user.profile.profile_img.url }}" class="img-thumbnail">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" name="name" maxlength="100" required="required" id="id_name" value="{{user.get_full_name}}" readonly>
+                    </div>
+                </div>
             </div>
             
-            <div class="col-md-6 exclude">
-                <input type="email" class="form-control" name="email" maxlength="254" required="required" id="id_email" value="{{user.email}}" readonly>
+            <div class="col exclude">
+                <input type="email" class="form-control" name="email" maxlength="254" required="required" id="id_email" value="{{user.email}}" readonly title="Email address is readonly.">
             </div>
             
             <div class="col-12">
@@ -233,5 +243,39 @@
 {% endif %}
 
 
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div id="excludeToastMessage" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex"> 
+            <div class="toast-body">
+                You cannot change your name!
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const name_input = document.getElementById('id_name');
+        const email_input = document.getElementById('id_email');
+        const exclude_toast_message = document.getElementById('excludeToastMessage');
+        const toast_body = exclude_toast_message.querySelector('.toast-body');
+        const toast = new bootstrap.Toast(exclude_toast_message);
+
+        if (name_input) {
+            name_input.addEventListener('click', function() {
+                toast_body.textContent = 'You cannot change your name!';
+                toast.show();
+            });
+        }
+
+        if (email_input) {
+            email_input.addEventListener('click', function() {
+                toast_body.textContent = 'You cannot change your email address!';
+                toast.show();
+            });
+        }
+    });
+</script>
 
 {% endblock %}

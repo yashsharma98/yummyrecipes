@@ -35,15 +35,6 @@
         </div>
 
         <div class="favourites">
-            <!-- {% if post in user.favourite.all %}
-            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-            </a>
-            {% else %}
-            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                <span class="material-symbols-rounded favourite-icon">favorite</span>
-            </a>
-            {% endif %} -->
             {% if post in user.favourite.all %}
             <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                 <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>

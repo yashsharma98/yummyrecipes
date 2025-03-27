@@ -53,41 +53,24 @@
                     <button id="generateRecipeImage" class="btn btn-transparent form-submit generate_ai_img_btn ai-theme-btn"><i class="fa-solid fa-wand-sparkles" style="font-size: 0.8em;margin-right: 10px;"></i> Generate</button>
                 </div>
 
-                <!-- <div class="col-12 first-div">
-                  <label for="id_title" class="form-label">Prompt</label>
-                  <div class="ai_img_input">
-                  <div class="col-sm-11 img_prompt_text">
-                    <input type="text" name="title" class="form-control" id="id_title" required="required" placeholder="Enter a meal, cuisine, or ingredient to get a recipe" autocomplete="off" title="Promt for image">
-                  </div>
-                  </div>
-                  <span id="nameError"></span>
-                </div>
-
-                <div class="text-center">
-                  <div class="form-btns">
-                    <button id="generateRecipeImage" class="btn btn-transparent generate_ai_img_btn generate-button"><i class="fa-solid fa-wand-sparkles" style="font-size: 0.8em;margin-right: 5px;"></i> <span>Generate</span></button>
-                  </div>
-                </div> -->
-
               </form> 
 
-                 <!-- Image preview -->
-                <div class="imgarea">
-                    <div class="gen-img" style="display: none">
-                        <img class="preview-image" src="" alt="Image">
-                        <div class="preview_ai_img_title"></div>
-                    </div>
-                </div> 
-              
-                <div class="col-12 generated-recipe-content">
-                    <p id="generated-recipe">
-                    </p>
-                </div>
+              {# Image preview #}
+              <div class="imgarea">
+                  <div class="gen-img" style="display: none">
+                      <img class="preview-image" src="" alt="Image">
+                      <div class="preview_ai_img_title"></div>
+                  </div>
+              </div> 
+            
+              <div class="col-12 generated-recipe-content">
+                  <p id="generated-recipe">
+                  </p>
+              </div>
 
-
-                <div class="mt-3 text-secondary ai-recipe-check-response" style="display: none;">
-                  <small><p class="fst-italic px-2">May generate inaccurate response.</p></small>
-                </div>
+              <div class="mt-3 text-secondary ai-recipe-check-response" style="display: none;">
+                <small><p class="fst-italic px-2">May generate inaccurate response.</p></small>
+              </div>
                 
             </div>
             
@@ -121,15 +104,12 @@
 
 {% else %} 
   
-<script>
-  location.href = "{% url 'login' %}";
-</script>
+  <script>
+    location.href = "{% url 'login' %}";
+  </script>
 
 {% endif %}
 </body>
-
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 
 
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
@@ -143,8 +123,7 @@
     </div>
 </div>
 
-
-<!-- Sending & getting response of image using openai api -->
+{# Sending & getting response of image using openai api #}
 <script>
   $(document).ready(function() {
     $('#generateRecipeImage').on('click', function(e) {
@@ -239,10 +218,6 @@
   });
 </script>
 
-
-
-
-
 <script>
 function validateForm() {
   const form = document.getElementById('myForm');
@@ -255,7 +230,6 @@ function validateForm() {
   }
 }
 </script>
-
 
 <script>
    const previewContainers = document.querySelector('.new-container');

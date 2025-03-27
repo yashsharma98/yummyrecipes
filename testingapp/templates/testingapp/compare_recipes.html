@@ -133,7 +133,13 @@
                                             </tr>
                                             <tr>
                                                 <th scope="row" colspan="2">Prep time</th>
-                                                <td>{{recipe1.timing}} min</td>
+                                                <td>
+                                                    {% if recipe1.timing > 1 %}
+                                                        {{recipe1.timing}} mins
+                                                    {% else %}
+                                                        {{recipe1.timing}} min
+                                                    {% endif %}
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <th scope="row" colspan="2">Servings</th>
@@ -143,10 +149,6 @@
                                                 <th scope="row" colspan="2">Difficulty</th>
                                                 <td>{{recipe1.difficulty}}</td>
                                             </tr>
-                                            <!-- <tr>
-                                                <th scope="row" colspan="2">Views</th>
-                                                <td>{% get_hit_count for recipe1 %}</td>
-                                            </tr> -->
                                             <tr>
                                                 <th scope="row" colspan="2">Posted</th>
                                                 <td>{{recipe1.get_date}}</td>
@@ -269,7 +271,13 @@
                                         </tr>
                                         <tr>
                                             <th scope="row" colspan="2">Prep time</th>
-                                            <td>{{recipe2.timing}} min</td>
+                                            <td>
+                                                {% if recipe2.timing > 1 %}
+                                                    {{recipe2.timing}} mins
+                                                {% else %}
+                                                    {{recipe2.timing}} min
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th scope="row" colspan="2">Servings</th>
@@ -279,10 +287,6 @@
                                             <th scope="row" colspan="2">Difficulty</th>
                                             <td>{{recipe2.difficulty}}</td>
                                         </tr>
-                                        <!-- <tr>
-                                            <th scope="row" colspan="2">Views</th>
-                                            <td>{% get_hit_count for recipe2 %}</td>
-                                        </tr> -->
                                         <tr>
                                             <th scope="row" colspan="2">Posted</th>
                                             <td>{{recipe2.get_date}}</td>
@@ -389,7 +393,7 @@
 
   </div>
 
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
+{% else %}
 
 <script>
     location.href = "{% url 'home' %}";

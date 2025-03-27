@@ -48,7 +48,7 @@
               {% endif %}
             </p>
 
-            {% if results %} <!-- placeholder -->
+            {% if results %}
 
               <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
 
@@ -72,7 +72,6 @@
                                   <div>
                                     <h3 class="card-title">{{ profile_result.get_full_name }}</h3>
                                   </div>
-                                  <!-- <p class="card-text">{{profile_result.email}}</p> -->
                                   <div>
                                     <small>
                                       {% if profile_result.followers.count > 1 %}
@@ -93,13 +92,13 @@
                                   <div>
                                     {% if profile_result != request.user %}
                                       {% for key, value in is_following.items %}
-                                        {% if key == profile_result.username and value == False %} <!-- if user is not following the targeted user -->
+                                        {% if key == profile_result.username and value == False %} {# if user is not following the targeted user #}
                                           <form method="post" action="{% url 'follow_unfollow_user' profile_result.username %}">
                                             {% csrf_token %}
                                             <button type="submit">Follow</button>
                                           </form>
 
-                                        {% elif key == profile_result.username and value == True %}  <!-- if user is following the targeted user -->
+                                        {% elif key == profile_result.username and value == True %} {# if user is following the targeted user #}
                                           <form method="post" action="{% url 'follow_unfollow_user' profile_result.username %}">
                                             {% csrf_token %}
                                             <button type="submit">Unfollow</button>
@@ -108,11 +107,6 @@
                                         {% endif %}
                                       {% endfor %}
                                       {% else %}
-                                      <!-- <form method="post" action="{% url 'follow_unfollow_user' profile_result.username %}">
-                                        {% csrf_token %}
-                                        <button type="submit">Unfollow</button> REmove it
-                                      </form> -->
-                                      <!--  -->
                                     {% endif %}
                                   </div>
                                 </div>
@@ -190,10 +184,8 @@
 
             {% else %}
 
-              <!-- <div class="container search-pg-container card-group p-2">No results found for '{{query}}'</div> -->
 
-            {% endif %} <!-- placeholder ends -->
-                   
+            {% endif %}
         
           </div>
 
@@ -209,7 +201,7 @@
 
   </div>
 
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
+{% else %}
 
   <div class="primary-wrapper">
 
@@ -254,7 +246,6 @@
                                     <div>
                                       <h3 class="card-title">{{ profile_result.get_full_name }}</h3>
                                     </div>
-                                    <!-- <p class="card-text">{{profile_result.email}}</p> -->
                                     <div>
                                       <small>
                                         {% if profile_result.followers.count > 1 %}
@@ -350,7 +341,7 @@
 {% endif %}
 </body>
 
-<!-- following toast message -->
+{# following toast message #}
 {% if messages %}
   {% for message in messages %}
     {% if 'follow_message' in message.tags %}   
@@ -379,8 +370,7 @@
 {% endif %}
 
 
-<!-- if authenticated user tries to following itself -->
-
+{# if authenticated user tries to following itself #}
 {% if messages %}
   {% for message in messages %}
     {% if 'same_user' in message.tags %}   
@@ -406,12 +396,5 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-
-
-<!-- tooltip -->
-<script>
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-</script>
 
 {% endblock %}

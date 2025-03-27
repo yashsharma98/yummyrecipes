@@ -101,8 +101,6 @@
                                           <label for="id_gender" class="col-md-5 col-form-label uprofile-form-label">Gender</label>
       
                                           <div class="col">
-                                              <!-- <input type="text" class="form-control uprofile-input" name="gender" maxlength="10" value="{{user.profile.gender}}" required="" id="id_gender"> -->
-                                            
                                               <select name="gender" class="form-control uprofile-input" id="id_gender">
                                                 {% for choice in gender_choices %}
                                                     {% if user.profile.gender == choice.0 %}

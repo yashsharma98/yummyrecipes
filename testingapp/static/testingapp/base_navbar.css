@@ -28,6 +28,7 @@
 
     --col-color: #D0C9C0;
     --font_family: 'Jost';
+    --fill_color: #C1D8C3;
 }
 
 
@@ -84,12 +85,11 @@ html *{
 }
 
 .navrail-logo{
-    /* background: red; */
     /* width: 4.5%; */
     /* height: 50px; */
     position: relative;
     top: 60%;
-    left: -9px;
+    left: -7px;
     transition: 0.5s;
     opacity: 1;
     transition: opacity 0.2s ease;
@@ -99,12 +99,12 @@ html *{
 
 .scroll-indicator {
     position: fixed;
-    top: 14.5px;
+    top: 15.3px;
     left: 21.5px;
     opacity: 0;
     background: var(--bgcolor);
-    height: 50px;
-    width: 50px;
+    height: 48px;
+    width: 45px;
     border-radius: 30px;
     z-index: 9999;
     transition: background 0.4s ease,opacity 0.2s ease;
@@ -126,8 +126,8 @@ html *{
     transition: transform linear;
 }
 
-.nvarbar-circle-svg-path {
-    fill: var(--bgcolor);
+.navbar-circle-svg-path {
+    fill: var(--fill_color);
 }
 
 .nrweb-logo{
@@ -144,14 +144,12 @@ html *{
 }
 
 .navbar-brand-name{
-    /* background: red; */
     position: absolute;
     /* left: 90px; */
     left: 115px;
 }
 
 .navbar-brand-name a{
-    /* background: red; */
     /* font-family: 'Marck Script', cursive; */
     position: absolute;
     top: -18px;
@@ -169,7 +167,6 @@ html *{
 }
 
 .navbar-sm-weather .weather-widget{
-    /* background: red; */
     padding: 0;
     position: absolute;
     top: 20px;
@@ -190,7 +187,6 @@ html *{
 
 
 .navbar-right-list-items ul li.nav-item{
-    /* background: red; */
     /* padding: 5px; */
     border-radius: 100%;
     transition: all 0.1s ease;
@@ -391,7 +387,6 @@ html *{
 }
 
 .top-nb-dropmenu-content a{
-    /* background: red; */
     border-radius: 25px;
     border: 1.5px solid var(--activecolor);
     color: var(--maincolor);
@@ -478,7 +473,6 @@ html *{
 
 .dropmenu-details-links p{
     border-radius: 25px;
-    /* background: red; */
     padding-left: 0;
     text-align: center;
 }
@@ -529,7 +523,6 @@ html *{
 .dropmenu-details-wrapper .dropdown-second-child2{
     border-radius: 0 0 25px 25px;
     margin-top: -2px;
-    /* background: red; */
 }
 
 .dropmenu-details-wrapper a,
@@ -601,7 +594,6 @@ html *{
 
 .dropmenu-details-wrapper .dropmenu-text,
 .dropmenu-details-links .dropmenu-text{
-    /* background: red; */
     vertical-align: top;
     position: relative;
     bottom: 2px;
@@ -646,7 +638,6 @@ html *{
 }
 
 .dark-theme .darktheme-btn p:last-child{
-    /* background: red; */
     border-radius: 0 0 5px 5px;
 }
 
@@ -667,7 +658,6 @@ html *{
 
 /* toast message */
 .toast-container .theme-toast{
-    /* background: red; */
     border-radius: 40px;
     width: 170px;
     padding: 0;
@@ -686,14 +676,12 @@ html *{
 /* autocomplete widget */
 
 .autocomplete {
-    /* background: red; */
     position: relative;
 } 
 
 .autocomplete-items {
-    background: var(--white);
+    background: inherit;
     /* backdrop-filter: contrast(85%); */
-    /* position: absolute; */
     position: relative;
     border-radius: 25px;
     padding: 5px;
@@ -703,14 +691,12 @@ html *{
     /* padding: 5px 7px; */
     height: auto;
     z-index: 10;
-    /*position the autocomplete items to be the same width as the container:*/
     /* top: 100%; */
     /* left: 0;
     right: 0; */
     /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px; */
     transition: 0.3s ease;
     /* position: absolute; */
-    /* Set width to 100% */
     width: 100%;
 }
 
@@ -734,7 +720,7 @@ html *{
     background: var(--bgcolor);
     color: var(--maincolor);
     border-radius: 14px;
-    font-size: 0.85em;
+    font-size: 0.75em;
     display: inline-block;
     padding: 8px 15px;
     cursor: pointer; 
@@ -743,19 +729,12 @@ html *{
 }
 
 .additional-option:hover {
-    background-color: var(--hovercolor) !important;
+    background-color: var(--hovercolor);
 }
 
-.pages-options-autocomplete,.history-options-autocomplete {
+/* .pages-options-autocomplete,.history-options-autocomplete {
     background: rgba(255, 255, 255, 0.4);
-    /* background: red !important; */
-    border-radius: 25px;
-    padding: 0 12px;
-    /* margin: 0 10px;
-    position: relative;
-    bottom: 8px;
-    margin-top: 8px; */
-}
+} */
 
 .history-options-autocomplete{
     margin: 10px 0;
@@ -763,7 +742,7 @@ html *{
 
 .autocomplete-pages-heading{
     color: var(--maincolor);
-    font-size: 0.8em;
+    font-size: 0.7em;
     padding: 9px 4px 6px 4px;
     opacity: 0.8;
     margin-bottom: 6px;
@@ -792,13 +771,11 @@ html *{
     /* right: 10px; */
 }
   
-  /*when hovering an item:*/
 .autocomplete-items div:hover {
     background: var(--hovercolor);
     transition: background 0.3s ease;
 }
   
-  /*when navigating through the items using the arrow keys:*/
 .autocomplete-active {
     background: var(--hovercolor);
 }
@@ -889,7 +866,7 @@ html *{
 
 .logout-link{
     /* background: var(--white); */
-    /* background: var(--bgcolor); */
+    background: var(--bgcolor);
     border-radius: 100%;
     position: absolute;
     bottom: 14px;
@@ -929,7 +906,7 @@ html *{
 }
 
 .logout-link.clicked {
-    background-color: var(--hovercolor); /* Change to your desired background color */
+    background-color: var(--hovercolor);
     transition: background-color 0.5s;
 }
   
@@ -958,7 +935,6 @@ html *{
 }
 
 .logouticon{
-    /* background: red; */
     position: relative;
     top: 2.5px;
 }
@@ -1023,7 +999,6 @@ html *{
 
 .nrlink-container:not(.logout-link){
     transition: 0.3s;
-    /* background: red; */
     margin-left: -2px;
     /* margin-top: 70px; */
     /* margin: 100px 0; */
@@ -1048,7 +1023,6 @@ html *{
 }
 
 .navrail-listitems{
-    /* background: red; */
     /* list-style-type: none; */
     margin: 18px 0;
     padding-right: 1px;
@@ -1077,7 +1051,7 @@ html *{
 }
 
 .navrail-links:hover .navrail-icons{
-    background: #95D2B3;
+    background: #A2B49F;
     font-variation-settings:
     'FILL' 0,
     'wght' 700,
@@ -1086,8 +1060,7 @@ html *{
 }
 
 .navrail-icons-active{
-    /* background: #8FC1D4; */
-    background: #92C7CF;
+    background: #AFC8E1;
     font-variation-settings:
     'FILL' 1,
     'wght' 400,
@@ -1153,7 +1126,6 @@ html *{
 
 .unauth-darktheme-container{
     list-style-type: none;
-    /* background: red; */
     position: absolute;
     bottom: 30px;
     left: 38px;
@@ -1342,6 +1314,16 @@ html *{
     }
 }
 
+.comments-offcanvas .offcanvas-header,
+.comments-offcanvas .offcanvas-body {
+    opacity: 1;
+}
+
+.comments-offcanvas.hiding .offcanvas-header,
+.comments-offcanvas.hiding .offcanvas-body {
+    opacity: 1; 
+}
+
 /* .offcanvas-backdrop {
     backdrop-filter: blur(0px) !important; 
 } */
@@ -1402,7 +1384,6 @@ html *{
 } */
 
 .offcanvas-header h5{
-    /* background: red; */
     color: var(--maincolor);
     /* font-family: 'Marck Script', cursive; */
     margin-left: 5px;
@@ -1463,6 +1444,12 @@ html *{
     font-weight: bold;
 }
 
+.notification-offcanvas .modal-close-btn:focus,
+.notification-offcanvas .modal-close-btn:active{
+    border: 0;
+    box-shadow: none;
+}
+
 .notification-offcanvas .offcanvas-body{
     /* border-radius: 0 0 22px 22px; */
     border: 0;
@@ -1490,37 +1477,29 @@ html *{
 .alert-notification{
     background: var(--bgcolor);
     border: 0;
-    border-radius: 30px;
-    padding: 8px;
+    border-radius: 20px;
+    padding: 5px;
     padding-bottom: 6px;
-    margin: 8px 0;
+    margin: 10px 0;
 }
 
 .alert-notification:first-child{
     margin-top: 0;
 }
 
-/* .notification-container{
-    display: flex;
-    align-items: center;
-} */
-
-/* .notification-container div:nth-child(1){
-    background: red;
-} */
 .notification-container .main-notification-header{
-    /* background: blue !important; */
     font-size: 0.75em;
 }
 
 .notification-container div:nth-child(2){
-    /* background: teal; */
     display: block;
+    font-size: 0.95em;
 }
 
 .notification-container div:nth-child(2) a{
     text-decoration: none;
     color: inherit;
+    font-size: 0.95em;
 }  
 
 .notification-container div:nth-child(2) a:hover{
@@ -1528,7 +1507,6 @@ html *{
 }
 
 .notification-container div:nth-child(3){
-    /* background: turquoise; */
     font-size: 0.7em;
 }
 
@@ -1550,10 +1528,9 @@ html *{
 }
 
 .alert-notification .notification-icons{
-    /* background: red; */
     display: inline-block;
     vertical-align: middle;
-    font-size: 1.2em;
+    font-size: 1em;
     font-variation-settings:
     'FILL' 1,
     'wght' 400,
@@ -1600,13 +1577,12 @@ html *{
 .notification-offcanvas .offcanvas-body::-webkit-scrollbar-thumb{
     border-radius: 20px;
     border: 3px solid rgba(0, 0, 0, 0);
-    background-color: rgb(116, 116, 116);
     background-clip: padding-box;
 }
 
-.notification-offcanvas .offcanvas-body::-webkit-scrollbar-thumb:hover{
+/* .notification-offcanvas .offcanvas-body::-webkit-scrollbar-thumb:hover{
     background-color: rgb(75, 75, 75);
-}
+} */
 
 .notification-footer button{
     background: var(--bgcolor);
@@ -1695,13 +1671,12 @@ html *{
 }
 
 .offcanvas-body-links li a .offcanvas-link-icons{
-    /* background: red; */
     font-size: 1.1em;
     margin-left: -5px;
     display: inline-block;
     vertical-align: middle;
     position: relative;
-    bottom: 2px;
+    bottom: 0;
 }
 
 .offcanvas-body-links li:hover{
@@ -1742,7 +1717,6 @@ html *{
 }
 
 .body-links-second h5,.body-links-third h5{
-    /* background: red; */
     color: var(--maincolor);
     font-size: 1.1em;
     font-weight: bold;
@@ -1780,18 +1754,17 @@ html *{
 }
 
 .logout-container ul li:last-child h4{
-    /* background: red; */
     font-size: 1.1em;
     margin-left: 5px;
 }
 
 .logout-container .logout-btn{
     background: var(--sidebarbgcolor);
+    color: var(--maincolor);
     border: 0;
     border-radius: 30px;
     font-size: 0.85em;
     padding: 8px 10px;
-    padding-bottom: 6px;
     width: 40px;
     height: 40px;
     transition: all 0.2s ease-in-out;
@@ -1861,7 +1834,7 @@ html *{
     overflow-y: scroll;
 }
 
-.logoutmodal:not(.searchmodal,.shopping-list-modal,.user-detail-modal){
+.logoutmodal:not(.searchmodal,.shopping-list-modal,.user-detail-modal,.clipborardmodal){
     padding: 0;
     width: 400px;
     margin: 0 auto;
@@ -1928,8 +1901,25 @@ html *{
     transition: all 0.2s ease-in-out;
 }
 
-.logoutmodal .modal-body-footer button:not(.delete-modal-footer form button,
-.logoutmodal .modal-body-footer .footerbtn,.share-recipe-modal .modal-body-footer .share-recipe-footerbtn){
+.accountdeletemodal .modal-body-footer button {
+    margin: 0;
+}
+
+.accountdeletemodal .modal-body-footer .data-download-btn {
+    border: 1px solid var(--maincolor);
+}
+
+.accountdeletemodal .modal-body-footer div.d-flex{
+    width: 100%;
+    margin: 0;
+}
+
+.accountdeletemodal .modal-body-footer .data-download-btn:hover{
+    border: 1px solid var(--hovercolor);
+}
+
+.logoutmodal .modal-body-footer button:not(.delete-modal-footer form button,.deletemodal .modal-body-footer button:last-child,
+.logoutmodal .modal-body-footer .footerbtn,.share-recipe-modal .modal-body-footer .share-recipe-footerbtn,.weathermodal .modal-body-footer .logout-modal-btn){
     background-color: inherit;
 }
 
@@ -1966,19 +1956,18 @@ html *{
 .modal-body-scrollable-container::-webkit-scrollbar-thumb {
     border-radius: 20px;
     border: 3px solid rgba(0, 0, 0, 0);
-    background-color: rgb(116, 116, 116);
     background-clip: padding-box;
 }
   
 .modal-body-scrollable-container::-webkit-scrollbar-thumb:hover {
     border-radius: 10px;
-    background-color: rgb(75, 75, 75);
 }
 
 /* logout modal ends */
 
 /* delete modal */
-.deletemodal .modal-body-footer form button{
+.deletemodal .modal-body-footer form button,
+.deletemodal .modal-body-footer button:last-child:not(.accountdeletemodal .modal-body-footer button:first-child){
     background: red;
     color: var(--white);
 }
@@ -2012,19 +2001,19 @@ html *{
 .modal .modal-body::-webkit-scrollbar-thumb{
     border-radius: 20px;
     border: 3px solid rgba(0, 0, 0, 0);
-    background-color: rgb(116, 116, 116);
     background-clip: padding-box;
 }
 
-.modal .modal-body::-webkit-scrollbar-thumb:hover{
+/* .modal .modal-body::-webkit-scrollbar-thumb:hover{
     background-color: rgb(75, 75, 75);
-}
+} */
 
 .search-modal-container {
     position: relative;
     background: transparent;
     backdrop-filter: contrast(70%);
     border-radius: 30px;
+    transition: 0.25s;
 }
 
 .search-modal-container .search-icon {
@@ -2102,7 +2091,7 @@ html *{
     padding: 15px;
     border-radius: 30px;
     width: 100%;
-    transition: backdrop-filter 0.3s ease, transform 0.4s ease;
+    transition: 0.25s;
 }
 
 .modal-search form input:not(.filter-form input,
@@ -2214,18 +2203,19 @@ html *{
 }
 
 .filter-form select,.filter-form input{
-    background: var(--sidecardcolor);
-    border: 1.5px solid transparent;
+    background: transparent;
+    border: 1.5px solid var(--sidebarbgcolor);
     border-radius: 30px;
     color: var(--maincolor);
-    font-size: 0.85em;
-    padding: 12px;
+    font-size: 0.8em;
+    padding: 10px;
     width: 214px;
     transition: border 0.4s ease;
 }
 
 .filter-form select:hover,.filter-form input:hover{
     cursor: pointer;
+    background: transparent;
 }
 
 .filter-form input::placeholder{
@@ -2236,7 +2226,7 @@ html *{
 .filter-form input:is(:hover, :focus, :active){
     outline: 0;
     box-shadow: none;
-    background: var(--sidecardcolor);
+    background: transparent;
     border: 1.5px solid var(--hovercolor);
 }
 
@@ -2253,7 +2243,7 @@ html *{
     border: 0;
     text-align: center;
     border-radius: 30px;
-    padding: 10px 20px;
+    padding: 8px 20px;
     font-size: 0.9em;
 }
 
@@ -2303,13 +2293,17 @@ html *{
 .weathermodal form input::placeholder,
 .ai-theme-form-content input::placeholder{
     transform: translateX(0);
-    font-size: 0.95em;
-    opacity: 0.95;
+    font-size: 0.9em;
+    opacity: 0.9;
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .weathermodal form input::placeholder{
     font-size: inherit;
+}
+
+.ai-theme-form-content input::placeholder{
+    opacity: 0.7;
 }
 
 .weathermodal .modal-body form input:focus::placeholder,
@@ -2328,7 +2322,6 @@ html *{
 .weathermodal .modal-body table tr th:nth-child(3n+1){
     vertical-align: middle;
     width: 10%;
-    /* background: red; */
 }
 
 .weathermodal .modal-body table tr th:nth-child(3n+1) span{
@@ -2339,6 +2332,21 @@ html *{
 .weathermodal .modal-body table tr th:nth-child(3n+2){
     vertical-align: middle;
     width: 30%;
+}
+
+.weathermodal .modal-body table tr:first-child th{
+    padding: 5px 0 0 5px;
+}
+
+.weathermodal .modal-body table tr:nth-child(2) td{
+    padding: 0 5px 10px 0;
+}
+
+.weathermodal .modal-body table tr:nth-child(2) div{
+    background: var(--sidecardcolor);
+    padding: 10px;
+    border-radius: 20px;
+    text-align: justify;
 }
 
 .weathermodal .modal-body table ul li{
@@ -2440,12 +2448,11 @@ html *{
     .offcanvas-btn-icon{
         position: relative;
         top: 4px;
-        -ms-transform: rotate(180deg); /* IE 9 */
+        -ms-transform: rotate(180deg);
         transform: rotate(180deg);
     }
 
     .navrail-logo{
-        /* background: red; */
         position: absolute;
         top: 12%;
         left: 45px;
@@ -2474,7 +2481,6 @@ html *{
     }
 
     .navbar-brand-name{
-        /* background: red; */
         position: absolute;
         left: 100px;
     }

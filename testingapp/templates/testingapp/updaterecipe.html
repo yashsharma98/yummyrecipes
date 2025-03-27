@@ -11,7 +11,6 @@
 
 {% block title %}
 <title>Update recipe</title>
-<!-- <title>Update '{{form.title.value}}'</title> -->
 {% endblock %}
 
 {% block weather_widget %}
@@ -38,144 +37,65 @@
           <div class="dynamic-recipes dynamic-header tertiary-wrapper">
                    
             <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
-              Update recipe
+              Edit recipe
             </h1>
 
-            <p class="sub-heading">Recipe : ' {{form.title.value}} '</p>
-            <!-- <p>something goes here</p> -->
-
             <div class="recipe-form-container updrecipe-container">
-
-              
-              {% for i in recipes.photo_set.all %}
-                {% if recipes.photo_set.count == 1 %}    
-                  <label for="id_form-0-image" class="form-label current-img-label d-flex justify-content-center">Currently</label>
-                {% else %}
-              
-                {% endif %}
-              {% endfor %}
-
-              <div class="recipe-img-grid">    
-
-                {% for i in recipes.photo_set.all %}
-
-                  <div class="responsive">
-                    <div class="gallery">
-                      <a target="_blank" href="{{ i.image.url }}">
-                        <img src="{{ i.image.url }}" alt="{{ i.image.url }}">
-                      </a>
-                      
-                      <!-- <div class="desc">Add a description of the image here</div> -->
-                    </div>
-                  </div>
-                  
-                  
-                {% endfor %}
-
-                
-                
-              </div>
-              <div class="updateimg-container img-del-btn">
-                {% for i in recipes.photo_set.all %}
-
-                  <div class="image-field">
-                    <form method="post" action="{% url 'delete_image' i.pk %}" class="image-delete-form">
-                      {% csrf_token %}
-                      <button type="submit" class="form-control image-input"><span class="material-symbols-rounded upload-img-icon">delete</span> Delete</button>
-                    </form>
-                  </div>
-                  
-                {% endfor %}
-
-                </div>
-
+             
               <form class="row mt-1 g-0 create-recipe-form" method="POST" id="myForm" enctype="multipart/form-data">
                 {% csrf_token %}
-                  
-                    <div class="" style="display: none;">
-                       {{ formset.management_form }}
-                      
-                      {{formset}}
-                    </div>       
-
-                    <!-- {% for f in formset %}
-  
-                      {{ f.as_p }}
-
-                    {% endfor %} -->
-
-                    <div class="updateimg-container">
-
-                      {% for i in recipes.photo_set.all %}
-
-                        {% if forloop.counter0 == 0 %}
-
-                          <div class="image-field">
-                            <label for="id_form-0-image" name="form-0-image" class="border form-label img-input-btn">
-                              <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter">Change image</span>
-                            </label>
-                            <div class="col-sm-11 input-field">
-                              <input class="form-control image-input" type="file" name="form-0-image" accept="image/*" id="id_form-0-image">
-                            </div>
-                          </div>   
-
-                            {% if recipes.photo_set.count == 1 %}
-                            
-                              <div class="image-field">
-                                <label for="id_form-1-image" name="form-1-image" class="border form-label img-input-btn">
-                                  <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter2">Add another image</span>
-                                </label>
-                                <div class="col-sm-11 input-field">
-                                  <input class="form-control image-input" type="file" name="form-1-image" accept="image/*" id="id_form-1-image">
-                                </div>
-                              </div>
-
-                            {% endif %}
-                          
-                        {% elif forloop.counter0 == 1 %}
-                        
-                          <div class="image-field">
-                            <label for="id_form-1-image" name="form-1-image" class="border form-label img-input-btn">
-                              <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter2">Change image</span>
-                            </label>
-                            <div class="col-sm-11 input-field">
-                              <input class="form-control image-input" type="file" name="form-1-image" accept="image/*" id="id_form-1-image">
-                            </div>
+            
+                <div class="update-recipe-img-grid">
+                  {% for i in recipes.photo_set.all %}
+                    <div id="image-container-{{ i.pk }}" class="responsive">
+                      <div class="gallery">
+                        <a target="_blank" href="{{ i.image.url }}">
+                          <img src="{{ i.image.url }}" alt="Image Preview">
+                        </a>
+                        {% if image_count == 1 %}
+                          <div class="updaterecipe-buttons-container single-img-replace-btn">
+                            <label for="change-image-{{ i.pk }}">Replace image</label>
+                            <input type="file" name="change_image_{{ i.pk }}" accept="image/*" id="change-image-{{ i.pk }}" data-image-id="{{ i.pk }}" style="display: none;">
                           </div>
-
+                        {% else %}
+                          <div class="updaterecipe-buttons-container">
+                            <button type="submit" name="delete_image" value="{{ i.pk }}" class="btn btn-danger">Remove image</button>
+                            <label for="change-image-{{ i.pk }}">Replace image</label>
+                            <input type="file" name="change_image_{{ i.pk }}" accept="image/*" id="change-image-{{ i.pk }}" data-image-id="{{ i.pk }}" style="display: none;">
+                          </div>
                         {% endif %}
-
-                      {% empty %}
-                      
-                        <div class="image-field">
-                          <div class="empty-image">
-                            <img src="{% static 'testingapp/media/empty4.jpg' %}" alt="placeholder image">
-                          </div>  
-                          <label for="id_form-0-image" name="form-0-image" class="border form-label img-input-btn">
-                            <span class="material-symbols-rounded upload-img-icon">upload</span> <span class="preview-counter">Add image</span>
-                          </label>
-                          <div class="col-sm-11 input-field">
-                            <input class="form-control image-input" type="file" name="form-0-image" accept="image/*" id="id_form-0-image">
-                          </div>
-                        </div>
-
-                      {% endfor %}
-
+                      </div>
                     </div>
+                  {% endfor %}
+                </div>
 
-
-                <div class="imgarea" style="padding-right: 20px;">
-                  <!-- <div class="testpreview"></div> -->
+                <div class="addmore-image-container">
+                  {% if image_count < 2 %}
+                    <div class="responsive">
+                      <div class="gallery updaterecipe-buttons-container add-more-img-btn-container">
+                          <label for="add-more-image"><span class="material-symbols-rounded recipe-action-icons">add_circle</span>Add more</label>
+                          <input type="file" name="add_more_image" id="add-more-image" accept="image/*" style="display: none;">
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+            
+                <div class="imgarea">
                     <div class="new-container">
                       
                     </div>
-
                 </div>
-                
 
+                <div class="" style="display: none;">
+                  {{ formset.management_form }}
+                  {% for form in formset %}
+                      {{ form.as_p }}
+                  {% endfor %}
+                </div>
+            
                 <div class="col-12 first-div">
                   <label for="inputTitle" class="form-label">Title</label>
-                  <div class="col-sm-11 input-field">
+                  <div class="col-sm-12 input-field">
                     <input type="text" name="title" class="form-control" id="inputTitle" value="{{ form.title.value }}" placeholder="Title of the recipe" required="required" data-bs-toggle="tooltip" data-bs-placement="bottom">
                   </div>
                   <span id="nameError"></span>
@@ -239,7 +159,6 @@
 
                 </div>
 
-
                 <div class="col-12 updateingredients">
                   <label for="inputIngredients" class="form-label">Ingredients</label>
                   <div class="col-sm-11 input-field">
@@ -254,8 +173,6 @@
                     
                     {{form.media}}
                   </div>
-                  
-                  <div class="recipe-instruction-text mt-2">Enter recipe instructions in a numeric list format <b>(e.g. 1. Preheat the oven...)</b></div>
 
                 </div> 
 
@@ -263,18 +180,15 @@
                 <div class="text-center">
                   <div class="form-btns">
                     <button type="submit" class="btn btn-transparent"><span>Save changes</span></button>
-                    <!-- <button type="submit" class="btn btn-transparent" onclick="formsubmit()"><span>Save changes</span></button> -->
-                    
                   </div>
                 </div>
-
-
+    
               </form>
 
               <div style="display: none;">
                 {{form.as_p}}
-                </div>
-                   
+              </div>
+                
             </div> 
         
           </div>
@@ -284,14 +198,12 @@
         <aside class="sidebar sidebar-dashboard recipe-img-preview-sidebar" id="show-sidebar">
                     
           <div class="sidebar-recipes">
-              
-            <!-- <h2></h2> -->
 
-              <!-- Image preview -->
-              <div class="preview-container">
-                <img class="preview-image" src="" alt="Image" style="display: none;">
-                <div class="recipe-title preview_ai_img_title"></div>
-              </div>
+            {# Image preview #}
+            <div class="preview-container">
+              <img class="preview-image" src="" alt="Image" style="display: none;">
+              <div class="recipe-title preview_ai_img_title"></div>
+            </div>
                
           </div>
 
@@ -307,20 +219,14 @@
 
   </div>
 
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
-
+{% else %}
+  
+  <script>
+    location.href = "{% url 'login' %}";
+  </script>
 
 {% endif %}
 </body>
-
-<!-- tooltip -->
-<script>
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-</script>
-
-
-
 
 <script>
   function validateForm() {
@@ -333,7 +239,7 @@
       }
     }
   }
-  </script>
+</script>
   
 <script>
   function formsubmit() 
@@ -406,285 +312,92 @@
 document.getElementById("output").reset();
 }
 
-</script>
-  
+</script> 
 
-
-<!-- image preview with name of the file (input id=id_form-0-image) -->
+{# image preview with name of the file (input id=id_form-0-image) #}
 <script>
- const previewContainers = document.querySelector('.new-container');
- const imagesInput = document.getElementById('id_form-0-image');
- const previewContainer = document.querySelector('.preview-container');
- const imgcounter = document.getElementById('counter');
- const sideBar = document.getElementById('show-sidebar');
-
- let counterValue = 0;
- 
- const ttpreviewContainer = document.querySelector('.preview-counter');
- 
- imagesInput.addEventListener('change', () => {
-   previewContainer.innerHTML = '';
-   previewContainers.innerHTML = '';
- 
-   for (const file of imagesInput.files) {
-     const reader = new FileReader();
- 
-     reader.addEventListener('load', () => {
-       const image = document.createElement('img');
-       image.classList.add('preview-image');
-       image.src = reader.result;
- 
-       sideBar.classList.add('show-sidebar');
- 
-       const name = document.createElement('div');
-       name.classList.add('preview-name');
-       name.textContent = file.name;
- 
-       const removeButtonNew = document.createElement('button');
-       removeButtonNew.textContent = 'x';   
-       removeButtonNew.classList.add('img-remove-button');
- 
-       const removeButtonPreview = document.createElement('button');
-       removeButtonPreview.textContent = 'x';   
-       removeButtonPreview.classList.add('img-remove-button');
- 
-       const preview1 = document.createElement('div');
-       preview1.classList.add('new-container');
-       preview1.appendChild(copyElementWithChildren(image));
-       preview1.appendChild(copyElementWithChildren(name));
-       preview1.appendChild(removeButtonNew);
- 
-       const preview = document.createElement('div');
-       preview.classList.add('preview-container');
-       preview.appendChild(image);
-       preview.appendChild(name);
-       preview.appendChild(removeButtonPreview);
- 
-       previewContainers.appendChild(preview1);
-       previewContainer.appendChild(preview);
- 
-       removeButtonNew.addEventListener('click', () => {
-         preview1.remove();
-         preview.remove();
- 
-   updateCounter();
- 
-     updateFileList(file);
-       });
- 
-       removeButtonPreview.addEventListener('click', () => {
-         preview1.remove();
-         preview.remove();
- 
-   updateCounter();
- 
-     updateFileList(file);
-       });
-     });
- 
-     reader.readAsDataURL(file);
-   }
-   sideBar.classList.add('show-sidebar');
- });
- 
- function copyElementWithChildren(element) {
-   const htmlContent = element.outerHTML;
-   const newElement = document.createElement('div');
-   newElement.innerHTML = htmlContent;
-   return newElement.firstChild;
- }
- 
- function updateCounter() {
-   const numFiles = imagesInput.files.length;
- 
-   if (numFiles === 1) {
-     const counter = document.createElement('span');
-     counter.classList.add('preview-counter');
-     counter.textContent = `${numFiles} file selected`;
- 
-     ttpreviewContainer.innerHTML = '';
-     ttpreviewContainer.appendChild(counter);
-   } else if (numFiles > 1) {
-     const counter = document.createElement('span');
-     counter.classList.add('preview-counter');
-     counter.textContent = `${numFiles} files selected`;
- 
-     ttpreviewContainer.innerHTML = '';
-     ttpreviewContainer.appendChild(counter);
-   } else {
-     
-     ttpreviewContainer.innerHTML = 'Change image';
-     sideBar.classList.remove('show-sidebar');
-   }
- }
- 
- imagesInput.addEventListener('change', () => {
-   updateCounter();
- });
- 
- document.addEventListener('click', (event) => {
-   const target = event.target;
-   if (target.classList.contains('img-remove-button')) {
-     updateCounter();
-   }
- });
- 
- 
- updateCounter();
- 
- function updateFileList(fileToRemove) {
-   const files = Array.from(imagesInput.files);
-   const updatedFiles = files.filter(file => file !== fileToRemove);
- 
-   const newFileList = new DataTransfer();
-   updatedFiles.forEach(file => newFileList.items.add(file));
- 
-   imagesInput.files = newFileList.files;
- }
- 
- 
-   
+  document.addEventListener("DOMContentLoaded", function () {
+      const previewContainerDesktop = document.querySelector('.recipe-img-preview-sidebar'); // Sidebar (desktop)
+      const previewContainerMobile = document.querySelector('.new-container'); // Mobile preview container
+      const sidebar = document.getElementById('show-sidebar'); // Sidebar container
+  
+      function handleFileSelect(event) {
+          const input = event.target;
+          const file = input.files[0];
+  
+          if (!file) return;
+  
+          const reader = new FileReader();
+          reader.onload = function (e) {
+              const previewMobile = createPreviewElement(file.name, e.target.result, input);
+              const previewDesktop = createPreviewElement(file.name, e.target.result, input);
+  
+              setupRemoveButton(previewMobile, previewDesktop, input);
+              setupRemoveButton(previewDesktop, previewMobile, input);
+  
+              previewContainerMobile.appendChild(previewMobile);
+              previewContainerDesktop.appendChild(previewDesktop);
+  
+              sidebar.classList.add('show-sidebar'); 
+          };
+  
+          reader.readAsDataURL(file);
+      }
+  
+      function createPreviewElement(fileName, fileSrc, input) {
+          const preview = document.createElement('div');
+          preview.classList.add('preview-container');
+  
+          const image = document.createElement('img');
+          image.classList.add('preview-image');
+          image.src = fileSrc;
+  
+          const name = document.createElement('div');
+          name.classList.add('preview-name');
+          name.textContent = fileName;
+  
+          const removeButton = document.createElement('button');
+          removeButton.textContent = 'x';
+          removeButton.classList.add('img-remove-button');
+  
+          preview.appendChild(image);
+          preview.appendChild(name);
+          preview.appendChild(removeButton);
+  
+          return preview;
+      }
+  
+      function setupRemoveButton(previewElement, counterpartElement, input) {
+          const removeButton = previewElement.querySelector('.img-remove-button');
+          removeButton.addEventListener('click', function () {
+              previewElement.remove();
+              counterpartElement.remove();
+              input.value = '';
+              updateSidebarVisibility();
+          });
+      }
+  
+      function updateSidebarVisibility() {
+          if (previewContainerDesktop.children.length === 0) {
+              sidebar.classList.remove('show-sidebar');
+          }
+      }
+  
+      function setupImageInputs() {
+          document.querySelectorAll('input[type="file"]').forEach(input => {
+              if (!input.dataset.listenerAdded) {
+                  input.dataset.listenerAdded = true;
+                  input.addEventListener("change", handleFileSelect);
+              }
+          });
+      }
+  
+      setupImageInputs();
+  });
 </script>
-
-<!-- image preview with name of the file (input id=id_form-1-image) -->
+  
+{# increasing the counter inside textarea by pressing enter #}
 <script>
- const previewContainers1 = document.querySelector('.new-container');
- const imagesInput1 = document.getElementById('id_form-1-image');
- const previewContainer1 = document.querySelector('.preview-container');
- const imgcounter1 = document.getElementById('counter');
- const sideBar1 = document.getElementById('show-sidebar');
- 
- let counterValue1 = 0;
- 
- const ttpreviewContainer1 = document.querySelector('.preview-counter');
- 
- imagesInput1.addEventListener('change', () => {
-   previewContainer1.innerHTML = '';
-   previewContainers1.innerHTML = '';
- 
-   for (const file of imagesInput1.files) {
-     const reader = new FileReader();
- 
-     reader.addEventListener('load', () => {
-       const image = document.createElement('img');
-       image.classList.add('preview-image');
-       image.src = reader.result;
- 
-       sideBar1.classList.add('show-sidebar');
- 
-       const name = document.createElement('div');
-       name.classList.add('preview-name');
-       name.textContent = file.name;
- 
-       const removeButtonNew = document.createElement('button');
-       removeButtonNew.textContent = 'x';   
-       removeButtonNew.classList.add('img-remove-button');
- 
-       const removeButtonPreview = document.createElement('button');
-       removeButtonPreview.textContent = 'x';   
-       removeButtonPreview.classList.add('img-remove-button');
- 
-       const preview1 = document.createElement('div');
-       preview1.classList.add('new-container');
-       preview1.appendChild(copyElementWithChildren(image));
-       preview1.appendChild(copyElementWithChildren(name));
-       preview1.appendChild(removeButtonNew);
- 
-       const preview = document.createElement('div');
-       preview.classList.add('preview-container');
-       preview.appendChild(image);
-       preview.appendChild(name);
-       preview.appendChild(removeButtonPreview);
- 
-       previewContainers1.appendChild(preview1);
-       previewContainer1.appendChild(preview);
- 
-       removeButtonNew.addEventListener('click', () => {
-         preview1.remove();
-         preview.remove();
- 
-   updateCounter();
- 
-     updateFileList(file);
-       });
- 
-       removeButtonPreview.addEventListener('click', () => {
-         preview1.remove();
-         preview.remove();
- 
-   updateCounter();
- 
-     updateFileList(file);
-       });
-     });
- 
-     reader.readAsDataURL(file);
-   }
-   sideBar1.classList.add('show-sidebar');
- });
- 
- function copyElementWithChildren(element) {
-   const htmlContent = element.outerHTML;
-   const newElement = document.createElement('div');
-   newElement.innerHTML = htmlContent;
-   return newElement.firstChild;
- }
- 
- function updateCounter() {
-   const numFiles = imagesInput1.files.length;
- 
-   if (numFiles === 1) {
-     const counter = document.createElement('span');
-     counter.classList.add('preview-counter');
-     counter.textContent = `${numFiles} file selected`;
- 
-     ttpreviewContainer1.innerHTML = '';
-     ttpreviewContainer1.appendChild(counter);
-   } else if (numFiles > 1) {
-     const counter = document.createElement('span');
-     counter.classList.add('preview-counter');
-     counter.textContent = `${numFiles} files selected`;
- 
-     ttpreviewContainer1.innerHTML = '';
-     ttpreviewContainer1.appendChild(counter);
-   } else {
-     
-     ttpreviewContainer1.innerHTML = 'Change image';
-     sideBar1.classList.remove('show-sidebar');
-   }
- }
- 
- imagesInput1.addEventListener('change', () => {
-   updateCounter();
- });
- 
- document.addEventListener('click', (event) => {
-   const target = event.target;
-   if (target.classList.contains('img-remove-button')) {
-     updateCounter();
-   }
- });
- 
- 
- updateCounter();
- 
- function updateFileList(fileToRemove) {
-   const files = Array.from(imagesInput1.files);
-   const updatedFiles = files.filter(file => file !== fileToRemove);
- 
-   const newFileList = new DataTransfer();
-   updatedFiles.forEach(file => newFileList.items.add(file));
- 
-   imagesInput1.files = newFileList.files;
- }
- 
- 
-   
-</script>
-  
-  
-  <!-- increasing the counter inside textarea by pressing enter -->
-  <script>
     const textarea = document.getElementById('inputRecipe');
     let counter = 2; 
     let lastCounter = 1; 
@@ -717,10 +430,9 @@ document.getElementById("output").reset();
         }
       }
     });
-  </script>
+</script>
   
-  <!-- same above counter for ingredients -->
-  <script>
+<script>
     const ingredientstextarea = document.getElementById('inputIngredients');
     let newcounter = 2; 
     let prevcounter = 1; 
@@ -753,6 +465,6 @@ document.getElementById("output").reset();
         }
       }
     });
-  </script>
+</script>
 
 {% endblock %}

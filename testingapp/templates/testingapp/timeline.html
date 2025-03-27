@@ -109,16 +109,12 @@
                     <div class="explore-ta timeline-tab-1 timeline-tab-2">
                         <div class="timeline-tab-wrapper">
                         {% if year != curyear %}
-                            <!-- <button class="montab" id="Curmonth" onclick="prevmonth(event, 'prev_year_graph')">Graph</button> -->
-                            
-                            <!-- <span id="Curmonth" style="visibility: hidden;display: none;"></span> -->
 
                             <div class="btn btn-secondary montab dropdown-btn dropdown-slide active" onclick="prevmonth(event, 'prev_year_graph')">
                                 Graph
                             </div>
 
                             <button class="montab month-view-tab" id="" onclick="prevmonth(event, 'prev_months')">Month view</button>
-                            <!-- <span>| By Category</span> -->
 
                             <div class="btn btn-secondary montab dropdown-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
                                 <span id="categoryname">By Category</span> <span class="material-symbols-rounded expand-icon">expand_more</span>
@@ -133,16 +129,11 @@
 
         
                         {% elif year == curyear %}
-                            <!-- id="Curmonth" -->
-
                             <div class="btn btn-secondary catetab dropdown-btn active" id="" onclick="monthview(event, 'cur_year_graph')">
                                 Graph
                             </div>
 
-                            <!-- <button class="catetab" id="Curmonth" onclick="monthview(event, 'months')">Month view</button> -->
-
                             <button class="catetab month-view-tab" id="" onclick="monthview(event, 'months')">Month view</button>
-                            <!-- <span>| By Category</span> -->
 
                             <div class="btn btn-secondary montab dropdown-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
                                 <span id="categoryname_curyear">By Category</span> <span class="material-symbols-rounded expand-icon">expand_more</span>
@@ -5515,7 +5506,7 @@
 
   </div>
 
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
+{% else %}
 
     <script>
         location.href = "{% url 'login' %}";
@@ -5528,68 +5519,164 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
-    <!-- for previous year -->
-    <script>
-        const ctx = document.getElementById('myChart').getContext('2d');
-        const recipeData = JSON.parse('{{ prev_recipe_data|safe }}');
+{# for previous year #}
+<script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const recipeData = JSON.parse('{{ prev_recipe_data|safe }}');
 
-        const chartData = {
-        labels: recipeData.prev_months,
-        data: recipeData.recipeCounts
-        };
+    const chartData = {
+    labels: recipeData.prev_months,
+    data: recipeData.recipeCounts
+    };
 
-        new Chart(ctx, {
+    new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: chartData.labels,
+        datasets: [{
+        label: 'Number of Recipes',
+        data: chartData.data,
+        backgroundColor: 
+                ['rgba(133, 193, 233, 0.8)',
+                'rgba(255, 160, 122, 0.7)',
+                'rgba(249, 231, 159, 0.7)',
+                'rgba(153, 51, 153, 0.7)',
+                'rgba(127, 179, 213, 0.7)',
+                'rgba(144, 148, 151, 0.7)',
+                'rgba(128, 139, 150, 0.7)',
+                'rgba(52, 73, 94, 0.7)',
+                'rgba(125, 206, 160, 0.7)',
+                'rgba(120, 66, 18, 0.7)',
+                'rgba(40, 116, 166, 0.7)',
+                'rgba(51, 204, 204, 0.7)',
+                'rgba(153, 102, 102, 0.7)',
+            ],
+
+        borderColor: 
+                ['rgba(133, 193, 233, 0.8)',
+                'rgba(255, 160, 122, 0.7)',
+                'rgba(249, 231, 159, 0.7)',
+                'rgba(153, 51, 153, 0.7)',
+                'rgba(127, 179, 213, 0.7)',
+                'rgba(144, 148, 151, 0.7)',
+                'rgba(128, 139, 150, 0.7)',
+                'rgba(52, 73, 94, 0.7)',
+                'rgba(125, 206, 160, 0.7)',
+                'rgba(120, 66, 18, 0.7)',
+                'rgba(40, 116, 166, 0.7)',
+                'rgba(51, 204, 204, 0.7)',
+                'rgba(153, 102, 102, 0.7)'],
+
+        borderWidth: 1,
+        borderRadius: 25,
+        // hoverBackgroundColor:'rgba(255, 159, 64, 0.2)',
+        // pointBackgroundColor:'rgba(255, 159, 64, 0.2)',
+        // showLine:true,
+        fill: {
+            target: 'origin',
+            // above: 'rgb(204, 213, 174)',   // Area will be red above the origin
+            above:'rgb(208, 201, 192)',
+            below: 'rgb(204, 213, 174)' ,   // And blue below the origin
+        }
+        }]
+    },
+    options: {
+        responsive: true,
+        animations: {
+        tension: {
+            duration: 2000,
+            easing: 'linear',
+            from: 1,
+            to: 0,
+            loop: true
+        }
+        
+        },
+        scales: {
+            x: {
+                title: {
+                display: true,
+                text: 'Months'
+                },
+            },
+
+            y: {
+                beginAtZero: true,
+                stacked: true,
+                stepSize: 1,
+                title: {
+                display: true,
+                text: 'Number of recipes',
+                }
+            },
+
+        },
+        layout: {
+            padding: 10
+        } 
+    }
+    });
+</script>
+
+
+{# for current year #}
+<script>
+    const ctx2 = document.getElementById('myChartnew').getContext('2d');
+    const recipeData2 = JSON.parse('{{ recipe_data|safe }}');
+
+    const chartData2 = {
+    labels: recipeData2.months,
+    data: recipeData2.recipeCounts
+    };
+
+    new Chart(ctx2, {
         type: 'bar',
         data: {
-            labels: chartData.labels,
-            datasets: [{
+        labels: chartData2.labels,
+        datasets: [{
             label: 'Number of Recipes',
-            data: chartData.data,
-            //   backgroundColor: 'rgba(54, 162, 235, 0.5)',
-            // backgroundColor: gradient,
+            data: chartData2.data,
             backgroundColor: 
-                    ['rgba(133, 193, 233, 0.8)',
-                    'rgba(255, 160, 122, 0.7)',
-                    'rgba(249, 231, 159, 0.7)',
-                    'rgba(153, 51, 153, 0.7)',
-                    'rgba(127, 179, 213, 0.7)',
-                    'rgba(144, 148, 151, 0.7)',
-                    'rgba(128, 139, 150, 0.7)',
-                    'rgba(52, 73, 94, 0.7)',
-                    'rgba(125, 206, 160, 0.7)',
-                    'rgba(120, 66, 18, 0.7)',
-                    'rgba(40, 116, 166, 0.7)',
-                    'rgba(51, 204, 204, 0.7)',
-                    'rgba(153, 102, 102, 0.7)',
-                ],
+                        ['rgba(133, 193, 233, 0.8)',
+                        'rgba(255, 160, 122, 0.7)',
+                        'rgba(249, 231, 159, 0.7)',
+                        'rgba(153, 51, 153, 0.7)',
+                        'rgba(127, 179, 213, 0.7)',
+                        'rgba(144, 148, 151, 0.7)',
+                        'rgba(128, 139, 150, 0.7)',
+                        'rgba(52, 73, 94, 0.7)',
+                        'rgba(125, 206, 160, 0.7)',
+                        'rgba(120, 66, 18, 0.7)',
+                        'rgba(40, 116, 166, 0.7)',
+                        'rgba(51, 204, 204, 0.7)',
+                        'rgba(153, 102, 102, 0.7)'],
 
-            //   borderColor: 'rgba(54, 162, 235, 1)',
-            borderColor: 
-                    ['rgba(133, 193, 233, 0.8)',
-                    'rgba(255, 160, 122, 0.7)',
-                    'rgba(249, 231, 159, 0.7)',
-                    'rgba(153, 51, 153, 0.7)',
-                    'rgba(127, 179, 213, 0.7)',
-                    'rgba(144, 148, 151, 0.7)',
-                    'rgba(128, 139, 150, 0.7)',
-                    'rgba(52, 73, 94, 0.7)',
-                    'rgba(125, 206, 160, 0.7)',
-                    'rgba(120, 66, 18, 0.7)',
-                    'rgba(40, 116, 166, 0.7)',
-                    'rgba(51, 204, 204, 0.7)',
-                    'rgba(153, 102, 102, 0.7)'],
+                borderColor: 
+                        ['rgba(133, 193, 233, 0.8)',
+                        'rgba(255, 160, 122, 0.7)',
+                        'rgba(249, 231, 159, 0.7)',
+                        'rgba(153, 51, 153, 0.7)',
+                        'rgba(127, 179, 213, 0.7)',
+                        'rgba(144, 148, 151, 0.7)',
+                        'rgba(128, 139, 150, 0.7)',
+                        'rgba(52, 73, 94, 0.7)',
+                        'rgba(125, 206, 160, 0.7)',
+                        'rgba(120, 66, 18, 0.7)',
+                        'rgba(40, 116, 166, 0.7)',
+                        'rgba(51, 204, 204, 0.7)',
+                        'rgba(153, 102, 102, 0.7)'],
 
-            borderWidth: 1,
-            borderRadius: 25,
-            // hoverBackgroundColor:'rgba(255, 159, 64, 0.2)',
-            // pointBackgroundColor:'rgba(255, 159, 64, 0.2)',
-            // showLine:true,
-            fill: {
+                borderWidth: 1,
+                borderRadius: 50,
+                // hoverBackgroundColor:'rgba(255, 159, 64, 0.2)',
+                // pointBackgroundColor:'rgba(255, 159, 64, 0.2)',
+                // showLine:true,
+                fill: {
                 target: 'origin',
                 // above: 'rgb(204, 213, 174)',   // Area will be red above the origin
                 above:'rgb(208, 201, 192)',
                 below: 'rgb(204, 213, 174)' ,   // And blue below the origin
-            }
+                }
             }]
         },
         options: {
@@ -5602,7 +5689,6 @@
                 to: 0,
                 loop: true
             }
-            
             },
             scales: {
                 x: {
@@ -5621,113 +5707,14 @@
                     text: 'Number of recipes',
                     }
                 },
-
             },
             layout: {
-                padding: 10
-            } 
-        }
-        });
-    </script>
-
-
-    <!-- for current year -->
-    <script>
-        const ctx2 = document.getElementById('myChartnew').getContext('2d');
-        const recipeData2 = JSON.parse('{{ recipe_data|safe }}');
-
-        const chartData2 = {
-        labels: recipeData2.months,
-        data: recipeData2.recipeCounts
-        };
-
-        new Chart(ctx2, {
-            type: 'bar',
-            data: {
-            labels: chartData2.labels,
-            datasets: [{
-                label: 'Number of Recipes',
-                data: chartData2.data,
-                backgroundColor: 
-                            ['rgba(133, 193, 233, 0.8)',
-                            'rgba(255, 160, 122, 0.7)',
-                            'rgba(249, 231, 159, 0.7)',
-                            'rgba(153, 51, 153, 0.7)',
-                            'rgba(127, 179, 213, 0.7)',
-                            'rgba(144, 148, 151, 0.7)',
-                            'rgba(128, 139, 150, 0.7)',
-                            'rgba(52, 73, 94, 0.7)',
-                            'rgba(125, 206, 160, 0.7)',
-                            'rgba(120, 66, 18, 0.7)',
-                            'rgba(40, 116, 166, 0.7)',
-                            'rgba(51, 204, 204, 0.7)',
-                            'rgba(153, 102, 102, 0.7)'],
-
-                    //   borderColor: 'rgba(54, 162, 235, 1)',
-                    borderColor: 
-                            ['rgba(133, 193, 233, 0.8)',
-                            'rgba(255, 160, 122, 0.7)',
-                            'rgba(249, 231, 159, 0.7)',
-                            'rgba(153, 51, 153, 0.7)',
-                            'rgba(127, 179, 213, 0.7)',
-                            'rgba(144, 148, 151, 0.7)',
-                            'rgba(128, 139, 150, 0.7)',
-                            'rgba(52, 73, 94, 0.7)',
-                            'rgba(125, 206, 160, 0.7)',
-                            'rgba(120, 66, 18, 0.7)',
-                            'rgba(40, 116, 166, 0.7)',
-                            'rgba(51, 204, 204, 0.7)',
-                            'rgba(153, 102, 102, 0.7)'],
-
-                    borderWidth: 1,
-                    borderRadius: 50,
-                    // hoverBackgroundColor:'rgba(255, 159, 64, 0.2)',
-                    // pointBackgroundColor:'rgba(255, 159, 64, 0.2)',
-                    // showLine:true,
-                    fill: {
-                    target: 'origin',
-                    // above: 'rgb(204, 213, 174)',   // Area will be red above the origin
-                    above:'rgb(208, 201, 192)',
-                    below: 'rgb(204, 213, 174)' ,   // And blue below the origin
-                    }
-                }]
-            },
-            options: {
-                responsive: true,
-                animations: {
-                tension: {
-                    duration: 2000,
-                    easing: 'linear',
-                    from: 1,
-                    to: 0,
-                    loop: true
-                }
-                },
-                scales: {
-                    x: {
-                        title: {
-                        display: true,
-                        text: 'Months'
-                        },
-                    },
-
-                    y: {
-                        beginAtZero: true,
-                        stacked: true,
-                        stepSize: 1,
-                        title: {
-                        display: true,
-                        text: 'Number of recipes',
-                        }
-                    },
-                },
-                layout: {
-                padding: 5
-                }
-            
+            padding: 5
             }
-        });
-    </script>
+        
+        }
+    });
+</script>
 
 
 <script>
@@ -5793,88 +5780,7 @@
 
 </script>
 
-<!-- quick view offcanvas -->
-<!-- {% if all_recipes %} 
-{% for post in all_recipes %}
-<div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="quickviewModalLabel">Yummy Recipes</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body qv-modal-body">
-        <article class="article-featured">
-            <div class="qv-offcanvas-img-container">
-                {% for i in post.photo_set.all %}
-                    {% if forloop.counter0 == 0 %}
-                        <img src="{{ i.image.url }}" class="article-image qv-offcanvas-img" alt="{{post.title}}">
-                    {% endif %}
-                    {% empty %}
-                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
-                {% endfor %}
-            </div>
-            
-            <div class="qv-offcanvas-title-container">
-                <h3 class="article-title">{{post.title}}</h3>
-                <p>
-                    <ul>
-                        <li><img src="{{ post.author.profile.profile_img.url }}" style="width: 30px; height: 30px; border-radius:100px" alt="Image"></li>
-                        <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
-                    </ul>
-                </p>
-            </div>
-
-            <div class="qv-offcanvas-table-wrapper">
-                <table class="table">
-                    
-                    <tbody class="qv-table-body">
-                    <tr>
-                        <th scope="row" colspan="2">Type</th>
-                        <td>{{post.type}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Category</th>
-                        <td>{{post.category}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Cuisine</th>
-                        <td>{{post.cuisine}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Prep time</th>
-                        <td>{{post.timing}} min</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Servings</th>
-                        <td>{{post.servings}}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colspan="2">Difficulty</th>
-                      <td>{{post.difficulty}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Likes</th>
-                        <td>{{post.total_likes}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Dislikes</th>
-                        <td>{{post.total_dislikes}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            
-        </article>
-
-        <div class="footer-area">
-            <a href="{% url 'viewpost' post.pk %}" class="qv-offcanvas-footer-link">View <span class="material-symbols-rounded qv-offcanvas-link-icon">trending_flat</span></a>
-        </div>
-    </div>
-</div>
-{% endfor %}
-{% endif %} -->
-
-<!-- Month unavailable modal -->
+{# Month unavailable modal #}
 <div class="modal fade Modal-logout" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog md-effect-1 modal-dialog-centered">
         <div class="modal-content logoutmodal">
@@ -5891,7 +5797,7 @@
     </div>
 </div>
 
-<!-- Zero recipe posted modal -->
+{# Zero recipe posted modal #}
 <div class="modal fade Modal-logout" id="zeroModal" tabindex="-1" aria-labelledby="zeroModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content logoutmodal">

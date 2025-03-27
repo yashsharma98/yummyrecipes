@@ -22,6 +22,7 @@ from django.db.models import Q
 from django.views.decorators.cache import cache_control
 from hitcount.views import HitCountDetailView,HitCountMixin
 from hitcount.models import HitCount
+from hitcount.utils import get_hitcount_model
 import datetime
 from datetime import date, timedelta
 from django.utils import timezone
@@ -112,27 +113,16 @@ from django.contrib.sites.shortcuts import get_current_site
 import boto3
 import time
 import google.generativeai as genai
+from django.core.cache import cache
+import psycopg2
+from urllib.parse import urljoin
 
 def handling_404(request, exception):
     return render(request, 'testingapp/404.html') 
 
-def extract_colors_from_recipe_image(request, post_photos):
-
-    profile = request.user.userprofile
-
-    if profile.use_colors_from_image:
-        extracted_colors = []
-
-        for i, photo_instance in enumerate(post_photos, 1):
-            image_path = photo_instance.image.path
-            colors = extract_dominant_colors(image_path)
-            extracted_colors.extend(colors)
-
-        return extracted_colors if extracted_colors else []
-    else:
-        return []
-
-# You can define any additional views or logic here if needed for your project
+def dynamic_css(request):
+    response = HttpResponse(render_to_string("testingapp/dynamic.css", {"user": request.user}), content_type="text/css")
+    return response
 
 class CustomPasswordResetView(PasswordResetView):
     # Customization for Password Reset View
@@ -218,7 +208,6 @@ def appearance(request):
                 if image_generation_form.is_valid():
                     # Get the title from the image generation form
                     title = image_generation_form.cleaned_data['title']
-                    # print(title)
 
                     # Generating colors paletts using OpenAI API
 
@@ -247,7 +236,24 @@ def appearance(request):
 
                     model = genai.GenerativeModel("gemini-1.5-flash")
                     response = model.generate_content(
-                        f"Create four distinct color palettes for a UI design system, with each palette containing at least seven different colors for the following elements: Primary Color (for cards, buttons, etc.), which should be light and stand out against the background; Secondary Color (for the foreground, background on the body, and bootstrap modal), which should be lighter than the primary color and suitable for larger background areas; Tertiary Color (for text color), which should be most darkest to ensure excellent readability against lighter backgrounds; Active Link Color (background color for active links), which should be distinct and different from the primary, secondary, and tertiary colors; Hover Color (for hovering over links, cards, buttons, etc.), which should be light and provide clear visual feedback on interaction; Neutral Primary (a contrasting, punchy color for specific UI elements), which should be medium-light and complement the other colors; and Neutral Secondary (a lighter contrasting color), which should be moderately light and distinct from the neutral primary, ideal for subtle highlights or less dominant UI elements. Each palette should ensure the colors work harmoniously together for a balanced, aesthetically pleasing design suitable for web or app interfaces."
+                        f"""
+                        Create four distinct color palettes for a UI design system, with each palette containing at least 
+                        seven different colors for the following elements: Primary Color (for cards, buttons, etc.), 
+                        which should be light and stand out against the background; 
+                        Secondary Color (for the foreground, background on the body, and bootstrap modal), 
+                        which should be lighter than the primary color and suitable for larger background areas; 
+                        Tertiary Color (for text color), which should be most darkest to ensure excellent readability 
+                        against lighter backgrounds; Active Link Color (background color for active links), 
+                        which should be distinct and different from the primary, secondary, and tertiary colors; 
+                        Hover Color (for hovering over links, cards, buttons, etc. modrate dark that provides good contrast for light text and light dark text), 
+                        which should be light and provide clear visual feedback on interaction; 
+                        Neutral Primary (a contrasting, punchy color for specific UI elements, lighter dark when other colors are dark so that light tertiary color for text appears clearly), 
+                        which should be medium-light and complement the other colors; 
+                        and Neutral Secondary (light color for light mode, a slightly dark mid-tone color), 
+                        which should be a shade that provides good contrast for light text, 
+                        but is not excessively dark, making it suitable for subtle highlights or less dominant UI elements in dark mode.
+                        Each palette should ensure the colors work harmoniously together for a balanced, aesthetically pleasing design suitable for web or app interfaces.
+                        """
                         f": {title}."
                     )
                     hex_codes = extract_hex_codes(response.text)
@@ -259,7 +265,7 @@ def appearance(request):
 
             except Exception as e:
                 error = str(e)
-                # print(error)
+                
                 return JsonResponse({"error": error})
             
     form = AIcolorCodeGenerationForm()
@@ -271,7 +277,6 @@ def appearance(request):
         form = UseColorFromImageForm(request.POST)
         if form.is_valid():
             use_colors_from_image = form.cleaned_data.get('use_colors_from_image', False)
-            # Update the user's email notification preference in the database
             request.user.userprofile.use_colors_from_image = use_colors_from_image
             request.user.userprofile.save()
             return redirect('appearance')
@@ -318,7 +323,7 @@ def reset_colors(request):
     if request.method == 'POST':
         if request.POST.get("default_form_type") == 'defaultform':
             defaultprimary_color = request.POST.get('default_primary_color')
-            # print(defaultprimary_color)
+
             user_profile.primary_color = defaultprimary_color
 
             defaultsecondary_color = request.POST.get('default_secondary_color')
@@ -341,7 +346,7 @@ def reset_colors(request):
 
             theme = request.POST.get('default_theme')
             user_profile.theme = theme
-            # print(theme)
+
             user_profile.save()
 
             return JsonResponse({'defaultprimary_color': defaultprimary_color,'defaultsecondary_color':defaultsecondary_color,'theme': theme,
@@ -392,7 +397,7 @@ def reset_dark_theme(request):
 
             theme = request.POST.get('default_dark_theme')
             user_profile.theme = theme
-            # print(theme)
+
             user_profile.save()
 
             # return redirect('appearance')
@@ -433,155 +438,8 @@ def default_color_palette1(request):
     user_profile = UserProfile.objects.get(user=request.user)
 
     if request.method == 'POST':
-        if request.POST.get("dcp_form_type") == 'dcpcolorform1':
-            dcpprimary_color = request.POST.get('dcp_primary_color')
-            user_profile.primary_color = dcpprimary_color
-
-            dcpsecondary_color = request.POST.get('dcp_secondary_color')
-            user_profile.secondary_color = dcpsecondary_color
-
-            dcptertiary_color = request.POST.get('dcp_tertiary_color')
-            user_profile.tertiary_color = dcptertiary_color
-
-            dcpactivelink_color = request.POST.get('dcp_activelink_color')
-            user_profile.active_link_color = dcpactivelink_color
-
-            dcphover_color = request.POST.get('dcp_hover_color')
-            user_profile.hover_color = dcphover_color
-
-            dcpneutral_primary1 = request.POST.get('dcp_neutral_primary1')
-            user_profile.neutral_primary = dcpneutral_primary1
-
-            dcpneutral_secondary1 = request.POST.get('dcp_neutral_secondary1')
-            user_profile.neutral_secondary = dcpneutral_secondary1
-
-            theme = request.POST.get('color_scheme_1')
-            user_profile.theme = theme
-            # print(theme)
-            user_profile.save()
-
-            return JsonResponse({'dcpprimary_color': dcpprimary_color,'dcpsecondary_color':dcpsecondary_color,'theme': theme,
-            'dcptertiary_color':dcptertiary_color,'dcpactivelink_color':dcpactivelink_color,'dcphover_color':dcphover_color})
-    
-        elif request.POST.get("dcp_form_type") == 'dcpcolorform2':
-            dcpprimary_color2 = request.POST.get('dcp_primary_color2')
-            user_profile.primary_color = dcpprimary_color2
-
-            dcpsecondary_color2 = request.POST.get('dcp_secondary_color2')
-            user_profile.secondary_color = dcpsecondary_color2
-
-            dcptertiary_color2 = request.POST.get('dcp_tertiary_color2')
-            user_profile.tertiary_color = dcptertiary_color2
-
-            dcpactivelink_color2 = request.POST.get('dcp_activelink_color2')
-            user_profile.active_link_color = dcpactivelink_color2
-
-            dcphover_color2 = request.POST.get('dcp_hover_color2')
-            user_profile.hover_color = dcphover_color2
-
-            dcpneutral_primary2 = request.POST.get('dcp_neutral_primary2')
-            user_profile.neutral_primary = dcpneutral_primary2
-
-            dcpneutral_secondary2 = request.POST.get('dcp_neutral_secondary2')
-            user_profile.neutral_secondary = dcpneutral_secondary2
-
-            theme_two = request.POST.get('color_scheme_2')
-            user_profile.theme = theme_two
-
-            user_profile.save()
-
-            return JsonResponse({'dcpprimary_color2': dcpprimary_color2,'dcpsecondary_color2':dcpsecondary_color2,'dcptertiary_color2':dcptertiary_color2,
-            'dcpactivelink_color2':dcpactivelink_color2,'dcphover_color2':dcphover_color2,'theme_two': theme_two})
-        
-        elif request.POST.get("dcp_form_type") == 'dcpcolorform3':
-            dcpprimary_color3 = request.POST.get('dcp_primary_color3')
-            user_profile.primary_color = dcpprimary_color3
-
-            dcpsecondary_color3 = request.POST.get('dcp_secondary_color3')
-            user_profile.secondary_color = dcpsecondary_color3
-
-            dcptertiary_color3 = request.POST.get('dcp_tertiary_color3')
-            user_profile.tertiary_color = dcptertiary_color3
-
-            dcpactivelink_color3 = request.POST.get('dcp_activelink_color3')
-            user_profile.active_link_color = dcpactivelink_color3
-
-            dcphover_color3 = request.POST.get('dcp_hover_color3')
-            user_profile.hover_color = dcphover_color3
-
-            dcpneutral_primary3 = request.POST.get('dcp_neutral_primary3')
-            user_profile.neutral_primary = dcpneutral_primary3
-
-            dcpneutral_secondary3 = request.POST.get('dcp_neutral_secondary3')
-            user_profile.neutral_secondary = dcpneutral_secondary3
-
-            theme = request.POST.get('color_scheme_3')
-            user_profile.theme = theme
-
-            user_profile.save()
-
-            return JsonResponse({'dcpprimary_color3': dcpprimary_color3,'dcpsecondary_color3':dcpsecondary_color3,'theme':theme,
-            'dcptertiary_color3':dcptertiary_color3,'dcpactivelink_color3':dcpactivelink_color3,'dcphover_color3':dcphover_color3})
-        
-        elif request.POST.get("dcp_form_type") == 'dcpcolorform4':
-            dcpprimary_color4 = request.POST.get('dcp_primary_color4')
-            user_profile.primary_color = dcpprimary_color4
-
-            dcpsecondary_color4 = request.POST.get('dcp_secondary_color4')
-            user_profile.secondary_color = dcpsecondary_color4
-
-            dcptertiary_color4 = request.POST.get('dcp_tertiary_color4')
-            user_profile.tertiary_color = dcptertiary_color4
-
-            dcpactivelink_color4 = request.POST.get('dcp_activelink_color4')
-            user_profile.active_link_color = dcpactivelink_color4
-
-            dcphover_color4 = request.POST.get('dcp_hover_color4')
-            user_profile.hover_color = dcphover_color4
-
-            user_profile.save()
-
-            return JsonResponse({'dcpprimary_color4': dcpprimary_color4,'dcpsecondary_color4':dcpsecondary_color4,
-            'dcptertiary_color4':dcptertiary_color4,'dcpactivelink_color4':dcpactivelink_color4,'dcphover_color4':dcphover_color4})
-
-
-
-
-        elif request.POST.get("dark_form_type1") == 'darkform1':
-            darkprimary_color = request.POST.get('dark_primary_color')
-            user_profile.primary_color = darkprimary_color
-
-            darksecondary_color = request.POST.get('dark_secondary_color')
-            user_profile.secondary_color = darksecondary_color
-
-            darktertiary_color = request.POST.get('dark_tertiary_color')
-            user_profile.tertiary_color = darktertiary_color
-
-            darkactivelink_color= request.POST.get('dark_activelink_color')
-            user_profile.active_link_color = darkactivelink_color
-
-            darkhover_color = request.POST.get('dark_hover_color')
-            user_profile.hover_color = darkhover_color
-
-            darkneutral_primary = request.POST.get('dark_neutral_primary')
-            user_profile.neutral_primary = darkneutral_primary
-
-            darkneutral_secondary = request.POST.get('dark_neutral_secondary')
-            user_profile.neutral_secondary = darkneutral_secondary
-
-            theme = request.POST.get('dark_theme1')
-            user_profile.theme = theme
-
-            user_profile.save()
-
-            return JsonResponse({'darkprimary_color': darkprimary_color,'darksecondary_color':darksecondary_color,'theme':theme,
-            'darktertiary_color':darktertiary_color,'darkactivelink_color':darkactivelink_color,'darkhover_color':darkhover_color})
-    
-
-
-
         # ai colors
-        elif request.POST.get("ai_color_palette").startswith('aiform'):
+        if request.POST.get("ai_color_palette").startswith('aiform'):
             # 7 colors in each form palette
             for i in range(1, 8):
                 color_key = f'ai_color{i}'
@@ -605,8 +463,6 @@ def default_color_palette1(request):
 
             theme = request.POST.get('ai_theme')
             user_profile.theme = theme
-
-
             user_profile.save()
 
         
@@ -882,12 +738,14 @@ def searchresults_view(request):
     "query":query,'all_recipes':all_recipes,'profile_results': profile_results,'is_following':is_following,'filter_values':filter_values})
 
 
-from urllib.parse import urljoin
 @login_required(login_url='login')
 def customer_render_pdf_view(request,feed,pk, *args, **kwargs):    
     recipes = get_object_or_404(post,title=feed)
-
     recipe_images = photo.objects.filter(feed=recipes)
+
+    recipe_title = recipes.title or 'recipe'
+    safe_filename = recipe_title.replace(" ", "_")
+    filename = f"{safe_filename}.pdf"
 
     if settings.ENVIRONMENT == 'True':
         if recipe_images.exists():
@@ -952,50 +810,71 @@ def customer_render_pdf_view(request,feed,pk, *args, **kwargs):
     pdf = pdfkit.from_string(html_content, False, options=options, css=[css])
    
     response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="recipe.pdf"'
+    response['Content-Disposition'] = f'inline; filename="{filename}"'
     
     return response
 
 
 
-def aa_view(request, api_key, location):
+def weather_forecast_view(request, api_key, location):
+# Generate cache key based on location
+    cache_key = f"weather_data_{location}"
+    cached_data = cache.get(cache_key)
 
-    curmonth = datetime.datetime.today().month
+    # Return cached data if available
+    if cached_data:
+        return cached_data
 
+    # Only fetch new data if it’s a POST request and cache is empty
     if request.method == 'POST':
-        city = request.POST['location']
-        
+        city = request.POST.get('location', location)  # Fallback to passed location
         location = city.replace(' ', '+')
         api_key = settings.OPENWEATHERMAP_API_KEY
-        
-        res = urllib.request.urlopen('http://api.openweathermap.org/data/2.5/weather?q='+location+'&mode=json&units=metric&appid='+api_key).read()
-        json_data = json.loads(res)
 
-    
-        data = {
-            "temp" : int(json_data['main']['temp']),
-            "des" : str(json_data['weather'][0]['main']), #"des" : str(json_data['weather'][0]['description']),
-            "location": str(json_data['name']),
-            "wind_speed": int(json_data['wind']['speed']),
-            "feels_like": int(json_data['main']['feels_like']),
-            "min" : int(json_data['main']['temp_min']),
-            "max" : int(json_data['main']['temp_max']),
-            "icon": str(json_data['weather'][0]['icon']),
-            # "country_code" : str(json_data['sys']['country']),
-            # "coordinate" : str(json_data['coord']['lon']) + ' ' + str(json_data['coord']['lat']),
-            # "cld" : str(json_data['clouds']['all']),
-            # "pressure" : str(json_data['main']['pressure']),
-            "humidity" : str(json_data['main']['humidity']),
-        }  
-        
-    else:
-        
-        data = {} 
+        try:
+            # Fetch weather data from OpenWeatherMap API
+            res = urllib.request.urlopen(
+                f'http://api.openweathermap.org/data/2.5/weather?q={location}&mode=json&units=metric&appid={api_key}'
+            ).read()
+            json_data = json.loads(res)
 
-    return data
+            # Structure weather data
+            data = {
+                "temp": int(json_data['main']['temp']),
+                "des": str(json_data['weather'][0]['main']),
+                "location": str(json_data['name']),
+                "wind_speed": int(json_data['wind']['speed']),
+                "feels_like": int(json_data['main']['feels_like']),
+                "min": int(json_data['main']['temp_min']),
+                "max": int(json_data['main']['temp_max']),
+                "icon": str(json_data['weather'][0]['icon']),
+                "humidity": str(json_data['main']['humidity']),
+            }
 
+            # Generate summary using Gemini API
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            prompt = f"""
+                Provide a unique short informative weather summary based on these details:
+                - Location: {data['location']}
+                - Temperature: {data['temp']}°C
+                - Feels Like: {data['feels_like']}°C
+                - Condition: {data['des']}
+                - Wind Speed: {data['wind_speed']} m/h
+                - Min Temp: {data['min']}°C
+                - Max Temp: {data['max']}°C
+                The summary should be natural and easy to understand. Also include emojis.
+            """
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            response = model.generate_content(prompt)
+            data["summary"] = response.text if response else "Weather report unavailable."
 
+            # Cache weather data for 6 hours (21600 seconds)
+            cache.set(cache_key, data, timeout=21600)
+            return data
 
+        except Exception as e:
+            return {}
+    return {}
 
 def save_location(request):
     if request.method == 'POST':
@@ -1004,31 +883,118 @@ def save_location(request):
             location = form.cleaned_data['location']
             api_key = settings.OPENWEATHERMAP_API_KEY
 
-            # Update the user's location in the database
+            # Update user profile
             user_profile, created = UserLocation.objects.get_or_create(user=request.user)
             user_profile.location = location
             user_profile.save()
 
-            # Update the weather data for the user's location
-            weather_data = aa_view(request, api_key, location)  # Pass the location parameter
+            # Generate cache key for weather data and recipes
+            weather_cache_key = f"weather_data_{location}"
+            recipe_cache_key = f"suggested_recipes_{location}"
+
+            # Check if weather and recipe cache exist
+            cached_weather_data = cache.get(weather_cache_key)
+            cached_recipes = cache.get(recipe_cache_key)
+
+            # If both weather and recipes are in cache, return instantly
+            if cached_weather_data and cached_recipes:
+                return JsonResponse({
+                    'weather_data': cached_weather_data,
+                    'suggested_recipes': cached_recipes[0],
+                    'gemini_response': cached_recipes[1]
+                })
+
+            # Fetch or retrieve cached weather data
+            weather_data = weather_forecast_view(request, api_key, location)
             if weather_data:
                 user_profile.weather_data = weather_data
                 user_profile.save()
 
+                # storing weather data in cache
+                cache.set(weather_cache_key, weather_data, timeout=3600)
 
-            response_data = {
-            'form': form,
-            'weather_data': weather_data,  
-            'user': request.user
-            }
-        
-            return JsonResponse({'weather_data': weather_data})
+                # new recipe suggestions
+                suggested_recipes, gemini_response = suggest_recipes(weather_data)
+
+                # storing suggested recipes in cache
+                cache.set(recipe_cache_key, (suggested_recipes, gemini_response), timeout=3600)
+
+                response_data = {
+                    'weather_data': weather_data,
+                    'suggested_recipes': suggested_recipes,
+                    'gemini_response': gemini_response
+                }
+                return JsonResponse(response_data)
+            else:
+                return JsonResponse({'error': 'Error fetching weather data.'})
     else:
         form = LocationForm()
 
     return render(request, 'testingapp/home.html', {'form': form})
 
+def suggest_recipes(weather_data):
+    cache_key = f"suggested_recipes_{weather_data['location']}_{weather_data['temp']}_{weather_data['des']}"
+    cached_data = cache.get(cache_key)
 
+    if cached_data:
+        return cached_data
+
+    try:
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+
+        conn = psycopg2.connect(
+            host=settings.DB_HOST,
+            port=settings.DB_PORT,
+            dbname=settings.DB_NAME,
+            user=settings.DB_USER,
+            password=settings.DB_PASSWORD,
+            sslmode=settings.DB_SSLMODE
+        )
+
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT p.id, p.title, COALESCE(ph.image, '')
+            FROM testingapp_post p
+            LEFT JOIN testingapp_photo ph ON ph.feed_id = p.id
+            GROUP BY p.id, p.title, ph.image;
+        """)
+        recipes_data = cursor.fetchall()
+        conn.close()
+
+        # Creating a list of from recipes_data tuple for prompt
+        recipes_list = "\n".join([f"- {title} (ID: {pk})" for pk, title, image in recipes_data])
+
+        prompt = f"""
+            Weather in {weather_data['location']}: Temperature {weather_data['temp']}°C, Condition: {weather_data['des']}.
+            Available Recipes:
+            {recipes_list}
+            Suggest the best recipes for this weather. Avoid using '**' for formatting. Also provide a very short explanation (7-10 words).
+        """
+
+        response = model.generate_content(prompt)
+        gemini_response = response.text
+
+        matches = re.findall(r'([\w\s]+)\s+\(ID:\s*(\d+)\):\s*(.*)', gemini_response)
+        suggested_recipes = {match[1]: match[2] for match in matches}
+
+        recipes_dict = {str(pk): {"title": title, "image": image} for pk, title, image in recipes_data}
+
+        suggested_recipes_data = [
+            {
+                "id": pk,
+                "title": recipes_dict[pk]["title"],
+                "image": default_storage.url(recipes_dict[pk]["image"]) if recipes_dict[pk]["image"] else "",
+                "description": suggested_recipes.get(pk)
+            }
+            for pk in suggested_recipes if pk in recipes_dict
+        ]
+        if suggested_recipes_data:  
+            cache.set(cache_key, (suggested_recipes_data, gemini_response), timeout=3600)
+        return suggested_recipes_data, gemini_response
+
+    except Exception as e:
+        return []
 
 
 def login_view(request):
@@ -1341,10 +1307,8 @@ class dashpostview(LoginRequiredMixin, ListView):
         # context['liked_message'] = get_messages(self.request)
 
         # stored_message = self.request.session.get('stored_messages', [])
-        # print(stored_message)  
 
         # notifications = Notification.objects.filter(recipient=user)
-        # print(notifications)
 
         joined = user.date_joined.date()
         today = datetime.date.today()
@@ -1488,7 +1452,6 @@ class dashpostview(LoginRequiredMixin, ListView):
             post_id = item['object_pk']
             popular_post = post.objects.get(pk=post_id)
             hits_on_popular_post = (popular_post, item['hit_count'])
-            # print(hits_on_popular_post)
             popular_recipe.append((popular_post))
 
         pks = post.objects.all().order_by('-date_post','-hit_count_generic__hits').values_list('pk', flat=True)
@@ -1623,34 +1586,86 @@ class dashpostview(LoginRequiredMixin, ListView):
             preference_choice_category = category_preference[:-8]
 
             recipes_preference = post.objects.filter(type=preference_choice_type,category=preference_choice_category).order_by('-hit_count_generic__hits','-date_post')
-            # print(recipes_preference,'type & category')
-
 
         elif type_preference is not None and cuisine_preference is not None and category_preference == 'Select':
             preference_choice_type = type_preference[:-8]
 
             recipes_preference = post.objects.filter(type=preference_choice_type,cuisine=cuisine_preference).order_by('-hit_count_generic__hits','-date_post')
-            # print(recipes_preference,'type & cuisine')
-
 
         elif category_preference is not None and cuisine_preference is not None and type_preference == 'Select':
             preference_choice_category = category_preference[:-8]
 
             recipes_preference = post.objects.filter(category=preference_choice_category,cuisine=cuisine_preference).order_by('-hit_count_generic__hits','-date_post')
-            # print(recipes_preference,'category & cuisine')
-
-        
+ 
         elif type_preference is not None and category_preference is not None and cuisine_preference is not None:
             preference_choice_type = type_preference[:-8]
             preference_choice_category = category_preference[:-8]
             
             recipes_preference = post.objects.filter(type=preference_choice_type,category=preference_choice_category,cuisine=cuisine_preference).order_by('-hit_count_generic__hits','-date_post')
-            # print(recipes_preference,'type , category, cuisine')
-        
+
         else:
             recipes_preference = []
 
-        context = {"all":all,"all_recipes":all_recipes,"all_urecipe":all_urecipe,"brkfst": brkfst,"test":test,"historys_pk":historys_pk,
+        blog_history_count = BlogHistory.objects.filter(user=user).count()
+
+        if blog_history_count >= 4 :
+            cache_key = f"suggested_recipes_{user.id}"
+            cached_data = cache.get(cache_key)
+
+            if cached_data:
+                context['suggested_recipes_data'] = cached_data
+            else:
+                blog_history = BlogHistory.objects.filter(user=user)
+
+                viewed_recipes = [(entry.blog_post) for entry in blog_history]
+                recipes_history = [[i.type,i.cuisine, i.category, i.ingredients] for i in viewed_recipes]  # Extracted history
+
+                recipe_conditions = Q()
+                for type,cuisine,category,ingredients in recipes_history:
+                    recipe_conditions |= (
+                        Q(type__icontains=type) | 
+                        Q(cuisine__icontains=cuisine) |
+                        Q(category__icontains=category)| 
+                        Q(ingredients__icontains=ingredients)
+                )
+
+                db_recipes = post.objects.filter(recipe_conditions).distinct()
+
+                recipes_list = "\n".join([f"- {recipe.category} (Cuisine: {recipe.cuisine},Type: {recipe.type},Ingredients: {recipe.ingredients}, ID: {recipe.id})" for recipe in db_recipes])
+
+                genai.configure(api_key=settings.GEMINI_API_KEY)
+                model = genai.GenerativeModel("gemini-1.5-flash")
+
+                prompt = f"""
+                    Based on the user's previous interests: {recipes_history},
+                    suggest the best recipes from this list, excluding the user's previous interests:
+                    {recipes_list}
+                    Exclude the user's previous interests: {recipes_history}.
+                    Format each suggestion as:
+                    - Recipe Name (ID: Recipe_ID): Avoid using '**' for formatting. Also provide a short explanation (7-10 words).
+                """
+
+                response = model.generate_content(prompt)
+                gemini_response = response.text.strip()
+
+                matches = re.findall(r'([\w\s]+)\s+\(ID:\s*(\d+)\):\s*(.*)', gemini_response)
+                suggested_recipes = {match[1]: match[2] for match in matches}
+
+                suggested_recipes_data = [
+                    {
+                        "id": pk,
+                        "title": recipe.title,
+                        "image": f"/media/{recipe.photo_set.first().image}",
+                        "description": suggested_recipes.get(pk, "No description available.")
+                    }
+                    for pk, recipe in {str(r.id): r for r in db_recipes}.items() if pk in suggested_recipes
+                ]
+
+                cache.set(cache_key, suggested_recipes_data, timeout=3600)
+
+                context['suggested_recipes_data'] = suggested_recipes_data
+
+        additional_context = {"all":all,"all_recipes":all_recipes,"all_urecipe":all_urecipe,"brkfst": brkfst,"test":test,"historys_pk":historys_pk,
         "lnch": lnch,"evesnack":evesnack,"dnr":dnr,"l":l,"form":form,"spotlight_list":spotlight_list,'brkfst_count':brkfst_count,'lnch_count':lnch_count,
         'evesnack_count':evesnack_count,'dnr_count':dnr_count,"titles":titles,"date":date,"time":time,"hour":hour,"sec":sec,"diff":diff,"seconds":seconds,
         "minutes":minutes,"hours":hours,"days":days,"months":months,"years":years,"monthint":monthint,"monthstr":monthstr,"lastrecipe":lastrecipe,
@@ -1660,7 +1675,8 @@ class dashpostview(LoginRequiredMixin, ListView):
         "next_day_brkfst":next_day_brkfst,"rice_recipe_list":rice_recipe_list,"panner_recipe_list":panner_recipe_list,'success_text': success_text,'current_time':current_time,
         'popular_recipe':popular_recipe,'pks':pks,'random_obj':random_obj,'recommended_recipes_list':recommended_recipes_list,'following_user_posts':following_user_posts,
         'type_preference':type_preference,'category_preference':category_preference,'cuisine_preference':cuisine_preference,'recipes_preference':recipes_preference}
-        return context  
+        context.update(additional_context) 
+        return context
     
 
 def compare_recipes(request,pk):
@@ -1813,7 +1829,7 @@ from django.views.decorators.http import require_POST
 @require_POST
 def remove_notification(request):
     notification_id = request.POST.get('notification_id')
-    # print(notification_id)
+
     try:
         notification = Notification.objects.get(id=notification_id, recipient=request.user)
         notification.delete()
@@ -1861,7 +1877,6 @@ def custom_cards(request,slug):
             'nonveg_recipes': nonveg_recipes,'new_recipes':new_recipes,'under_10_minutes':under_10_minutes})
     
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
         return render(request, 'testingapp/custom_cards.html', {'error_message': 'An error occurred'})
 
 
@@ -1890,7 +1905,6 @@ def cuisines(request,slug):
             'american_cuisine': american_cuisine,'italian_cuisine':italian_cuisine})
     
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
         return render(request, 'testingapp/cuisines.html', {'error_message': 'An error occurred'})
 
 
@@ -1899,12 +1913,24 @@ def delete_account(request):
     if request.method == 'POST':
         # Delete the user account
         user = request.user
+        user_email = user.email
         user.delete()
+
+        # send a email for confirming the account deletion
+        subject = '[Yummy Recipes] Account Deletion Confirmation'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [user_email]
+        context = {
+            'name': user.first_name,
+        }
+        html_content = render_to_string('testingapp/acc_deletion_email.html', context)
+        email = EmailMultiAlternatives(subject, '', from_email, recipient_list)
+        email.attach_alternative(html_content, "text/html")
+        email.send()
+
         return redirect('login') 
     
     return render(request, 'testingapp/delete_account.html')
-
-
 
 
 # Trending recipes
@@ -1954,71 +1980,76 @@ class trendingview(HitCountMixin, ListView):
 
 
 # Update Recipe
-def Updaterecipeview(request,title,pk, *args, **kwargs):
-    recipes = post.objects.get(title=title,pk=pk)
-    ImageFormset = modelformset_factory(photo, fields=('image',),extra=1,max_num=2)
+def Updaterecipeview(request, title, pk, *args, **kwargs):
+    recipes = post.objects.get(title=title, pk=pk)
+    ImageFormset = modelformset_factory(photo, fields=('id', 'image'), extra=1, max_num=2)
 
     if recipes.author != request.user:
         raise Http404
-        
+
     if request.method == 'POST':
-        form = post_form(request.POST or None, instance=recipes)
-        formset = ImageFormset(request.POST or None, request.FILES or None)
-        
+        # Delete image
+        if 'delete_image' in request.POST:
+            image_id = request.POST.get('delete_image')
+            if image_id and image_id.isdigit():
+                photo.objects.filter(pk=int(image_id), feed=recipes).delete()
+            return redirect('updaterecipe', title=title, pk=pk)
+
+        # Change image
+        for key, value in request.POST.items():
+            if key.startswith('image_id_'):
+                image_id = value
+                change_image = request.FILES.get(f'change_image_{image_id}')
+                if change_image:
+                    try:
+                        photo_instance = photo.objects.get(pk=image_id, feed=recipes)
+                        photo_instance.image = change_image
+                        photo_instance.save()
+                    except photo.DoesNotExist:
+                        pass
+
+        # Add image
+        if 'add_more_image' in request.FILES:
+            add_image = request.FILES.get('add_more_image')
+            photo.objects.create(feed=recipes, image=add_image)
+
+        # Main form
+        form = post_form(request.POST, instance=recipes)
+        formset = ImageFormset(request.POST, request.FILES)
+
         if form.is_valid() and formset.is_valid():
-            form.save()
+            updated_recipe = form.save()
 
-            data = photo.objects.filter(feed=recipes)
-            for index, f in enumerate(formset):
-                if f.cleaned_data:
-                    if f.cleaned_data['id'] is None:
-                        pho = photo(feed=recipes, image=f.cleaned_data.get('image'))
-                        pho.save()
-                    elif f.cleaned_data['image'] is False:
-                        pho = photo.objects.get(pk=request.POST.get('form-' + str(index) + '-pk'))
-                        pho.delete()
+            for form in formset:
+                if form.cleaned_data and form.cleaned_data.get('image'):
+                    image = form.cleaned_data.get('image')
+                    image_instance = form.cleaned_data.get('id')
+
+                    image_id = image_instance.pk if isinstance(image_instance, photo) else None
+
+                    if image_id:
+                        try:
+                            pho = photo.objects.get(pk=image_id, feed=recipes)
+                            pho.image = image
+                            pho.save()
+                        except photo.DoesNotExist:
+                            pass
                     else:
-                        pho = photo(feed=recipes, image=f.cleaned_data.get('image'))
-                        d = photo.objects.get(pk=data[index].pk)
-                        d.image = pho.image
-                        d.save()
+                        photo.objects.create(feed=recipes, image=image)
 
-            request.session['update_recipe_message'] = title
-            
+            request.session['update_recipe_message'] = updated_recipe.title
             return redirect('dashboard')
-            # return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-            
+
     else:
         form = post_form(instance=recipes)
         formset = ImageFormset(queryset=photo.objects.filter(feed=recipes))
 
-    # Get existing images
-    existing_images = photo.objects.filter(feed=recipes)
-
-    # Generate a list of forms for each existing image with a delete button
-    image_forms = []
-    for existing_image in existing_images:
-        image_form = ImageFormset(initial=[{'image': existing_image.image}], prefix=f'form-{existing_image.pk}')
-        image_forms.append({
-            'form': image_form,
-            'image': existing_image,
-        })
-
-
-    return render(request,'testingapp/updaterecipe.html',{'form':form,'formset':formset,'recipes':recipes,"image_forms":image_forms})
-
-
-
-
-def delete_image(request, image_pk):
-    image = get_object_or_404(photo, pk=image_pk)
-    
-    image.delete()
-    
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
-    # return redirect('updaterecipe')  
-
-
+    return render(request, 'testingapp/updaterecipe.html', {
+        'form': form,
+        'formset': formset,
+        'recipes': recipes,
+        'image_count': recipes.photo_set.count(),
+    })
 
 
 # Delete recipe
@@ -2067,8 +2098,6 @@ class Deletepost(DeleteView):
                 response_data['error'] = "You can't delete the post"
 
         except Exception as e:
-            # Log the exception or handle it as needed
-            # print(str(e))
             response_data['error'] = 'An error occurred during deletion'
 
         return JsonResponse(response_data)
@@ -2166,65 +2195,13 @@ def summarize_text(text):
         a = response.status_code
         return None, response.status_code
 
-
-def extract_dominant_colors(image_path, num_colors=7):
-    # Open the image
-    image = Image.open(image_path)
-
-    # Create a full-size thumbnail for faster processing
-    thumbnail_size = image.size
-    image.thumbnail(thumbnail_size)
-
-    # Convert the image to the paletted mode with an adaptive palette
-    paletted = image.convert('P', palette=Image.ADAPTIVE, colors=num_colors)
-
-    # Get the color palette of the paletted image
-    palette = paletted.getpalette()
-
-
-    # Convert palette RGB values to hexadecimal format
-    dominant_colors_hex = [
-        "#{:02x}{:02x}{:02x}".format(palette[i], palette[i + 1], palette[i + 2])
-        for i in range(0, len(palette), 3)
-    ]
-
-    return dominant_colors_hex
-
 # LoginRequiredMixin (removed to allow unauthenticated users to view any 2 recipes after that it requires login)
 class postDetailView(HitCountDetailView):
     model = post
     template_name = 'testingapp/postdetail.html'
     context_object_name = 'post'
     # slug_field = 'slug'
-    count_hit = True
-
-    def extract_colors(self, post_photos):
-        user = self.request.user
-        if user.is_authenticated:
-            profile = user.userprofile
-
-            if profile.use_colors_from_image:
-                extracted_colors = []
-                
-                for i, photo_instance in enumerate(post_photos, 1):
-                    image_path = photo_instance.image.path
-                    colors = extract_dominant_colors(image_path)
-                    # colors = extract_dominant_colors(image_path, thumbnail_size=(100, 100))
-
-                    # Print all extracted colors for the current photo
-                    # for j, color_hex in enumerate(colors, 1):
-                        # print(f"Color {i}-{j} (Hex): {color_hex}")
-
-                    extracted_colors.extend(colors)  # Add colors to the list
-                # print(extracted_colors)
-                return extracted_colors if extracted_colors else []
-            
-            else:
-                return []
-        
-        else:
-            return []
-    
+    count_hit = True 
     
     def dispatch(self, request, *args, **kwargs):
         user = request.user
@@ -2263,10 +2240,6 @@ class postDetailView(HitCountDetailView):
 
             viewed_recipes.append(self.get_object().pk)
             request.session['viewed_recipes'] = viewed_recipes[:5]  # Limit to 5 recipes
-            
-        post_instance = self.get_object()  # Get the post instance
-        post_photos = post_instance.photo_set.all()  # Retrieve related photos
-        colors_response = self.extract_colors(post_photos)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -2510,7 +2483,7 @@ class postDetailView(HitCountDetailView):
         qr.make(fit=True)
         
         if user.is_authenticated:
-            fill_color = self.request.user.userprofile.neutral_primary
+            fill_color = self.request.user.userprofile.tertiary_color
             back_color = self.request.user.userprofile.secondary_color
         else:
             fill_color = '#000000'
@@ -2538,35 +2511,7 @@ class postDetailView(HitCountDetailView):
         return soup.get_text()
 
 
-    def translate_content(self, post_content):
-        openai.api_key = settings.OPENAI_API_KEY
-
-        stripped_content = self.strip_tags(post_content)
-
-        try:
-            response = openai.Completion.create(
-                engine="gpt-3.5-turbo-instruct",
-                prompt=f"Translate the following English text to Hindi: '{stripped_content}'",
-                max_tokens=300
-            )
-            translated_text = response.choices[0].text.strip()
-            return JsonResponse({'translated_text': translated_text})
-
-        except Exception as e:
-            return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
-        # response = openai.Completion.create(
-        #     engine="gpt-3.5-turbo-instruct",
-        #     prompt=f"Translate the following English text to Hindi: '{stripped_content}'",
-        #     max_tokens=300
-        # )
-
-        # translated_text = response.choices[0].text.strip()
-        # print(stripped_content)
-        # return JsonResponse({'translated_text': translated_text})
-
-
     def post(self,request,*args,**kwargs):
-        # print(request.POST)
         if 'comt' in request.POST:
             com = comments.objects.create(post_super=self.get_object(),comment_user=request.user,comment=request.POST['comt'])
             # Notify the author of the post
@@ -2587,6 +2532,43 @@ class postDetailView(HitCountDetailView):
             post_content = request.POST['post_content']
             return self.translate_content(post_content)
 
+
+from django.views.decorators.csrf import csrf_protect
+@csrf_protect  # Remove if using {% csrf_token %}
+def translate_content(request):
+    if request.method == "POST":
+        post_content = request.POST.get("post_content", "")
+        stripped_content = strip_tags(post_content)  
+
+        # If OpenAI API is available
+        if settings.OPENAI_API_KEY:
+            try:
+                openai.api_key = settings.OPENAI_API_KEY
+                response = openai.Completion.create(
+                    engine="gpt-3.5-turbo-instruct",
+                    prompt=f"Translate the following instruction Hindi: '{stripped_content}'",
+                    max_tokens=300
+                )
+                translated_text = response.choices[0].text.strip()
+                return JsonResponse({'translated_text': translated_text})
+
+            except Exception as e:
+                return JsonResponse({'error': f'An unexpected error occurred: {str(e)}'}, status=500)
+        
+        # Else use Gemini API
+        elif settings.GEMINI_API_KEY:
+            try:
+                genai.configure(api_key=settings.GEMINI_API_KEY)
+                model = genai.GenerativeModel("gemini-1.5-flash")
+                response = model.generate_content(
+                    f"Translate the following instruction into Hindi: {stripped_content}"
+                )
+                return JsonResponse({'translated_text': response.text.strip()})
+
+            except Exception as e:
+                return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 def shopping_list_pdf(request,title,pk, *args, **kwargs):
@@ -2656,14 +2638,12 @@ def blog_history(request):
 def delete_entry(request,pk):
     entry = BlogHistory.objects.get(pk=pk)
     entry.delete()
-    print(entry)
 
     return redirect('blog_history')
 
 
 def bulk_delete_blogs(request):
     entry_ids = request.POST.getlist('blog_ids')
-    print(entry_ids)
     BlogHistory.objects.filter(id__in=entry_ids,user=request.user).delete()
     return redirect('blog_history')
     
@@ -2671,7 +2651,6 @@ def bulk_delete_blogs(request):
 def delete_all_blog_history(request):
     if request.method == 'POST':
         a = BlogHistory.objects.all().delete()
-        print(a)
         return redirect('blog_history') 
     return redirect('blog_history') 
 
@@ -2926,8 +2905,6 @@ def dislike_view(request):
             post_id = request.POST.get('post_id')
             post_obj = post.objects.get(id=post_id)
             profiles = profile.objects.get(user=user)
-
-            # print('dislike',post_obj)
             
             # Check if the user has already liked the recipe
             if profiles in post_obj.likes.all():
@@ -3000,7 +2977,7 @@ def post_post_view(request):
                 if image_generation_form.is_valid():
                     # Get the title from the image generation form
                     title = image_generation_form.cleaned_data['title']
-                    # print(title)
+                    
                     # Generate an image based on the user's input
                     openai.api_key = settings.OPENAI_API_KEY  
                     
@@ -3014,7 +2991,7 @@ def post_post_view(request):
                     try:
                         # Download the generated image
                         image_url = response.data[0].url
-                        # print(image_url)
+
                     except (AttributeError, KeyError):
                         image_url = None
 
@@ -3022,9 +2999,8 @@ def post_post_view(request):
                         return JsonResponse({"image_url": image_url,"title":title})
                     
             except Exception as e:
-                # print(f"An error occurred: {str(e)}")
                 error = str(e)
-                # print(error)
+                
                 return JsonResponse({"error": error})
         
         elif 'title' in request.POST:
@@ -3137,7 +3113,7 @@ def post_post_view(request):
                                     image_data = response['Body'].read()
                                 except Exception as e:
                                     error = str(e)
-                                    # print(error)
+                                    
                                     return HttpResponse(f'Failed to download file: {str(e)}')
 
                                 
@@ -3183,7 +3159,7 @@ def post_post_view(request):
                             email.attach_alternative(html_message, "text/html")
 
                             image_path = os.path.join(settings.MEDIA_ROOT, 'images', f"{file_name}")
-                            # print(image_path, 'image path')
+
                             if os.path.exists(image_path):
                                 with open(image_path, 'rb') as image_file:
                                     img_data = image_file.read()
@@ -3208,7 +3184,7 @@ def post_post_view(request):
 
                             
                             image_path = os.path.join(settings.MEDIA_ROOT, 'images', f"{file_name}")
-                            print(image_path,'check image')
+                            
                             if os.path.exists(image_path):
                                 with open(image_path, 'rb') as image_file:
                                     img_data = image_file.read()
@@ -3359,7 +3335,6 @@ def UpdateProfile(request):
     update_view = Updateview(request.POST or None, request.FILES, instance=request.user.profile)
     if request.method == 'POST':
         
-        # print(update_view)
         if update_profile.is_valid() or update_view.is_valid():
             pro = update_profile.save(commit = False)
             view = update_view.save(commit = False)
@@ -3589,7 +3564,6 @@ def timeline(request):
 
         if i != curyear:
             prev_years = post.objects.filter(author=user,date_post__year = i).count()
-            # print(prev_years)
 
             prev_jan = post.objects.filter(author=user,date_post__year = i,date_post__month='01')
             prev_total_jan_posts = post.objects.filter(author=user,date_post__year = i,date_post__month='01').count()
@@ -3977,7 +3951,7 @@ def add_to_favorites(request, id):
 
     # Render the updated HTML for the favourites page (updating favourites page using update_recipe_card.html page without reloadinq)
     updated_html = render(request, 'testingapp/update_recipe_card.html', {'post': blog, 'user': request.user}).content.decode('utf-8')
-    # print(updated_html)
+
     return JsonResponse({'action': action,'recipe_title':recipe_title,'updated_html': updated_html, 'post_id': id})
         
     
@@ -4289,3 +4263,180 @@ def followers_list(request, name, pk):
     return render(request, 'testingapp/connections.html', {'user': user, 'followers': followers, 'following': following,
     'followers_count':followers_count,'following_count':following_count,'distinct_years':distinct_years,'year_data':year_data,
     'year_data_history':year_data_history})
+
+
+from django.core.serializers import serialize
+import csv
+import openpyxl
+
+@login_required
+def export_user_data(request):
+    if request.user.is_authenticated:
+        user = request.user
+        full_name = f"{user.first_name} {user.last_name}".strip() or "user_data"
+        safe_filename = full_name.replace(" ", "_")
+        filename = f"{safe_filename}_data.xlsx"
+        workbook = openpyxl.Workbook()
+
+        # Sheet for recipes
+        sheet_recipes = workbook.active
+        sheet_recipes.title = "Recipes"
+        sheet_recipes.append([
+            'Title', 'Timing (in mins)', 'Servings', 'Type', 'Cuisine', 'Category', 
+            'Difficulty', 'Ingredients', 'Instructions', 'Date Posted', 'Date Modified',
+            'Likes', 'Dislikes', 'Views'
+            ])
+
+        for data in post.objects.filter(author=user):
+            clean_content = strip_tags(data.content)
+            clean_ingredients = strip_tags(data.ingredients)
+            hit_count = get_hitcount_model().objects.get_for_object(data).hits
+            
+            sheet_recipes.append([
+                data.title, data.timing, data.servings, data.type, data.cuisine, data.category,data.difficulty,
+                clean_ingredients, clean_content,
+                data.date_post.strftime('%d-%m-%Y %I:%M %p'),
+                data.date_modified.strftime('%d-%m-%Y %I:%M %p'),
+                data.likes.count(), data.dislikes.count(), hit_count
+            ])
+
+        # Sheet for comments received on user’s recipes
+        sheet_comments = workbook.create_sheet(title="Comments")
+        sheet_comments.append(['Recipe Title', 'Comment', 'Commented By', 'Date'])
+
+        for comment in comments.objects.filter(post_super__author=user):
+            sheet_comments.append([
+                comment.post_super.title, 
+                comment.comment, 
+                f"{comment.comment_user.first_name} {comment.comment_user.last_name}".strip(),
+                comment.date_comment.strftime('%d-%m-%Y %I:%M %p')
+            ])
+
+        # Sheet for recipes visited (history)
+        sheet_history = workbook.create_sheet(title="Recipes Visited")
+        sheet_history.append(['Recipe Title', 'Timestamp'])
+
+        for history in BlogHistory.objects.filter(user=user):
+            sheet_history.append([
+                history.blog_post.title, 
+                history.timestamp.strftime('%d-%m-%Y %I:%M %p')
+            ])
+
+        # Sheet for redeemed credits
+        sheet_redeemed = workbook.create_sheet(title="Redeemed Credits")
+        sheet_redeemed.append(['Amount', 'Redeemed Timestamp'])
+
+        for credit in RedeemedCredit.objects.filter(user=user):
+            sheet_redeemed.append([
+                credit.amount, 
+                credit.redeemed_timestamp.strftime('%d-%m-%Y %I:%M %p')
+            ])
+
+        # Sheet for credit history
+        sheet_credit_history = workbook.create_sheet(title="Credit History")
+        sheet_credit_history.append(['Amount', 'Action', 'Timestamp'])
+
+        for history in CreditHistory.objects.filter(user=user):
+            sheet_credit_history.append([
+                history.amount, 
+                history.get_credit_action_display(), 
+                history.earned_timestamp.strftime('%d-%m-%Y %I:%M %p')
+            ])
+
+        # Sheet for credit spent history
+        sheet_spent_history = workbook.create_sheet(title="Credit Spent")
+        sheet_spent_history.append(['Recipe Title', 'Amount Spent', 'Timestamp'])
+
+        for spent in CreditSpentHistory.objects.filter(user=user):
+            sheet_spent_history.append([
+                spent.recipename.title, 
+                spent.amount, 
+                spent.spent_timestamp.strftime('%d-%m-%Y %I:%M %p')
+            ])
+
+        # Sheet for feedback
+        sheet_feedback = workbook.create_sheet(title="Feedback")
+        sheet_feedback.append(['Name', 'Email', 'Subject', 'Message', 'Timestamp'])
+
+        for feedback in Feedback.objects.filter(user=user):
+            sheet_feedback.append([
+                feedback.name,
+                feedback.email,
+                feedback.subject,
+                feedback.message,
+                feedback.timestamp.strftime('%d-%m-%Y %I:%M %p')
+            ])
+
+        # Sheet for profile data
+        sheet_profile_theme = workbook.create_sheet(title="Profile data")
+        sheet_profile_theme.append([
+            'Full Name', 'Email', 'Last Login', 'Joined Date',
+            'Bio', 'Date of Birth', 'Gender', 'Credits', 'Earned Credits', 'Redeemed Credits', 'Credits Spent',
+            'Facebook', 'Instagram', 'Twitter', 'Threads', 'YouTube', 'Website',
+            'Preference Type', 'Preference Category', 'Preference Cuisine',
+            '', '',
+            'Primary Color', 'Secondary Color', 'Tertiary Color', 'Active Link Color', 'Hover Color',
+            'Neutral Primary Color', 'Neutral Secondary Color'
+        ])
+
+        user_profile = profile.objects.filter(user=user).first()
+        user_theme = UserProfile.objects.filter(user=user).first()
+        last_login = user.last_login.strftime('%d-%m-%Y %I:%M %p') if user.last_login else 'N/A'
+        date_joined = user.date_joined.strftime('%d-%m-%Y %I:%M %p')
+
+        if user_profile and user_theme:
+            sheet_profile_theme.append([
+                f"{user.first_name} {user.last_name}".strip(),
+                user.email,
+                last_login,
+                date_joined,
+                user_profile.bio, 
+                user_profile.dob.strftime('%d-%m-%Y') if user_profile.dob else 'N/A',
+                user_profile.gender,
+                user_profile.credits, user_profile.earned_credits, user_profile.redeemed_credits, user_profile.credits_spent,
+                user_profile.facebook, user_profile.instagram, user_profile.twitter, 
+                user_profile.threads, user_profile.youtube, user_profile.website,
+                user_profile.preference_type if user_profile.preference_type != "Select" else "N/A",
+                user_profile.preference_category if user_profile.preference_category != "Select" else "N/A",
+                user_profile.preference_cuisine if user_profile.preference_cuisine != "Select" else "N/A",
+                '', '',
+                user_theme.primary_color, user_theme.secondary_color, user_theme.tertiary_color, 
+                user_theme.active_link_color, user_theme.hover_color,
+                user_theme.neutral_primary, user_theme.neutral_secondary
+            ])
+
+        
+        # Sheet for Follows (Followers & Following)
+        sheet_follows = workbook.create_sheet(title="Follows")
+        sheet_follows.append(['Follower', 'Following', 'Timestamp'])
+
+        for follow in Follow.objects.filter(follower=user):
+            follower_name = f"{follow.follower.first_name} {follow.follower.last_name}".strip()
+            following_name = f"{follow.following.first_name} {follow.following.last_name}".strip()
+
+            if follow.follower == user:
+                follower_name += " (You)"
+            if follow.following == user:
+                following_name += " (You)"
+
+            sheet_follows.append([follower_name, following_name, follow.created_at.strftime('%d-%m-%Y %I:%M %p')])
+
+        for follow in Follow.objects.filter(following=user):
+            follower_name = f"{follow.follower.first_name} {follow.follower.last_name}".strip()
+            following_name = f"{follow.following.first_name} {follow.following.last_name}".strip()
+
+            if follow.follower == user:
+                follower_name += " (You)"
+            if follow.following == user:
+                following_name += " (You)"
+
+            sheet_follows.append([follower_name, following_name, follow.created_at.strftime('%d-%m-%Y %I:%M %p')])
+
+        # **Prepare Response**
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+        workbook.save(response)
+        return response
+    else:
+        return HttpResponse("Unauthorized", status=401)

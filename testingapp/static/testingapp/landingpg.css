@@ -26,8 +26,9 @@ section {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensure the image covers the section */
+    object-fit: cover;
     z-index: -1;
+    will-change: transform;
 }
 
 .text-area-1{
@@ -35,19 +36,18 @@ section {
     left: 120px;
     top: 200px;
     transition: 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
-    /* background: red; */
 }
 
 .text-area-1 .main-heading {
     font-family: 'Marck Script', cursive;
     font-size: 8em;
-    color: #5c5545;
+    color: #6c584c;
     transition: 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .para1 {
-    color: #5c5545;
-    font-size: 1.05em;
+    color: #5e503f;
+    font-size: 1em;
     margin: 20px 0;
     max-width: 600px;
 }
@@ -76,20 +76,20 @@ section {
 }
 
 #links-ch1{
-    background: #E3CE8B;
-    color: black;
-    /* color: black; */
+    /* background: #D5C7BC; */
+    background: #F0E6D2 ;
+    color: #2d1805;
 }
 
 #links-ch1:hover{
     /* background: white; */
     opacity: 0.8;
-    color: black;
+    color: #2d1805;
 }
 
 #links-ch2{
     background: rgb(251, 251, 251);
-    color: black;
+    color: #2d1805;
 }
 
 #links-ch2:hover{
@@ -100,20 +100,21 @@ section {
 }
 
 .card-heading{
-    border-radius: 30px;
-    padding: 30px;
+    border-radius: 50px 50px 50px 5px;
+    padding: 20px 50px;
     text-align: center;
     position: absolute;
     top: 80px;
-    background: transparent; 
+    background: #D5C7BC;
+    /* background: transparent; 
     -webkit-backdrop-filter: blur(70px);
-    backdrop-filter: blur(70px);
+    backdrop-filter: blur(70px); */
     transition: all 0.5s;
 }
 
 .card-heading h3{
-    color: whitesmoke;
-    font-size: 1.2em;
+    color: #2d1805;
+    font-size: 1em;
 }
 
 .card-container {
@@ -137,6 +138,21 @@ section {
     overflow: hidden;
     border-radius: 25px;
     transition: all 0.3s;
+    scroll-snap-align: start;
+    animation: landingpagecards;
+    animation-timeline: view(inline);
+}
+
+@keyframes landingpagecards {
+    entry 0%,
+    exit 100% {
+        opacity: 0.7;
+    }
+
+    entry 100%,
+    exit 0% {
+        opacity: 1;
+    }
 }
 
 .main-cards a{
@@ -337,7 +353,7 @@ section {
     }
     
     .main-cards {
-        min-width: 50%;
+        min-width: 280px;
     }
 
     .footer {
@@ -391,7 +407,7 @@ section {
     }
 
     .main-cards{
-        min-width: 40%;
+        min-width: 280px;
     }
 
     .footer {

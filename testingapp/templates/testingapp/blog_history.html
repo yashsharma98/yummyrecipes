@@ -23,7 +23,6 @@
 
 <body>
 
-    
 
 {% if user.is_authenticated %}
 
@@ -111,12 +110,9 @@
 
                 </div>
 
-
             </div>
 
             
-            
-
             <div class="dynamic-card-container all-recipes-card-container dashboard-card-container history-container">
 
                 {% if blog_posts %}
@@ -141,9 +137,6 @@
                                                 <div class="recipe-post-title">{{post.title}}</div>
                                                 
                                                 <p class="recipe-timestamp">{{timestamp}} </p> 
-                                                <!-- - {{todays_date}} -->
-
-                                                <!-- <p class="recipe-timestamp">{{post.author}}</p> -->
 
                                                 <div class="single-recipe-delete">         
                                                     <div class="btn-group me-2 delete-link" role="group" aria-label="Second group">
@@ -157,7 +150,7 @@
                                         </div>
 
                                     </div>
-                                <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+
                                 </li>
                             {% empty %}
                                 <li>No posts available for today.</li>
@@ -186,9 +179,6 @@
                                                 <div class="recipe-post-title">{{post.title}}</div>
                                                 
                                                 <p class="recipe-timestamp">{{timestamp}} </p> 
-                                                <!-- - {{todays_date}} -->
-
-                                                <!-- <p class="recipe-timestamp">{{post.author}}</p> -->
 
                                                 <div class="single-recipe-delete">         
                                                     <div class="btn-group me-2 delete-link" role="group" aria-label="Second group">
@@ -202,7 +192,7 @@
                                         </div>
 
                                     </div>
-                                <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+
                                 </li>
                             {% empty %}
                                 <li>No posts available for yesterday.</li>
@@ -231,9 +221,6 @@
                                                 <div class="recipe-post-title">{{post.title}}</div>
                                                 
                                                 <p class="recipe-timestamp">{{timestamp}} </p> 
-                                                <!-- - {{todays_date}} -->
-
-                                                <!-- <p class="recipe-timestamp">{{post.author}}</p> -->
 
                                                 <div class="single-recipe-delete">         
                                                     <div class="btn-group me-2 delete-link" role="group" aria-label="Second group">
@@ -247,7 +234,7 @@
                                         </div>
 
                                     </div>
-                                <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+
                                 </li>
                             {% empty %}
                                 <li>No posts available for yesterday.</li>
@@ -276,9 +263,6 @@
                                                 <div class="recipe-post-title">{{post.title}}</div>
                                                 
                                                 <p class="recipe-timestamp">{{timestamp}} </p> 
-                                                <!-- - {{todays_date}} -->
-
-                                                <!-- <p class="recipe-timestamp">{{post.author}}</p> -->
 
                                                 <div class="single-recipe-delete">         
                                                     <div class="btn-group me-2 delete-link" role="group" aria-label="Second group">
@@ -292,7 +276,7 @@
                                         </div>
 
                                     </div>
-                                <!-- <span class="badge bg-primary rounded-pill">14</span> -->
+
                                 </li>
                             {% empty %}
                                 <li>No posts available</li>
@@ -323,14 +307,16 @@
 
   </div>
 
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
+{% else %}
 
-
+    <script>
+        location.href = "{% url 'login' %}";
+    </script>
 
 {% endif %}
 </body>
 
-<!-- delete post from history page -->
+{# delete post from history page #}
 {% if blog_posts %}
 {% for pk, post, timestamp in blog_posts %}
 <div class="modal fade Modal-delete" id="deleteModal{{pk}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -340,10 +326,6 @@
                 <div class="modal-body-header">
                     <h2>Delete recipe?</h2>
                     <p>Delete <b>'{{post.title}}' </b> from history?</p>
-                    
-                    <!-- <div class="callout callout-warning">
-                        <h6><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</h6>
-                    </div> -->
                 </div>
             
                 <div class="modal-body-footer delete-modal-footer">
@@ -360,7 +342,7 @@
 {% endfor %}
 {% endif %}
 
-<!-- delete post from history page all at once -->
+{# delete post from history page all at once #}
 <div class="modal fade Modal-logout" id="deleteAllHistoryModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content logoutmodal">
@@ -381,37 +363,6 @@
         </div>
     </div>
 </div>
-
-<!-- <div class="modal fade Modal-delete" id="deleteModalall" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content logoutmodal deletemodal">
-            <div class="modal-header">
-                <h5 class="modal-title">Yummy Recipes</h5>
-                <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
-            </div>
-  
-            <div class="modal-body">
-                <h2>Delete recipe?</h2>
-                
-                <p2 class="del-te">Delete all selected {{pk}} recipes from history?</p2>
-                
-                <div class="callout callout-warning">
-                    <h6><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</h6>
-                </div>
-            </div>
-            
-            
-  
-            <div class="modal-footer delete-modal-footer">
-                <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-                <form method="post" action="{% url 'bulk_delete' %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> -->
 
 <script>
     function recipes(evt, type) {

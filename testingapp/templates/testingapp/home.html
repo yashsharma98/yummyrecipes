@@ -111,7 +111,7 @@
 
                     {% endfor %}
                     
-                    <!-- rice recipe cards -->
+                    {# rice recipe cards #}
                     {% for post in rice_recipe_list %}
                         {% if forloop.first %}
                             <button type="button" class="btn btn-warning spotlight-btn" data-bs-toggle="modal" data-bs-target="#similarricerecipes">
@@ -122,7 +122,7 @@
                                             <img src="{{ i.image.url }}" alt="{{post.title}}" class="spotlight-image">
                                         
                                             <div class="card-img-overlay">
-                                                <!-- <h3 class="card-title">{{post.whenpublished}}</h3> -->
+                                                {# <h3 class="card-title">{{post.whenpublished}}</h3> #}
                                                 <h3 class="card-title">Rice recipes</h3>
                                             </div>
                                         {% endif %}
@@ -189,15 +189,6 @@
                                                 </div>
 
                                                 <div class="favourites">
-                                                    <!-- {% if post in user.favourite.all %}
-                                                    <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                        <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                    </a>
-                                                    {% else %}
-                                                    <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                        <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                    </a>
-                                                    {% endif %} -->
                                                     {% if post in user.favourite.all %}
                                                     <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                         <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -228,7 +219,7 @@
 
                         {% else %}
 
-                            <div class="dynamic-recipes u--bounceInLeft">
+                            <div class="dynamic-recipes">
 
                                 {% if hour < 4 %}
                                 <h1>Dinner recipes
@@ -248,7 +239,7 @@
                                     
                                     {% if dnr %}
 
-                                        {% if dinnerpage %} <!-- placeholder -->
+                                        {% if dinnerpage %} 
 
                                             {% for post in dinnerpage %}
                                             
@@ -288,15 +279,6 @@
                                                         </div>
 
                                                         <div class="favourites">
-                                                            <!-- {% if post in user.favourite.all %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                            </a>
-                                                            {% else %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                            </a>
-                                                            {% endif %} -->
                                                             {% if post in user.favourite.all %}
                                                             <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                                 <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -352,15 +334,6 @@
                                                         </div>
                                                         
                                                         <div class="favourites">
-                                                            <!-- {% if post in user.favourite.all %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                            </a>
-                                                            {% else %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                            </a>
-                                                            {% endif %} -->
                                                             {% if post in user.favourite.all %}
                                                             <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                                 <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -407,7 +380,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                        {% endif %} <!-- placeholder ends -->
+                                        {% endif %}
 
                                     {% else %}
                                         <div class="no-results">
@@ -420,7 +393,7 @@
 
                                 </div>
 
-                                <!-- Breakfast -->
+                                {# for breakfast #}
                                 {% elif hour < 12 %}
                                 <h1>Breakfast recipes
                                     <div class="scroll-btn-container">
@@ -439,7 +412,7 @@
                                     
                                     {% if brkfst %}
 
-                                        {% if breakfastpage %} <!-- placeholder -->
+                                        {% if breakfastpage %} 
 
                                             {% for post in breakfastpage %}
                                             
@@ -479,15 +452,6 @@
                                                         </div>
 
                                                         <div class="favourites">
-                                                            <!-- {% if post in user.favourite.all %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                            </a>
-                                                            {% else %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                            </a>
-                                                            {% endif %} -->
                                                             {% if post in user.favourite.all %}
                                                             <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                                 <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -542,15 +506,6 @@
                                                         </div>
                                                         
                                                         <div class="favourites">
-                                                            <!-- {% if post in user.favourite.all %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                            </a>
-                                                            {% else %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                            </a>
-                                                            {% endif %} -->
                                                             {% if post in user.favourite.all %}
                                                             <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                                 <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -597,7 +552,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                        {% endif %} <!-- placeholder ends -->
+                                        {% endif %}
 
                                     {% else %}
                                         <div class="no-results">
@@ -611,7 +566,7 @@
                                 </div>
                                 
 
-                                <!-- Lunch -->
+                                {# for lunch #}
                                 {% elif hour < 17 %}
                                 <h1>Lunch recipes
                                     <div class="scroll-btn-container">
@@ -629,7 +584,7 @@
                                 <div class="dynamic-card-container">
                                     {% if lnch %}
 
-                                    {% if lunchpage %} <!-- placeholder -->
+                                    {% if lunchpage %} 
 
                                         {% for post in lunchpage.object_list %}
 
@@ -669,15 +624,6 @@
                                                     </div>
 
                                                     <div class="favourites">
-                                                        <!-- {% if post in user.favourite.all %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                        </a>
-                                                        {% else %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                        </a>
-                                                        {% endif %} -->
                                                         {% if post in user.favourite.all %}
                                                         <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                             <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -733,15 +679,6 @@
                                                     </div>
 
                                                     <div class="favourites">
-                                                        <!-- {% if post in user.favourite.all %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                        </a>
-                                                        {% else %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                        </a>
-                                                        {% endif %} -->
                                                         {% if post in user.favourite.all %}
                                                         <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                             <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}"">favorite</span>
@@ -788,7 +725,7 @@
                                                 </p>
                                             </div>
                                         </div>
-                                    {% endif %} <!-- placeholder ends -->
+                                    {% endif %}
                                     
                                     {% else %}
                                         <div class="no-results">
@@ -801,7 +738,7 @@
                                 </div>
 
 
-                                <!-- Evening Snack -->
+                                {# for evening snack #}
                                 {% elif hour < 19 %}
                                 <h1>Evening Snacks
                                     <div class="scroll-btn-container">
@@ -818,7 +755,7 @@
                                 <div class="dynamic-card-container">
                                     {% if evesnack %}
 
-                                        {% if eveningsnackupage %} <!-- placeholder -->
+                                        {% if eveningsnackupage %} 
 
                                             {% for post in eveningsnackupage.object_list %}
 
@@ -858,15 +795,6 @@
                                                         </div>
 
                                                         <div class="favourites">
-                                                            <!-- {% if post in user.favourite.all %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                            </a>
-                                                            {% else %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                            </a>
-                                                            {% endif %} -->
                                                             {% if post in user.favourite.all %}
                                                             <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                                 <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -920,15 +848,6 @@
                                                         </div>
 
                                                         <div class="favourites">
-                                                            <!-- {% if post in user.favourite.all %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                            </a>
-                                                            {% else %}
-                                                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                            </a>
-                                                            {% endif %} -->
                                                             {% if post in user.favourite.all %}
                                                             <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                                 <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -975,7 +894,7 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                        {% endif %} <!-- placeholder ends -->
+                                        {% endif %}
 
                                     {% else %}
                                         <div class="no-results">
@@ -988,7 +907,7 @@
                                 </div>
 
                                 
-                                <!-- Dinner -->
+                                {# for dinner #}
                                 {% else %}
                                 <h1>Dinner recipes
                                     <div class="scroll-btn-container">
@@ -1006,7 +925,7 @@
                                 <div class="dynamic-card-container test-container">
                                     {% if dnr %}
 
-                                    {% if dinnerpage %} <!-- placeholder -->
+                                    {% if dinnerpage %} 
 
                                         {% for post in dinnerpage %}
 
@@ -1046,15 +965,6 @@
                                                     </div>
 
                                                     <div class="favourites">
-                                                        <!-- {% if post in user.favourite.all %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                        </a>
-                                                        {% else %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                        </a>
-                                                        {% endif %} -->
                                                         {% if post in user.favourite.all %}
                                                         <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                             <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -1109,15 +1019,6 @@
                                                     </div>
 
                                                     <div class="favourites">
-                                                        <!-- {% if post in user.favourite.all %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                        </a>
-                                                        {% else %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                        </a>
-                                                        {% endif %} -->
                                                         {% if post in user.favourite.all %}
                                                         <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                             <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -1163,7 +1064,7 @@
                                                 </p>
                                             </div>
                                         </div>
-                                    {% endif %} <!-- placeholder ends -->
+                                    {% endif %}
 
                                     {% else %}
                                         <div class="no-results">
@@ -1179,10 +1080,18 @@
                                 
                             </div>
 
-                        {% endif %} <!-- preference recipes -->
+                        {% endif %}
+
+                        {# Recipes based on weather conditions #}
+                        {% if not user.userlocation.location == '' %}
+                            <div class="dynamic-recipes dynamic-all-recipes-card" id="weather-based-recipes-suggestions">
+                                <span id="suggested-recipes-header"></span>
+                                <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary" id="suggested-recipes-container"></div>
+                            </div>
+                        {% endif %}
 
 
-                        <!-- popular recipe card -->
+                        {# popular recipe card #}
                         <div class="dynamic-recipes u--slideLeft">
                             
                             <div class="dynamic-card-container popular-card-container">
@@ -1269,10 +1178,9 @@
                                 {% endif %}
                             </div>
 
-                        </div>
-
+                        </div>              
                         
-                        <!-- For you -->
+                        {# For you cards #}
                         <div class="dynamic-recipes foryou-wrapper">
                             <h1>For you</h1>
 
@@ -1352,8 +1260,60 @@
                             </div>
                         </div>
 
+                        {# Suggesting recieps based on history #}
+                        {% if suggested_recipes_data %}
+                            <div class="dynamic-recipes dynamic-all-recipes-card">
+                        
+                                <h1>You may also like</h1>
 
-                        <!-- all recipe card -->
+                                <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
+
+                                    {% for post in suggested_recipes_data %}
+
+                                        <div class="recipe-cards all-recipes-cards">
+
+                                            <a href="{% url 'viewpost' post.id %}">
+                                                <div class="img-container in-history">
+                                                    
+                                                    {% if post.image %}
+                                                        <img src="{{ post.image }}" class="recipe-img" alt="{{post.title}}">
+                                                    {% else %}
+                                                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-body recipe-info">
+                                                    <h4 class="card-title highlight">{{post.title}}</h4>
+                                                    <p><ul><li>{{post.description}}</li></ul></p>
+                                                </div>
+                                            </a>
+                                            <div class="quick-view">
+                                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.id}}" aria-controls="quickviewModal">
+                                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                                </button>
+                                            </div>
+
+                                            <div class="favourites">
+                                                {% if post in user.favourite.all %}
+                                                <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                                    <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
+                                                </a>
+                                                {% else %}
+                                                <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                                                    <span class="material-symbols-rounded favourite-icon">favorite</span>
+                                                </a>
+                                                {% endif %}
+                                            </div>  
+
+                                        </div>
+
+                                    {% endfor %}
+                                    
+                                </div> 
+                            
+                            </div>
+                        {% endif %}
+
+                        {# all recipe card #}
                         <div class="dynamic-recipes dynamic-all-recipes-card">
                     
                             {% if recommended_recipes_list %}
@@ -1417,15 +1377,13 @@
 
                                     {% endfor %}
 
-                                {% elif not all_urecipe %} <!-- placeholder -->
+                                {% elif not all_urecipe %}
 
                                     {% for post in all_urecipe %}
                                     
                                         {% if post.pk in historys_pk %}
                                         
                                             <div class="recipe-cards all-recipes-cards" data-post-id="{{ post.id }}" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
-                                                <!-- style="background-color: {{ post.color_5 }};" -->
-
                                                 <a href="{% url 'viewpost' post.pk %}">
                                                     <div class="img-container in-history">
                                                         {% for i in post.photo_set.all %}
@@ -1510,15 +1468,6 @@
                                                 </div>
 
                                                 <div class="favourites">
-                                                    <!-- {% if post in user.favourite.all %}
-                                                    <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                        <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                    </a>
-                                                    {% else %}
-                                                    <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                        <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                    </a>
-                                                    {% endif %} -->
                                                     {% if post in user.favourite.all %}
                                                     <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                                         <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
@@ -1546,14 +1495,13 @@
                                     <p> No recipes available!</p>
                                 </div>
 
-                                {% endif %} <!-- placeholder ends -->
+                                {% endif %}
                                 
                             </div> 
                         
                         </div>
 
-                        <!-- Recipes from user (following) which current user follows -->
-
+                        {# Recipes from user (following) which current user follows #}
                         {% if following_user_posts %}
                             <div class="dynamic-recipes dynamic-all-recipes-card">
                                 <h1>From people you follow</h1>
@@ -1616,8 +1564,6 @@
 
                         {% endif %}
                         
-                        
-                        
                     </main>
                     
                     
@@ -1629,7 +1575,7 @@
                             </div>
 
                             <div class="dynamic-card-container side-recipes-card-container">
-                                {% if trending_recipes %} <!-- placeholder -->
+                                {% if trending_recipes %} 
                                 
                                     {% for post in trending_recipes|slice:"0:10" %}
 
@@ -1664,17 +1610,6 @@
                                                         </button>
                                                     </div>
                                                     
-                                                    <!-- <div class="favourites sidebar-favourite">
-                                                        {% if post in user.favourite.all %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                                                        </a>
-                                                        {% else %}
-                                                        <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                                            <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                                        </a>
-                                                        {% endif %}
-                                                    </div> -->
                                                     <div class="cards-footer">
                                                         
                                                     </div>
@@ -1727,7 +1662,6 @@
                     </aside>
 
                 </div>
-            <!-- container ends -->
             
             </div>
 
@@ -1746,7 +1680,6 @@
   {% endif %}
     
 </body>
-
 
 
 <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script> 
@@ -1771,7 +1704,7 @@
 </script>
 {% endif %}
 
-<!-- scroll buttons -->
+{# scroll buttons #}
 <script>
     const cardWrapper = document.querySelector('.dynamic-card-container');
     const scrollLeftButton = document.getElementById('scroll-left');
@@ -1810,7 +1743,7 @@
 </script>
 
 
-<!-- similar day spotlight modal -->
+{# similar day spotlight modal #}
 {% for post in spotlight_list %}
 <div class="modal fade modal-xl" id="spotlightModal{{post.pk}}" tabindex="-1" aria-labelledby="spotlightModalLabel" aria-hidden="true">
     <div class="modal-dialog spotlight-modal-dialog">
@@ -1834,7 +1767,7 @@
                     <div class="card-img-overlay">
                         <div class="d-block image-text">
                             <h2>{{post.title}}</h2>
-                            <!-- <p>{{post.get_date|date:"F j, Y"}}</p> -->
+                            {# <p>{{post.get_date|date:"F j, Y"}}</p> #}
                             </div>
                         </div>
                         <a href="{% url 'viewpost' post.pk %}" class="stretched-link"></a>
@@ -1842,19 +1775,15 @@
                     
                 </div>
             </div>
-
           
         </div>
-        <!-- <div class="modal-footer">
-            <a href="{% url 'viewpost' post.pk %}" class="btn btn-primary">View recipe</a>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div> -->
+
       </div>
     </div>
 </div>
 {% endfor %}
 
-<!-- similar rice recipes modal -->
+{# similar rice recipes modal #}
 <div class="modal fade modal-xl" id="similarricerecipes" tabindex="-1" aria-labelledby="similarricerecipes" aria-hidden="true">
     <div class="modal-dialog spotlight-modal-dialog">
       <div class="modal-content spotlight-modal-content">
@@ -1883,34 +1812,9 @@
                     {% endfor %}
                 </div>
             </div>
-
-            <!-- {% for post in rice_recipe_list %}
-
-            
-                    {% for i in post.photo_set.all %}
-                      {% if forloop.counter0 == 0 %}
-                        
-                          <img src="{{ i.image.url }}" class="img-fluid" alt="{{post.title}}">
-                        
-                      {% endif %}
-                    {% endfor %}
-
-                  
-                    <li>{{post.get_date|date:"F j, Y"}}</li>
-                    <li>{{post.date_post.time}}</li>
-                  
-
-            {% endfor %} -->
-
         </div>
-        <!-- <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div> -->
       </div>
     </div>
 </div>
-
-
 
 {% endblock %}

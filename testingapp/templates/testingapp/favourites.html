@@ -43,7 +43,6 @@
 
                 {% include 'testingapp/update_recipe_card.html' %}
 
-                   
             </div> 
         
           </div>
@@ -60,7 +59,11 @@
 
   </div>
 
-{% else %}  <!-- User is unauthenticated then redirect to login page-->
+{% else %}
+
+  <script>
+    location.href = "{% url 'login' %}";
+  </script>
 
 {% endif %}
 </body>

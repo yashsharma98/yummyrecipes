@@ -184,10 +184,8 @@ if 'DATABASE_URL' in os.environ:
         'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
 
-
 else:
     # PosgreSQL
-
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -199,8 +197,13 @@ else:
         }
     }
 
-
-
+# Using database for suggesting recipes based on weather 
+DB_HOST = os.environ.get("DB_HOST")
+DB_PORT = os.environ.get("DB_PORT", "5432")
+DB_NAME = os.environ.get("DB_NAME")
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+DB_SSLMODE = os.environ.get("DB_SSLMODE", "prefer")
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -307,7 +310,7 @@ TINYMCE_DEFAULT_CONFIG = {
     # 'width': 1000,
     'cleanup_on_startup': True,
     'custom_undo_redo_levels': 20,
-    'selector': 'textarea',
+    'selector': 'textarea:not(#customClipboardModalText)',
     'plugins': '''
             textcolor save link image media preview codesample contextmenu
             table code lists insertdatetime  nonbreaking

@@ -42,7 +42,7 @@
 
             <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
 
-              {% if counts %} <!-- placeholder -->
+              {% if counts %}
                 
                 {% for post in counts %} 
           
@@ -86,15 +86,6 @@
                           </div>
                           
                           <div class="favourites">
-                            <!-- {% if post in user.favourite.all %}
-                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                            </a>
-                            {% else %}
-                            <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                            </a>
-                            {% endif %} -->
                             {% if post in user.favourite.all %}
                             <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                                 <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
@@ -146,15 +137,6 @@
                         </div>
 
                         <div class="favourites">
-                          <!-- {% if post in user.favourite.all %}
-                          <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Remove from favourites"> 
-                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                          </a>
-                          {% else %}
-                          <a href="{% url 'add_to_favorites' post.id %}" class="" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Add to favourites"> 
-                              <span class="material-symbols-rounded favourite-icon">favorite</span>
-                          </a>
-                          {% endif %} -->
                           {% if post in user.favourite.all %}
                           <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                               <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
@@ -180,7 +162,7 @@
                 <div class="unavailable-message">
                   <p>No recipes available!</p>
                 </div>
-              {% endif %} <!-- placeholder ends -->
+              {% endif %}
                    
             </div> 
         
@@ -212,8 +194,6 @@
                   
             <h1>Trending recipes</h1>
 
-            <!-- <p>something goes here</p> -->
-
             <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
                 
               {% for post in counts %} 
@@ -221,13 +201,11 @@
                 {% get_hit_count for post as check %} 
     
                 {% if check == '0' or check == '1' %}
-                    
-                  <!-- <p>Hide- {% get_hit_count for post%}</p> -->
     
                 {% else %}  
                 
                   <div class="recipe-cards all-recipes-cards">
-                      <a href="{% url 'viewpost' post.pk %}"> <!-- {% url 'topostlogin' post.pk %} -->
+                      <a href="{% url 'viewpost' post.pk %}">
                         <div class="img-container">
                           {% for i in post.photo_set.all %}
                           {% if forloop.counter0 == 0 %}
@@ -257,7 +235,6 @@
                           </button>
                       </div>
 
-
                   </div>
 
                 {% endif %}
@@ -278,10 +255,5 @@
 
 {% endif %}
 </body>
-
-
-
-
-
 
 {% endblock %}
