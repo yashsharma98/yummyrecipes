@@ -1,25 +1,101 @@
-# Yummy-Recipes
-"Yummy Recipes" is a Django-based web application that allows users to explore, create, and view recipes. With features like recipe management, hit counting, trending recipes, and a customizable profile. Built with Django, Python, and Bootstrap, this project showcases the power of web development for culinary exploration.
+# Yummy Recipes
 
-# Installation 
+Yummy Recipes is a full-stack Django web application where users can upload, explore, and interact with recipes. A simple recipe sharing platform gradually evolved into a feature rich system with machine learning, semantic search, and AI-based recipe generation.
 
-# Screenshots
+<br>
+
+**Live Link**  
+https://yummy-recipes-ht6h.onrender.com/
+
+<br>
+
+## About The Project
+
+This project goes beyond a simple recipe management application, focusing not only on core features but also on improving search accuracy, integrating machine learning models, and handling deployment.
+
+The application is deployed on **Render**, uses **PostgreSQL** as the database, and stores media and static files on **AWS S3**.
+
+<br>
+
+## Main Features
+
+### Recipe Management
+- Upload, edit, and delete recipes  
+- Display detailed ingredients, instructions, and nutritional information  
+- Download, share, and generate QR codes for recipes  
+- Compare any two recipes side by side 
+
+<br>
+
+### Search System
+- Search recipes with advanced filters:
+  - Category (Breakfast, Lunch, Snacks, Dinner)
+  - Cuisine
+  - Type (Veg/Non-Veg)
+  - Servings
+  - Timing
+  - Difficulty  
+- Semantic search using vector embeddings
+- Ability to search and follow other users
+- Fallback mechanism
+
+<br>
+
+### Cooking Time Prediction
+- Trained an **XGBoost** model to predict preparation and cooking time  
+- Uses ingredients and instructions as input  
+- Integrated directly into the Django application  
+
+<br>
+
+### Recipe Recommendations
+- Personalized suggestions based on:
+  - User preferences  
+  - Previous history
+
+<br>
+
+### Social Engagement
+- Like / Dislike recipes
+- Comments
+- Follow / Unfollow users  
+- Notification panel  
+- Author profile pages  
+
+<br>
+
+### Recipe Summarization & AI Generation
+- Generate recipes using Gemini API
+- Recipe summarization & translation
+
+<br>
+
+### User Dashboard
+- Track uploads and views  
+- View likes/dislikes received  
+- Manage favorites  
+- Credit system
+- Activity timeline
 
 
-# Packages
-* Django
-* django-ajax
-* django-anymail
-* django-browser-reload
-* django-chartjs
-* django-ckeditor
-* django-hitcount
-* django-pdfkit
-* django-wkhtmltopdf
-* django-xhtml2pdf
-* djangorestframework
-* Pillow
-* PyPDF3
-* reportlab
-* requests
-* urllib3
+<br>
+
+## Technologies Used
+
+### Backend
+- Django  
+- PostgreSQL  
+- XGBoost  
+- NLP & Vector Embeddings  
+- Gemini API  
+
+### Frontend
+- HTML  
+- CSS  
+- Bootstrap  
+
+### Deployment & Services
+- Render  
+- AWS S3  
+- Google OAuth  
+- Email Integration  
