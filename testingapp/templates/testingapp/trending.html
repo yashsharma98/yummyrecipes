@@ -24,7 +24,7 @@
 
 <body>
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated or is_guest %}
 
   <div class="primary-wrapper">
 
@@ -42,117 +42,15 @@
 
             <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
 
-              {% if counts %}
+                {% if posts %}
                 
-                {% for post in counts %} 
-          
-                  {% get_hit_count for post as check %} 
-      
-                  {% if check == '0' or check == '1' %}
-      
-                  {% else %}  
+                  {% for post in posts %}
+              
+                  {% get_hit_count for post as check %}
+              
+                  {% if check|add:"0" > 1 %}
                   
-                    {% if post.pk in historys_pk %}
-
-                      <div class="recipe-cards all-recipes-cards trending-cards" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
-                          <a href="{% url 'viewpost' post.pk %}">
-                              <div class="img-container">
-                                {% for i in post.photo_set.all %}
-                                {% if forloop.counter0 == 0 %}
-                                    <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
-                                {% endif %}
-                                {% empty %}
-                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
-                                {% endfor %}
-
-                                <div class="readtime-container">
-                                  <p>{{ post.read_time|pluralize_min }}</p>
-                                </div>
-                              </div>
-                              <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
-                                  <h4 class="card-title highlight">{{post.title}}</h4>
-                                  <p class="card-text">
-                                      <ul>
-                                          <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
-                                          <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
-                                      </ul>
-                                  </p>
-                                </div>
-                          </a>
-                          <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
-                              <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                  <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
-                              </button>
-                          </div>
-                          
-                          <div class="favourites">
-                            {% if post in user.favourite.all %}
-                            <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                            </a>
-                            {% else %}
-                            <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                <span class="material-symbols-rounded favourite-icon">favorite</span>
-                            </a>
-                            {% endif %}
-                          </div>  
-
-
-                          <div class="cards-footer">
-                            
-                          </div>
-                      </div>
-                    
-                    {% else %}  
-                    
-                      <div class="recipe-cards all-recipes-cards trending-cards" data-bgcolor="{{ post.color_1 }}" data-hovercolor="{{ post.color_5 }}">
-                        <a href="{% url 'viewpost' post.pk %}">
-                            <div class="img-container">
-                              {% for i in post.photo_set.all %}
-                              {% if forloop.counter0 == 0 %}
-                                  <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
-                              {% endif %}
-                              {% empty %}
-                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
-                              {% endfor %}
-
-                              <div class="readtime-container">
-                                <p>{{ post.read_time|pluralize_min }}</p>
-                              </div>
-                            </div>
-                            <div class="card-body recipe-info" data-color="{{ post.color_7 }}">
-                                <h4 class="card-title highlight">{{post.title}}</h4>
-                                <p class="card-text">
-                                    <ul>
-                                        <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
-                                        <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
-                                    </ul>
-                                </p>
-                              </div>
-                        </a>
-                        <div class="quick-view" data-qvcolor="{{ post.color_2 }}" data-hovercolor="{{ post.color_5 }}">
-                            <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
-                            </button>
-                        </div>
-
-                        <div class="favourites">
-                          {% if post in user.favourite.all %}
-                          <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                              <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
-                          </a>
-                          {% else %}
-                          <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                              <span class="material-symbols-rounded favourite-icon">favorite</span>
-                          </a>
-                          {% endif %}
-                        </div>  
-
-
-
-                      </div>
-
-                    {% endif %}
+                    {% include "testingapp/recipe_card.html" with post=post extra_css_class="all-recipes-cards trending-cards" %}
 
                   {% endif %}
 
@@ -196,50 +94,25 @@
 
             <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
                 
-              {% for post in counts %} 
-        
-                {% get_hit_count for post as check %} 
-    
-                {% if check == '0' or check == '1' %}
-    
-                {% else %}  
+              {% if counts %}
                 
-                  <div class="recipe-cards all-recipes-cards">
-                      <a href="{% url 'viewpost' post.pk %}">
-                        <div class="img-container">
-                          {% for i in post.photo_set.all %}
-                          {% if forloop.counter0 == 0 %}
-                              <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
-                          {% endif %}
-                          {% empty %}
-                              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
-                          {% endfor %}
+                {% for post in counts %}
 
-                          <div class="readtime-container">
-                            <p>{{ post.read_time|pluralize_min }}</p>
-                          </div>
-                        </div>
-                        <div class="card-body recipe-info">
-                            <h4 class="card-title highlight">{{post.title}}</h4>
-                            <p class="card-text">
-                                <ul>
-                                    <li><img src="{{ post.author.profile.profile_img.url }}"  alt="Image"></li>
-                                    <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
-                                </ul>
-                            </p>
-                          </div>
-                      </a>
-                      <div class="quick-view">
-                          <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                              <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
-                          </button>
-                      </div>
+                  {% get_hit_count for post as check %}
 
-                  </div>
+                  {% if check|add:"0" > 1 %}
+                  
+                    {% include "testingapp/recipe_card.html" with post=post extra_css_class="all-recipes-cards trending-cards" %}
 
-                {% endif %}
+                  {% endif %}
 
-              {% endfor %}
+                {% endfor %}
+
+              {% else %}
+                <div class="unavailable-message">
+                  <p>No recipes available!</p>
+                </div>
+              {% endif %}
                   
             </div> 
         

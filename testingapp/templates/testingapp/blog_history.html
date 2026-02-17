@@ -42,65 +42,65 @@
 
             <p class="sub-heading">Previously visited recipes</p>
 
-            <div class="explore-tab">
+            <div class="explore-tab {% if blog_posts and not today_posts and not yesterday_posts and not previous_7_days_posts %}only-delete-btn{% endif %}">
 
                 <div class="d-flex justify-content-start">
                     <div class="">
                         {% if blog_posts %}
-                            <button data-bs-toggle="modal" data-bs-target="#deleteAllHistoryModal" class="tablinks history-delete-all-btn">Delete All</button>
+                            <button data-bs-toggle="modal" data-bs-target="#deleteAllHistoryModal" class="tablinks history-delete-all-btn"><span class="tab-btns-label">Delete All</span></button>
                         {% endif %}
                     </div>
 
                     <div class="history-tab-btns">
                         {% if today_posts %}
-                        <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'Today')">Today</button>
+                            <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'Today')"><span class="tab-btns-label">Today</span></button>
 
                             {% if yesterday_posts %}
-                                <button class="tablinks" onclick="recipes(event, 'Yesterday')">Yesterday</button>
+                                <button class="tablinks" onclick="recipes(event, 'Yesterday')"><span class="tab-btns-label">Yesterday</span></button>
                             {% endif %}
 
                             {% if previous_7_days_posts %}
-                                <button class="tablinks" onclick="recipes(event, 'previous_7_days')">Previous 7 days</button>
+                                <button class="tablinks" onclick="recipes(event, 'previous_7_days')"><span class="tab-btns-label">Previous 7 days</span></button>
                             {% endif %}
 
                             {% if blog_posts %}
-                                <button class="tablinks" onclick="recipes(event, 'showall')">Full history</button>
+                                <button class="tablinks" onclick="recipes(event, 'showall')"><span class="tab-btns-label">Full history</span></button>
                             {% endif %}
 
 
                         {% elif yesterday_posts %}
-                        <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'Yesterday')">Yesterday</button>
-                        <button class="tablinks" onclick="recipes(event, 'previous_7_days')">Previous 7 days</button>
-                        <button class="tablinks" onclick="recipes(event, 'showall')">Full history</button>
+                        <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'Yesterday')"><span class="tab-btns-label">Yesterday</span></button>
+                        <button class="tablinks" onclick="recipes(event, 'previous_7_days')"><span class="tab-btns-label">Previous 7 days</span></button>
+                        <button class="tablinks" onclick="recipes(event, 'showall')"><span class="tab-btns-label">Full history</span></button>
 
                         {% elif previous_7_days_posts %}
-                        <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'previous_7_days')">Previous 7 days</button>
-                        <button class="tablinks" onclick="recipes(event, 'showall')">Full history</button>
+                        <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'previous_7_days')"><span class="tab-btns-label">Previous 7 days</span></button>
+                        <button class="tablinks" onclick="recipes(event, 'showall')"><span class="tab-btns-label">Full history</span></button>
 
                         {% elif blog_posts %}
                         
                         {% else %}
                 
                             {% if today_posts %}
-                                <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'Today')">Today</button>
+                                <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'Today')"><span class="tab-btns-label">Today</span></button>
                             {% else %}
 
                             {% endif %}
 
                             {% if yesterday_posts %}
-                                <button class="tablinks" onclick="recipes(event, 'Yesterday')">Yesterday</button>
+                                <button class="tablinks" onclick="recipes(event, 'Yesterday')"><span class="tab-btns-label">Yesterday</span></button>
                             {% else %}
 
                             {% endif %}
 
                             {% if previous_7_days_posts %}
-                                <button class="tablinks" onclick="recipes(event, 'previous_7_days')">Previous 7 days</button>
+                                <button class="tablinks" onclick="recipes(event, 'previous_7_days')"><span class="tab-btns-label">Previous 7 days</span></button>
                             {% else %}
 
                             {% endif %}
 
                             {% if blog_posts %}
-                                <button class="tablinks" onclick="recipes(event, 'showall')">Full history</button>
+                                <button class="tablinks" onclick="recipes(event, 'showall')"><span class="tab-btns-label">Full history</span></button>
                             {% else %}
 
                             {% endif %}
@@ -127,10 +127,10 @@
                                         <div class="d-flex history-list-body">
                                             {% for i in post.photo_set.all %}
                                                 {% if forloop.counter0 == 0 %}
-                                                    <img src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
+                                                    <img loading="lazy" src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
                                                 {% endif %}
                                                 {% empty %}
-                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
+                                                    <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
                                             {% endfor %}
                                             <div class="list-content-body">
 
@@ -169,10 +169,10 @@
                                         <div class="d-flex history-list-body">
                                             {% for i in post.photo_set.all %}
                                                 {% if forloop.counter0 == 0 %}
-                                                    <img src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img">
+                                                    <img loading="lazy" src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img">
                                                 {% endif %}
                                                 {% empty %}
-                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
+                                                    <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
                                             {% endfor %}
                                             <div class="list-content-body">
 
@@ -211,10 +211,10 @@
                                         <div class="d-flex history-list-body">
                                             {% for i in post.photo_set.all %}
                                                 {% if forloop.counter0 == 0 %}
-                                                    <img src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img">
+                                                    <img loading="lazy" src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img">
                                                 {% endif %}
                                                 {% empty %}
-                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
+                                                    <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
                                             {% endfor %}
                                             <div class="list-content-body">
 
@@ -253,10 +253,10 @@
                                         <div class="d-flex history-list-body">
                                             {% for i in post.photo_set.all %}
                                                 {% if forloop.counter0 == 0 %}
-                                                    <img src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img">
+                                                    <img loading="lazy" src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img">
                                                 {% endif %}
                                                 {% empty %}
-                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
+                                                    <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" alt="recipe-image">
                                             {% endfor %}
                                             <div class="list-content-body">
 
@@ -316,54 +316,6 @@
 {% endif %}
 </body>
 
-{# delete post from history page #}
-{% if blog_posts %}
-{% for pk, post, timestamp in blog_posts %}
-<div class="modal fade Modal-delete" id="deleteModal{{pk}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content logoutmodal deletemodal">
-            <div class="modal-body">
-                <div class="modal-body-header">
-                    <h2>Delete recipe?</h2>
-                    <p>Delete <b>'{{post.title}}' </b> from history?</p>
-                </div>
-            
-                <div class="modal-body-footer delete-modal-footer">
-                    <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-                    <form method="post" action="{% url 'delete_blog' pk %}">
-                      {% csrf_token %}
-                      <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endfor %}
-{% endif %}
-
-{# delete post from history page all at once #}
-<div class="modal fade Modal-logout" id="deleteAllHistoryModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content logoutmodal">
-            <div class="modal-body">
-                <div class="modal-body-header">
-                    <h2>Delete all?</h2>
-                    <p class="del-text">Delete all recipe history?</p>
-                </div>
-            
-                <div class="modal-body-footer" id="logoutfooter">
-                    <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-                    <form action="{% url 'delete_all_blog_history' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger bg-danger text-white">Delete</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     function recipes(evt, type) {
   var i, tabcontent, tablinks;
@@ -405,4 +357,54 @@ document.getElementById("nonvegopen")
 
 </script>
 
+{% endblock %}
+
+{% block modals %}
+    {# delete post from history page #}
+    {% if blog_posts %}
+    {% for pk, post, timestamp in blog_posts %}
+    <div class="modal fade Modal-delete" id="deleteModal{{pk}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content logoutmodal deletemodal">
+                <div class="modal-body">
+                    <div class="modal-body-header">
+                        <h2>Delete recipe?</h2>
+                        <p>Delete <b>'{{post.title}}' </b> from history?</p>
+                    </div>
+                
+                    <div class="modal-body-footer delete-modal-footer">
+                        <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                        <form method="post" action="{% url 'delete_blog' pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {# delete post from history page all at once #}
+    <div class="modal fade Modal-logout" id="deleteAllHistoryModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content logoutmodal">
+                <div class="modal-body">
+                    <div class="modal-body-header">
+                        <h2>Delete all?</h2>
+                        <p class="del-text">Delete all recipe history?</p>
+                    </div>
+                
+                    <div class="modal-body-footer" id="logoutfooter">
+                        <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                        <form action="{% url 'delete_all_blog_history' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger bg-danger text-white">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

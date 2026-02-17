@@ -1,0 +1,13 @@
+{% load hitcount_tags %}
+
+{% load static %}
+
+{% load read_time_pluralize %}
+
+<div class="dynamic-card-container">
+    
+    {% for post in meal_posts %}
+        {% include "testingapp/recipe_card.html" with post=post extra_classes=extra_classes %}
+    {% endfor %}
+
+</div>

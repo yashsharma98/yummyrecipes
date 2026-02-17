@@ -69,9 +69,10 @@
 }
 
 .column p{
-    font-size: 0.9em;
+    font-size: 0.85em;
     text-wrap: balance;
     margin: 20px 0;
+    opacity: 0.85;
 }
 
 .column h5 {
@@ -91,11 +92,13 @@
     color: var(--maincolor);
     font-weight: bold;
     font-size: 0.9em;
+    filter: opacity(0.7);
     text-decoration: none;
+    transition: filter 0.4s ease;
 }
 
 .footer-container .column ul li a:hover{
-    text-decoration: underline;
+    filter: opacity(1);
 }
 
 .footer-bottom{
@@ -106,6 +109,10 @@
     font-size: 1.3em;
     font-weight: bold;
     margin-left: 6px;
+}
+
+.footer-bottom div div:last-child{
+    opacity: 0.85;
 }
 
 @media (max-width: 767px) {

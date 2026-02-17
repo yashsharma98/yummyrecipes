@@ -31,9 +31,9 @@
         <div class="main-recipe-image">
 
           {% if img %}
-            <img src="{{ img.image.url }}" class="recipe-img" alt="...">
+            <img loading="lazy" src="{{ img.image.url }}" class="recipe-img">
           {% else %}
-              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+              <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
           {% endif %}
 
           <div class="login-recipe-name">

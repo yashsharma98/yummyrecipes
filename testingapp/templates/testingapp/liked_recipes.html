@@ -84,237 +84,61 @@
 
             </div>
 
-            <div class="dynamic-card-container all-recipes-card-container tab-content" id="nav-tabContent">
+            <div class="dynamic-card-container all-recipes-card-container">
+
+                <div class="liked-disliked-card-container tab-content" id="nav-tabContent">
                 
-                <div class="tab-pane fade show active" id="liked-recipes" role="tabpanel" aria-labelledby="liked-recipes-tab" tabindex="0">
-         
-                    {% for post in all_liked_recipes %}  
+                    <div class="tab-pane fade show active" id="liked-recipes" role="tabpanel" aria-labelledby="liked-recipes-tab" tabindex="0">
+            
+                        {% for post in all_liked_recipes %}  
+                        
+                            {% include "testingapp/recipe_card.html" with post=post extra_css_class="all-recipes-cards" %}
+
+                        {% empty %}
+
+                            <div class="mt-3 mx-2">No recipes liked.</div>
+
+                        {% endfor %}
                     
-                        {% if post.pk in historys_pk %}
+                    </div>
 
-                        <div class="recipe-cards all-recipes-cards">
-                            <a href="{% url 'viewpost' post.pk %}">
-                                <div class="img-container">
-                                    {% for i in post.photo_set.all %}
-                                    {% if forloop.counter0 == 0 %}
-                                        <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
-                                    {% endif %}
-                                    {% empty %}
-                                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
-                                    {% endfor %}
-
-                                    <div class="readtime-container">
-                                        <p>{{ post.read_time }} min read</p>
-                                    </div>
-                                </div>
-                                <div class="card-body recipe-info">
-                                    <h4 class="card-title highlight">{{post.title}}</h4>
-                                    <p class="card-text">
-                                        <ul>
-                                            <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
-                                            <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
-                                        </ul>
-                                    </p>
-                                </div>
-                            </a>
-                            <div class="quick-view">
-                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
-                                </button>
-                            </div>
+                    <div class="tab-pane fade" id="recipes-with-likes" role="tabpanel" aria-labelledby="recipes-with-likes-tab" tabindex="0">
+                        {% if recipes_with_likes %}
                             
-                            <div class="favourites">
-                                {% if post in user.favourite.all %}
-                                <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                    <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                </a>
-                                {% else %}
-                                <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                    <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                </a>
-                                {% endif %}
-                            </div>  
+                            {% for post in recipes_with_likes %}
 
-                            <div class="cards-footer">
+                                {% include "testingapp/recipe_card.html" with post=post extra_css_class="all-recipes-cards" %}
 
-                            </div>
-                        </div>
+                            {% endfor %}
+                    
+                        {% else %}
+
+                            <div class="mt-3 mx-2">No recipes.</div>
+
+                        {% endif %}
+                    </div>
+
+                    <div class="tab-pane fade" id="top-liked" role="tabpanel" aria-labelledby="top-liked-tab" tabindex="0">
                         
-                        {% else %}  
+                        {% if top_liked_recipe %}
+                            
+                            {% for post in top_liked_recipe %}
+
+                                {% include "testingapp/recipe_card.html" with post=post extra_css_class="all-recipes-cards" %}
+
+                            {% endfor %}
                         
-                        <div class="recipe-cards all-recipes-cards">
-                            <a href="{% url 'viewpost' post.pk %}">
-                                <div class="img-container">
-                                    {% for i in post.photo_set.all %}
-                                    {% if forloop.counter0 == 0 %}
-                                        <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
-                                    {% endif %}
-                                    {% empty %}
-                                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
-                                    {% endfor %}
+                        {% else %}
 
-                                    <div class="readtime-container">
-                                        <p>{{ post.read_time }} min read</p>
-                                    </div>
-                                </div>
-                                <div class="card-body recipe-info">
-                                    <h4 class="card-title highlight">{{post.title}}</h4>
-                                    <p class="card-text">
-                                        <ul>
-                                            <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
-                                            <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
-                                        </ul>
-                                    </p>
-                                </div>
-                            </a>
-                            <div class="quick-view">
-                                <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                    <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
-                                </button>
-                            </div>
-
-                            <div class="favourites">
-                                {% if post in user.favourite.all %}
-                                <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                    <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                </a>
-                                {% else %}
-                                <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                    <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                </a>
-                                {% endif %}
-                            </div>  
-                        </div>
+                            <div class="mt-3 mx-2">No top liked recipe.</div>
 
                         {% endif %}
 
-                    {% empty %}
-
-                        <div class="mt-3 mx-2">No recipes liked.</div>
-
-                    {% endfor %}
-                
-                </div>
-
-                <div class="tab-pane fade" id="recipes-with-likes" role="tabpanel" aria-labelledby="recipes-with-likes-tab" tabindex="0">
-                    {% if recipes_with_likes %}
-                        
-                        {% for post in recipes_with_likes %}
-
-                            <div class="recipe-cards all-recipes-cards">
-                                <a href="{% url 'viewpost' post.pk %}">
-                                    <div class="img-container">
-                                        {% for i in post.photo_set.all %}
-                                        {% if forloop.counter0 == 0 %}
-                                            <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
-                                        {% endif %}
-                                        {% empty %}
-                                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
-                                        {% endfor %}
-
-                                        <div class="readtime-container">
-                                            <p>{{ post.read_time }} min read</p>
-                                        </div>
-                                    </div>
-                                    <div class="card-body recipe-info">
-                                        <h4 class="card-title highlight">{{post.title}}</h4>
-                                        <p class="card-text">
-                                            <ul>
-                                                <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
-                                                <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
-                                            </ul>
-                                        </p>
-                                    </div>
-                                </a>
-                                <div class="quick-view">
-                                    <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                        <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
-                                    </button>
-                                </div>
-
-                                <div class="favourites">
-                                    {% if post in user.favourite.all %}
-                                    <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                        <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                    </a>
-                                    {% else %}
-                                    <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                        <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                    </a>
-                                    {% endif %}
-                                </div>  
-                            </div>
-
-                        {% endfor %}
-                
-                    {% else %}
-
-                        <div class="mt-3 mx-2">No recipes.</div>
-
-                    {% endif %}
-                </div>
-
-                <div class="tab-pane fade" id="top-liked" role="tabpanel" aria-labelledby="top-liked-tab" tabindex="0">
-                    
-                    {% if top_liked_recipe %}
-                        
-                        {% for post in top_liked_recipe %}
-
-                            <div class="recipe-cards all-recipes-cards">
-                                <a href="{% url 'viewpost' post.pk %}">
-                                    <div class="img-container">
-                                        {% for i in post.photo_set.all %}
-                                        {% if forloop.counter0 == 0 %}
-                                            <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
-                                        {% endif %}
-                                        {% empty %}
-                                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
-                                        {% endfor %}
-
-                                        <div class="readtime-container">
-                                            <p>{{ post.read_time }} min read</p>
-                                        </div>
-                                    </div>
-                                    <div class="card-body recipe-info">
-                                        <h4 class="card-title highlight">{{post.title}}</h4>
-                                        <p class="card-text">
-                                            <ul>
-                                                <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
-                                                <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
-                                            </ul>
-                                        </p>
-                                    </div>
-                                </a>
-                                <div class="quick-view">
-                                    <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                        <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
-                                    </button>
-                                </div>
-
-                                <div class="favourites">
-                                    {% if post in user.favourite.all %}
-                                    <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                        <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                    </a>
-                                    {% else %}
-                                    <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
-                                        <span class="material-symbols-rounded favourite-icon">favorite</span>
-                                    </a>
-                                    {% endif %}
-                                </div>  
-                            </div>
-
-                        {% endfor %}
-                    
-                    {% else %}
-
-                        <div class="mt-3 mx-2">No top liked recipe.</div>
-
-                    {% endif %}
+                    </div>
 
                 </div>
                      
-              </div> 
+            </div> 
         
           </div>
 

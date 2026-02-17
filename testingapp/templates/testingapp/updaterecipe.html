@@ -45,12 +45,12 @@
               <form class="row mt-1 g-0 create-recipe-form" method="POST" id="myForm" enctype="multipart/form-data">
                 {% csrf_token %}
             
-                <div class="update-recipe-img-grid">
+                <div class="update-recipe-img-grid {% if image_count == 1 %} single-image{% endif %}">
                   {% for i in recipes.photo_set.all %}
                     <div id="image-container-{{ i.pk }}" class="responsive">
                       <div class="gallery">
                         <a target="_blank" href="{{ i.image.url }}">
-                          <img src="{{ i.image.url }}" alt="Image Preview">
+                          <img loading="lazy" src="{{ i.image.url }}" alt="Image Preview">
                         </a>
                         {% if image_count == 1 %}
                           <div class="updaterecipe-buttons-container single-img-replace-btn">
@@ -81,7 +81,7 @@
                 </div>
             
                 <div class="imgarea">
-                    <div class="new-container">
+                    <div class="upload-image-container">
                       
                     </div>
                 </div>
@@ -103,8 +103,8 @@
 
                 <div class="row mx-0 g-2 select-options updateselectoptions1">
 
-                  <div class="col-md-4">
-                    <label for="inputTyoe" class="col col-form-label">Type of recipe</label>
+                  <div class="col-md-6">
+                    <label for="inputType" class="col col-form-label">Type</label>
                     <select class="form-select" id="specificSizeSelect" name="type" required>
                       <option value="{{ form.type.value }}">{{ form.type.value }}</option>
                       <option value="Breakfast">Breakfast</option>
@@ -114,7 +114,7 @@
                     </select>
                   </div>
 
-                  <div class="col-md-4">
+                  <div class="col-md-5 select-option-filters">
                     <label for="inputCuisine" class="col col-form-label">Cuisine</label>
                     <select class="form-select" id="specificSizeSelect" name="cuisine" required>
                       <option value="{{ form.cuisine.value }}">{{ form.cuisine.value }}</option>
@@ -124,10 +124,10 @@
                     </select>
                   </div>
                   
-                  <div class="col-md-3">
+                  <!-- <div class="col-md-3">
                     <label for="inputTime" class="col col-form-label">Preparation time</label>
                     <input type="number" class="form-control" name="timing" id="inputTime" value="{{ form.timing.value }}" placeholder="Time (in min)" required="required" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Preparation time">
-                  </div>
+                  </div> -->
 
                 </div>
                 
@@ -200,9 +200,9 @@
           <div class="sidebar-recipes">
 
             {# Image preview #}
-            <div class="preview-container">
+            <div class="preview-container preview-image-container">
               <img class="preview-image" src="" alt="Image" style="display: none;">
-              <div class="recipe-title preview_ai_img_title"></div>
+              <!-- <div class="recipe-title preview_ai_img_title"></div> -->
             </div>
                
           </div>
@@ -317,82 +317,115 @@ document.getElementById("output").reset();
 {# image preview with name of the file (input id=id_form-0-image) #}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-      const previewContainerDesktop = document.querySelector('.recipe-img-preview-sidebar'); // Sidebar (desktop)
-      const previewContainerMobile = document.querySelector('.new-container'); // Mobile preview container
-      const sidebar = document.getElementById('show-sidebar'); // Sidebar container
-  
-      function handleFileSelect(event) {
-          const input = event.target;
-          const file = input.files[0];
-  
-          if (!file) return;
-  
-          const reader = new FileReader();
-          reader.onload = function (e) {
-              const previewMobile = createPreviewElement(file.name, e.target.result, input);
-              const previewDesktop = createPreviewElement(file.name, e.target.result, input);
-  
-              setupRemoveButton(previewMobile, previewDesktop, input);
-              setupRemoveButton(previewDesktop, previewMobile, input);
-  
-              previewContainerMobile.appendChild(previewMobile);
-              previewContainerDesktop.appendChild(previewDesktop);
-  
-              sidebar.classList.add('show-sidebar'); 
-          };
-  
-          reader.readAsDataURL(file);
+    const sidebar = document.getElementById('show-sidebar');
+    const previewContainerDesktop = document.querySelector('.sidebar-recipes .preview-container.preview-image-container');
+    const previewContainerMobile = document.querySelector('.upload-image-container');
+    const counterDisplay = document.querySelector('.preview-counter');
+
+    function handleFileSelect(event) {
+      const input = event.target;
+      const files = Array.from(input.files);
+
+      if (!files.length) return;
+
+      previewContainerDesktop.innerHTML = '';
+      previewContainerMobile.innerHTML = '';
+
+      files.forEach(file => {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const previewDesktop = createPreviewElement(file.name, e.target.result);
+          const previewMobile = createPreviewElement(file.name, e.target.result);
+
+          setupRemoveButton(previewDesktop, previewMobile, file, input);
+          setupRemoveButton(previewMobile, previewDesktop, file, input);
+
+          previewContainerDesktop.appendChild(previewDesktop);
+          previewContainerMobile.appendChild(previewMobile);
+
+          sidebar.classList.add('show-sidebar');
+          updateCounter(input.files.length);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function createPreviewElement(fileName, fileSrc) {
+      const preview = document.createElement('div');
+      preview.classList.add('preview-image-container');
+
+      const innerDiv = document.createElement('div');
+
+      const image = document.createElement('img');
+      image.classList.add('preview-image');
+      image.src = fileSrc;
+
+      const name = document.createElement('div');
+      name.classList.add('preview-name');
+      name.textContent = fileName;
+
+      innerDiv.appendChild(image);
+      innerDiv.appendChild(name);
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = 'x';
+      removeButton.classList.add('img-remove-button');
+
+      preview.appendChild(innerDiv);
+      preview.appendChild(removeButton);
+
+      return preview;
+    }
+
+    function setupRemoveButton(previewElement, counterpartElement, fileToRemove, input) {
+      const removeButton = previewElement.querySelector('.img-remove-button');
+      removeButton.addEventListener('click', () => {
+        previewElement.remove();
+        counterpartElement.remove();
+        updateFileList(input, fileToRemove);
+        updateSidebarVisibility(input);
+      });
+    }
+
+    function updateFileList(input, fileToRemove) {
+      const files = Array.from(input.files);
+      const updatedFiles = files.filter(file => file !== fileToRemove);
+      const dataTransfer = new DataTransfer();
+
+      updatedFiles.forEach(file => dataTransfer.items.add(file));
+      input.files = dataTransfer.files;
+
+      updateCounter(updatedFiles.length);
+    }
+
+    function updateCounter(count) {
+      if (counterDisplay) {
+        if (count === 0) {
+          counterDisplay.innerHTML = 'Select images';
+        } else {
+          counterDisplay.textContent = `${count} file${count > 1 ? 's' : ''} selected`;
+        }
       }
-  
-      function createPreviewElement(fileName, fileSrc, input) {
-          const preview = document.createElement('div');
-          preview.classList.add('preview-container');
-  
-          const image = document.createElement('img');
-          image.classList.add('preview-image');
-          image.src = fileSrc;
-  
-          const name = document.createElement('div');
-          name.classList.add('preview-name');
-          name.textContent = fileName;
-  
-          const removeButton = document.createElement('button');
-          removeButton.textContent = 'x';
-          removeButton.classList.add('img-remove-button');
-  
-          preview.appendChild(image);
-          preview.appendChild(name);
-          preview.appendChild(removeButton);
-  
-          return preview;
+    }
+
+    function updateSidebarVisibility(input) {
+      if (input.files.length === 0) {
+        sidebar.classList.remove('show-sidebar');
       }
-  
-      function setupRemoveButton(previewElement, counterpartElement, input) {
-          const removeButton = previewElement.querySelector('.img-remove-button');
-          removeButton.addEventListener('click', function () {
-              previewElement.remove();
-              counterpartElement.remove();
-              input.value = '';
-              updateSidebarVisibility();
-          });
-      }
-  
-      function updateSidebarVisibility() {
-          if (previewContainerDesktop.children.length === 0) {
-              sidebar.classList.remove('show-sidebar');
-          }
-      }
-  
-      function setupImageInputs() {
-          document.querySelectorAll('input[type="file"]').forEach(input => {
-              if (!input.dataset.listenerAdded) {
-                  input.dataset.listenerAdded = true;
-                  input.addEventListener("change", handleFileSelect);
-              }
-          });
-      }
-  
-      setupImageInputs();
+    }
+
+    function setupImageInputs() {
+      document.querySelectorAll('input[type="file"]').forEach(input => {
+        if (!input.dataset.listenerAdded) {
+          input.dataset.listenerAdded = true;
+          input.addEventListener("change", handleFileSelect);
+        }
+      });
+    }
+
+    setupImageInputs();
   });
 </script>
   

@@ -4,6 +4,7 @@
 
 {% load static %}
 
+{% load dictionary_values %}
 
 {% block css %}
 {% endblock %}
@@ -24,7 +25,7 @@
 
 <body>
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated or is_guest %}
 
   <div class="primary-wrapper">
 
@@ -49,113 +50,121 @@
                             <h6>Stats</h6>    
                             <div class="column-sub-heading">Your recipes collection</div>
 
-                            <div class="dashboard-recipe-container">
-                                <div class="dashboard-recipe-data d-flex">
-                                    
-                                    <div class="recipe-count">
-                                        <div class="recipe-data-header">
-                                            <h6>Total</h6>
-                                        </div>
+                            {% if not is_guest %}
+                                <div class="dashboard-recipe-container">
+                                    <div class="dashboard-recipe-data d-flex">
                                         
-                                        <div class="recipe-data-content">
-                                            {{tot_posts_byuser}}
+                                        <div class="recipe-count">
+                                            <div class="recipe-data-header">
+                                                <h6>Total</h6>
+                                            </div>
+                                            
+                                            <div class="recipe-data-content">
+                                                {{tot_posts_byuser}}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="recipe-count">
-                                        <div class="recipe-data-header">
-                                            <h6>Breakfast</h6>
+                                        <div class="recipe-count">
+                                            <div class="recipe-data-header">
+                                                <h6>Breakfast</h6>
+                                            </div>
+                                            
+                                            <div class="recipe-data-content">
+                                                {{breakfast}}
+                                            </div>
                                         </div>
-                                        
-                                        <div class="recipe-data-content">
-                                            {{breakfast}}
-                                        </div>
-                                    </div>
 
-                                    <div class="recipe-count">
-                                        <div class="recipe-data-header">
-                                            <h6>Lunch</h6>
+                                        <div class="recipe-count">
+                                            <div class="recipe-data-header">
+                                                <h6>Lunch</h6>
+                                            </div>
+                                            
+                                            <div class="recipe-data-content">
+                                                {{lunch}}
+                                            </div>
                                         </div>
-                                        
-                                        <div class="recipe-data-content">
-                                            {{lunch}}
-                                        </div>
-                                    </div>
 
-                                    <div class="recipe-count">
-                                        <div class="recipe-data-header">
-                                            <h6>Snacks</h6>
+                                        <div class="recipe-count">
+                                            <div class="recipe-data-header">
+                                                <h6>Snacks</h6>
+                                            </div>
+                                            
+                                            <div class="recipe-data-content">
+                                                {{evesnack}}
+                                            </div>
                                         </div>
-                                        
-                                        <div class="recipe-data-content">
-                                            {{evesnack}}
-                                        </div>
-                                    </div>
 
-                                    <div class="recipe-count">
-                                        <div class="recipe-data-header">
-                                            <h6>Dinner</h6>
+                                        <div class="recipe-count">
+                                            <div class="recipe-data-header">
+                                                <h6>Dinner</h6>
+                                            </div>
+                                            
+                                            <div class="recipe-data-content">
+                                                {{dinner}}
+                                            </div>
                                         </div>
-                                        
-                                        <div class="recipe-data-content">
-                                            {{dinner}}
-                                        </div>
-                                    </div>
 
-                                    <div class="recipe-count">
-                                        <div class="recipe-data-header">
-                                            <h6>Veg</h6>
+                                        <div class="recipe-count">
+                                            <div class="recipe-data-header">
+                                                <h6>Veg</h6>
+                                            </div>
+                                            
+                                            <div class="recipe-data-content">
+                                                {{veg}}
+                                            </div>
                                         </div>
-                                        
-                                        <div class="recipe-data-content">
-                                            {{veg}}
-                                        </div>
-                                    </div>
 
-                                    <div class="recipe-count">
-                                        <div class="recipe-data-header">
-                                            <h6>NonVeg</h6>
-                                        </div>
-                                        
-                                        <div class="recipe-data-content">
-                                            {{nonveg}}
+                                        <div class="recipe-count">
+                                            <div class="recipe-data-header">
+                                                <h6>NonVeg</h6>
+                                            </div>
+                                            
+                                            <div class="recipe-data-content">
+                                                {{nonveg}}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="dashboard-table-column-secondary-data">
-                                <h6>Goals</h6>    
-                                <div class="column-sub-heading">See how far you've come</div>
+                                <div class="dashboard-table-column-secondary-data">
+                                    <h6>Goals</h6>    
+                                    <div class="column-sub-heading">See how far you've come</div>
 
-                                <div class="dashboard-recipe-container">
-                                    <div class="dashboard-recipe-data d-flex">
-                                        <div class="recipe-count">
-                                            <div class="custom-progress">
-                                                <div class="custom-progress-bar-wrapper">
-                                                    <div class="custom-progress-bar">
-                                                        <span class="progress-label">{{ progress_percentage }}%</span>
+                                    <div class="dashboard-recipe-container">
+                                        <div class="dashboard-recipe-data d-flex">
+                                            <div class="recipe-count">
+                                                <div class="custom-progress">
+                                                    <div class="custom-progress-bar-wrapper">
+                                                        <div class="custom-progress-bar">
+                                                            <span class="progress-label">{{ progress_percentage }}%</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div class="recipe-count goal-tracker">
-                                            <div class="goal-tracker-container">
-                                                <div class="first-div"><h6>{{ todays_date.year }} Recipe Goals</h6></div>
-                                                <div class="second-div">
-                                                    <p>Target : {% if goal_for_year %}<strong>{{ goal_for_year.goal }}</strong> {% else %} Not set {% endif %} </p>
-                                                    <p>Shared : <strong>{{ recipes_uploaded }}</strong></p>
+                                            <div class="recipe-count goal-tracker">
+                                                <div class="goal-tracker-container">
+                                                    <div class="first-div"><h6>{{ todays_date.year }} Recipe Goals</h6></div>
+                                                    <div class="second-div">
+                                                        <p>Target : {% if goal_for_year %}<strong>{{ goal_for_year.goal }}</strong> {% else %} Not set {% endif %} </p>
+                                                        <p>Shared : <strong>{{ recipes_uploaded }}</strong></p>
+                                                    </div>
+                                                    {% if progress_percentage >= 100 %}
+                                                        <div class="third-div"><strong>Congratulations! 🎉</strong> &nbsp; You've reached your goal!</div>
+                                                    {% endif %}
                                                 </div>
-                                                {% if progress_percentage >= 100 %}
-                                                    <div class="third-div"><strong>Congratulations! 🎉</strong> &nbsp; You've reached your goal!</div>
-                                                {% endif %}
                                             </div>
+                                            
                                         </div>
-                                        
                                     </div>
                                 </div>
-                            </div>
+                            {% else %}
+                                <div class="dashboard-recipe-data dashboard-activity-tab">
+                                    <div class="empty-results">
+                                        Stats unavailable for guest user
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -164,79 +173,89 @@
                         <div class="column-sub-heading">Track your activity</div>
  
                         <div class="dashboard-recipe-container">
-                            <div class="dashboard-recipe-data dashboard-activity-tab d-flex">
-                                <div class="recipe-count">
-                                    <div class="recipe-data-header">
-                                        <h6>Credits</h6>
-                                    </div>
-                                    
-                                    <div class="recipe-data-content">
-                                        <span class="material-symbols-rounded share-recipe-icon">account_balance_wallet</span>
+                            {% if not is_guest %}                               
+                                <div class="dashboard-recipe-data dashboard-activity-tab d-flex">
+                                    <div class="recipe-count">
+                                        <div class="recipe-data-header">
+                                            <h6>Credits</h6>
+                                        </div>
+                                        
+                                        <div class="recipe-data-content">
+                                            <span class="material-symbols-rounded share-recipe-icon">account_balance_wallet</span>
+                                        </div>
+
+                                        <a href="{% url 'credits' %}" class="stretched-link"></a>
                                     </div>
 
-                                    <a href="{% url 'credits' %}" class="stretched-link"></a>
+                                    <div class="recipe-count">
+                                        <div class="recipe-data-header">
+                                            <h6>Liked</h6>
+                                        </div>
+                                        
+                                        <div class="recipe-data-content">
+                                            <span class="material-symbols-rounded share-recipe-icon">thumb_up</span>
+                                        </div>
+
+                                        <a href="{% url 'liked_recipes' %}" class="stretched-link"></a>
+                                    </div>
+
+                                    <div class="recipe-count">
+                                        <div class="recipe-data-header">
+                                            <h6>Disliked</h6>
+                                        </div>
+                                        
+                                        <div class="recipe-data-content">
+                                            <span class="material-symbols-rounded share-recipe-icon">thumb_down</span>
+                                        </div>
+
+                                        <a href="{% url 'disliked_recipes' %}" class="stretched-link"></a>
+                                    </div>
+
+                                    <div class="recipe-count">
+                                        <div class="recipe-data-header">
+                                            <h6>Timeline</h6>
+                                        </div>
+                                        
+                                        <div class="recipe-data-content">
+                                            <span class="material-symbols-rounded share-recipe-icon">timeline</span>
+                                        </div>
+
+                                        <a href="{% url 'timeline' %}" class="stretched-link"></a>
+                                    </div>
+
+                                    <div class="recipe-count">
+                                        <div class="recipe-data-header">
+                                            <h6>Views</h6>
+                                        </div>
+                                        
+                                        <div class="recipe-data-content">
+                                            <span class="material-symbols-rounded share-recipe-icon">visibility</span>
+                                        </div>
+
+                                        <a href="{% url 'total_views' %}" class="stretched-link"></a>
+                                    </div>
+
+                                    <div class="recipe-count">
+                                        <div class="recipe-data-header">
+                                            <h6>Network</h6>
+                                        </div>
+                                        
+                                        <div class="recipe-data-content">
+                                            <span class="material-symbols-rounded share-recipe-icon">group</span>
+                                        </div>
+
+                                        {% if not is_guest %}
+                                            <a href="{% url 'connections' name=user.get_full_name pk=user.pk %}" class="stretched-link"></a>
+                                        {% endif %}
+                                    </div>
                                 </div>
-
-                                <div class="recipe-count">
-                                    <div class="recipe-data-header">
-                                        <h6>Liked</h6>
+                            {% else %}
+                                <div class="dashboard-recipe-data dashboard-activity-tab">
+                                    <div class="empty-results">
+                                        Activity unavailable for guest user
                                     </div>
-                                    
-                                    <div class="recipe-data-content">
-                                        <span class="material-symbols-rounded share-recipe-icon">thumb_up</span>
-                                    </div>
-
-                                    <a href="{% url 'liked_recipes' %}" class="stretched-link"></a>
                                 </div>
-
-                                <div class="recipe-count">
-                                    <div class="recipe-data-header">
-                                        <h6>Disliked</h6>
-                                    </div>
-                                    
-                                    <div class="recipe-data-content">
-                                        <span class="material-symbols-rounded share-recipe-icon">thumb_down</span>
-                                    </div>
-
-                                    <a href="{% url 'disliked_recipes' %}" class="stretched-link"></a>
-                                </div>
-
-                                <div class="recipe-count">
-                                    <div class="recipe-data-header">
-                                        <h6>Timeline</h6>
-                                    </div>
-                                    
-                                    <div class="recipe-data-content">
-                                        <span class="material-symbols-rounded share-recipe-icon">timeline</span>
-                                    </div>
-
-                                    <a href="{% url 'timeline' %}" class="stretched-link"></a>
-                                </div>
-
-                                <div class="recipe-count">
-                                    <div class="recipe-data-header">
-                                        <h6>Views</h6>
-                                    </div>
-                                    
-                                    <div class="recipe-data-content">
-                                        <span class="material-symbols-rounded share-recipe-icon">visibility</span>
-                                    </div>
-
-                                    <a href="{% url 'total_views' %}" class="stretched-link"></a>
-                                </div>
-
-                                <div class="recipe-count">
-                                    <div class="recipe-data-header">
-                                        <h6>Network</h6>
-                                    </div>
-                                    
-                                    <div class="recipe-data-content">
-                                        <span class="material-symbols-rounded share-recipe-icon">group</span>
-                                    </div>
-
-                                    <a href="{% url 'connections' name=user.get_full_name pk=user.pk %}" class="stretched-link"></a>
-                                </div>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -246,80 +265,88 @@
                             <div class="column-sub-heading">Recent actions on recipes</div>
                             
                             <div class="dashboard-recipe-container">
-                                {% if last_recipe or last_viewed_recipe or last_liked_recipe or last_comment and commented_post %}
-                                    {% if last_recipe %}
-                                        <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ last_recipe.pk }}">
-                                            <div class="recent-tab-header">
-                                                <h6>Last recipe</h6>
-                                            </div>
-                                        
-                                            <div class="recent-tab-data">
-                                                <div class="d-flex justify-content-between">
-                                                    <div>
-                                                        <h4>{{last_recipe.title}}</h4>
-                                                    </div>
-                                                    <div>
-                                                        <span class="recent-tab-span">{{last_recipe.date_post.date}}</span>
+                                {% if not is_guest %}
+                                
+                                    {% if last_recipe or last_viewed_recipe or last_liked_recipe or last_comment and commented_post %}
+                                        {% if last_recipe %}
+                                            <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ last_recipe.pk }}">
+                                                <div class="recent-tab-header">
+                                                    <h6>Last recipe</h6>
+                                                </div>
+                                            
+                                                <div class="recent-tab-data">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div>
+                                                            <h4>{{last_recipe.title}}</h4>
+                                                        </div>
+                                                        <div>
+                                                            <span class="recent-tab-span">{{last_recipe.date_post.date}}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                        {% endif %}
+
+                                        {% if last_viewed_recipe %}
+                                            <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ last_viewed_recipe.blog_post.pk }}">
+                                                <div class="recent-tab-header">
+                                                    <h6>Recently viewed</h6>
+                                                </div>
+                                            
+                                                <div class="recent-tab-data">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div>
+                                                            <h4>{{last_viewed_recipe.blog_post.title}}</h4>
+                                                        </div> 
+                                                        <div>
+                                                            <span class="recent-tab-span">{{last_viewed_recipe.timestamp.date}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if last_liked_recipe %}
+                                            <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ last_liked_recipe.pk }}">
+                                                <div class="recent-tab-header">
+                                                    <h6>Recently liked</h6>
+                                                </div>
+                                            
+                                                <div class="recent-tab-data">
+                                                    <div class="d-flex justify-content-between">
+                                                        <div>
+                                                            <h4>{{last_liked_recipe.title}}</h4>
+                                                        </div> 
+                                                        <div>
+                                                            <span class="recent-tab-span">{{last_liked_recipe.date_modified.date}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if last_comment and commented_post %}
+                                            <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ commented_post.pk }}">
+                                                <div class="recent-tab-header">
+                                                    <h6>Last commented</h6>
+                                                </div>
+                                            
+                                                <div class="recent-tab-data">
+                                                    <h4><q>{{last_comment.comment}}</q> on</h4>
+                                                    <div class="recent-cmt-title mt-2">{{commented_post.title}}</div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="empty-results">
+                                            No recent actions
                                         </div>
                                     {% endif %}
 
-                                    {% if last_viewed_recipe %}
-                                        <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ last_viewed_recipe.blog_post.pk }}">
-                                            <div class="recent-tab-header">
-                                                <h6>Recently viewed</h6>
-                                            </div>
-                                        
-                                            <div class="recent-tab-data">
-                                                <div class="d-flex justify-content-between">
-                                                    <div>
-                                                        <h4>{{last_viewed_recipe.blog_post.title}}</h4>
-                                                    </div> 
-                                                    <div>
-                                                        <span class="recent-tab-span">{{last_viewed_recipe.timestamp.date}}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    {% if last_liked_recipe %}
-                                        <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ last_liked_recipe.pk }}">
-                                            <div class="recent-tab-header">
-                                                <h6>Recently liked</h6>
-                                            </div>
-                                        
-                                            <div class="recent-tab-data">
-                                                <div class="d-flex justify-content-between">
-                                                    <div>
-                                                        <h4>{{last_liked_recipe.title}}</h4>
-                                                    </div> 
-                                                    <div>
-                                                        <span class="recent-tab-span">{{last_liked_recipe.date_modified.date}}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if last_comment and commented_post %}
-                                        <div class="dashboard-recipe-data recent-tab-container" data-post-id="{{ commented_post.pk }}">
-                                            <div class="recent-tab-header">
-                                                <h6>Last commented</h6>
-                                            </div>
-                                        
-                                            <div class="recent-tab-data">
-                                                <h4><q>{{last_comment.comment}}</q> on</h4>
-                                                <div class="recent-cmt-title mt-2">{{commented_post.title}}</div>
-                                            </div>
-                                        </div>
-                                    {% endif %}
                                 {% else %}
-                                    <div class="empty-results">
-                                        No recent actions
-                                    </div>
+                                        <div class="empty-results">
+                                            Actions unavailable for guest user
+                                        </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -332,51 +359,59 @@
                         <div class="dashboard-recipe-container dashboard-recipe-tab-container">
                             
                             <div class="dashboard-recipe-data dasboard-recipe-tab top-performance-tab d-flex flex-wrap">
-                                {% if top_performing_recipes %}
-                                    {% for post in top_performing_recipes %}
-                                        <div class="horiz-card" data-post-id="{{post.id}}">
-                                            <a href="{% url 'viewpost' post.pk %}" class="">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="horiz-card-img-container">
-                                                        {% for i in post.photo_set.all %}
-                                                        {% if forloop.counter0 == 0 %}
-                                                            <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                        {% endif %}
-                                                        {% empty %}
-                                                            <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                        {% endfor %}
-                                                    </div>
-                                                    <div class="horiz-card-body">
-                                                        <h4>{{post.title}}</h4>
-                                                        
-                                                        <div class="top-perf-card-body-content">
-                                                            <div class="">
-                                                                <h6 style="text-align: center;">{{post.total_comments}}</h6>
-                                                                <span>Replies</span>
-                                                            </div>
-                                                            <div class="">
-                                                                <h6>{{post.total_likes}}</h6>
-                                                                <span>Likes</span>
-                                                            </div>
-                                                            <div class="">
-                                                                <h6>{% get_hit_count for post %}</h6>
-                                                                <span>Views</span>
-                                                            </div>
+                                {% if not is_guest %}
+
+                                    {% if top_performing_recipes %}
+                                        {% for post in top_performing_recipes %}
+                                            <div class="horiz-card" data-post-id="{{post.id}}">
+                                                <a href="{% url 'viewpost' post.pk %}" class="">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="horiz-card-img-container">
+                                                            {% for i in post.photo_set.all %}
+                                                            {% if forloop.counter0 == 0 %}
+                                                                <img loading="lazy" src="{{ i.image.url }}" alt="{{post.title}}">
+                                                            {% endif %}
+                                                            {% empty %}
+                                                                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}">
+                                                            {% endfor %}
                                                         </div>
-                                                    </div>    
-                                                </div>  
-                                            </a>
+                                                        <div class="horiz-card-body">
+                                                            <h4>{{post.title}}</h4>
+                                                            
+                                                            <div class="top-perf-card-body-content">
+                                                                <div class="">
+                                                                    <h6 style="text-align: center;">{{post.total_comments}}</h6>
+                                                                    <span>Replies</span>
+                                                                </div>
+                                                                <div class="">
+                                                                    <h6>{{post.total_likes}}</h6>
+                                                                    <span>Likes</span>
+                                                                </div>
+                                                                <div class="">
+                                                                    <h6>{% get_hit_count for post %}</h6>
+                                                                    <span>Views</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>    
+                                                    </div>  
+                                                </a>
+                                            </div>
+
+                                            {% if not forloop.last %}
+                                                <hr>
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    {% else %}
+                                        <div class="empty-results">
+                                            No recipes available
                                         </div>
-
-                                        {% if not forloop.last %}
-                                            <hr>
-                                        {% endif %}
-
-                                    {% endfor %}
+                                    {% endif %}
 
                                 {% else %}
                                     <div class="empty-results">
-                                        No recipes available
+                                        Unavailable for guest user
                                     </div>
                                 {% endif %}
                             </div>
@@ -389,542 +424,103 @@
                             <h6>Recipes</h6>  
                             <div class="column-sub-heading">Manage your recipes </div>
 
-                            <div class="dashboard-recipe-tab-btns">
-                                <button class="tablinks" id="defaultOpen" onclick="recipes(event, 'All')">All</button>
-                                <button class="tablinks" onclick="recipes(event, 'Breakfast')">Breakfast</button>
-                                <button class="tablinks" onclick="recipes(event, 'Lunch')">Lunch</button>
-                                <button class="tablinks" onclick="recipes(event, 'Snacks')">Snacks</button>
-                                <button class="tablinks" onclick="recipes(event, 'Dinner')">Dinner</button>
-                                <button class="tablinks" onclick="recipes(event, 'Veg')">Veg</button>
-                                <button class="tablinks" onclick="recipes(event, 'Non-veg')">Non-veg</button>
-                            </div>
-
-                            <div class="dashboard-recipe-container dashboard-recipe-tab-container">
-                                <div id="All" class="tabcontent main-tabcontent">
-                                    <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
-                                        {% if all %}
-                                            {% for post in all %}
-                                                <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
-                                                    <a href="{% url 'viewpost' post.pk %}" class="">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="horiz-card-img-container">
-                                                                {% for i in post.photo_set.all %}
-                                                                {% if forloop.counter0 == 0 %}
-                                                                    <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                                {% endif %}
-                                                                {% empty %}
-                                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                                {% endfor %}
-                                                            </div>
-                                                            <div class="horiz-card-body">
-                                                                <h4>{{post.title}}</h4>
-                                                                <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
-                                                            </div>    
-                                                        </div>  
-                                                        <div class="dashboard-cards-action-btn">
-                                                            <div class="dropdown-center body-detail-dropdown">
-                                                                <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
-                                                                </a>
-                                            
-                                                                <div class="dropdown-menu body-detail-dropdown-content">
-                                                                    <div class="body-detail-dropdown-list">
-                                                                        <div class="dropdown-second-child">
-                                                                            {% if post in user.favourite.all %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% else %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        
-                                                                            {% if user.id == post.author.id %}
-                                                                                <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">edit</span>
-                                                                                    Edit
-                                                                                </a>
-                                                                            
-                                                                                <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">delete</span>
-                                                                                    Delete
-                                                                                </a>
-                                                                                
-                                                                            {% endif %}
-
-                                                                            <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                                                                <span class="material-symbols-rounded share-recipe-icon">dock_to_left</span>
-                                                                                Quick view
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> 
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                                <div class="empty-results dashboard-recipe-tab-empty-results">
-                                                    No recipes available
-                                                </div>
-                                        {% endif %}
-                                    </div>
+                            {% if not is_guest %}
+                                <div class="dashboard-recipe-tab-btns">
+                                    {% for category in types %}
+                                        <button class="tablinks" {% if forloop.first %}id="defaultOpen"{% endif %} onclick="recipes(event, '{{ category }}')"><span class="tab-btns-label">{{ category|title }}</span></button>
+                                    {% endfor %}
                                 </div>
 
-                                <div id="Breakfast" class="tabcontent main-tabcontent">
-                                    <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
-                                        {% if brkfst %}
-                                            {% for post in brkfst %}
-                                                <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
-                                                    <a href="{% url 'viewpost' post.pk %}" class="">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="horiz-card-img-container">
-                                                                {% for i in post.photo_set.all %}
-                                                                {% if forloop.counter0 == 0 %}
-                                                                    <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                                {% endif %}
-                                                                {% empty %}
-                                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                                {% endfor %}
-                                                            </div>
-                                                            <div class="horiz-card-body">
-                                                                <h4>{{post.title}}</h4>
-                                                                <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
-                                                            </div>    
-                                                        </div>  
-                                                        <div class="dashboard-cards-action-btn">
-                                                            <div class="dropdown-center body-detail-dropdown">
-                                                                <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
-                                                                </a>
-                                            
-                                                                <div class="dropdown-menu body-detail-dropdown-content">
-                                                                    <div class="body-detail-dropdown-list">
-                                                                        <div class="dropdown-second-child">
-                                                                            {% if post in user.favourite.all %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% else %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        
-                                                                            {% if user.id == post.author.id %}
-                                                                                <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">edit</span>
-                                                                                    Edit
-                                                                                </a>
-                                                                            
-                                                                                <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">delete</span>
-                                                                                    Delete
-                                                                                </a>
-                                                                                
-                                                                            {% endif %}
+                                <div class="dashboard-recipe-container dashboard-recipe-tab-container">
 
-                                                                            <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                                                                <span class="material-symbols-rounded share-recipe-icon">dock_to_left</span>
-                                                                                Quick view
-                                                                            </a>
+                                    {% for category in types %}
+                                        <div id="{{ category }}" class="tabcontent main-tabcontent">
+                                            <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
+
+                                                {% with posts=category_dict|get_item:category %}
+                                                    {% if posts %}
+                                                        {% for post in posts %}
+                                                            <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
+                                                                <a href="{% url 'viewpost' post.pk %}" class="">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="horiz-card-img-container">
+                                                                            {% for i in post.photo_set.all %}
+                                                                            {% if forloop.counter0 == 0 %}
+                                                                                <img loading="lazy" src="{{ i.image.url }}" alt="{{post.title}}">
+                                                                            {% endif %}
+                                                                            {% empty %}
+                                                                                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}">
+                                                                            {% endfor %}
                                                                         </div>
-                                                                    </div>
-                                                                </div>
+                                                                        <div class="horiz-card-body">
+                                                                            <h4>{{post.title}}</h4>
+                                                                            <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
+                                                                        </div>    
+                                                                    </div>  
+                                                                    <div class="dashboard-cards-action-btn">
+                                                                        <div class="dropdown-center body-detail-dropdown">
+                                                                            <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                                <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
+                                                                            </a>
+                                                        
+                                                                            <div class="dropdown-menu body-detail-dropdown-content">
+                                                                                <div class="body-detail-dropdown-list">
+                                                                                    <div class="dropdown-second-child">
+                                                                                        {% if post in user.favourite.all %}
+                                                                                            <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
+                                                                                                <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
+                                                                                                Favourites
+                                                                                            </a>
+                                                                                        {% else %}
+                                                                                            <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
+                                                                                                <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
+                                                                                                Favourites
+                                                                                            </a>
+                                                                                        {% endif %}
+                                                                                    
+                                                                                        {% if user.id == post.author.id %}
+                                                                                            <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
+                                                                                                <span class="material-symbols-rounded share-recipe-icon">edit</span>
+                                                                                                Edit
+                                                                                            </a>
+                                                                                        
+                                                                                            <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
+                                                                                                <span class="material-symbols-rounded share-recipe-icon">delete</span>
+                                                                                                Delete
+                                                                                            </a>
+                                                                                            
+                                                                                        {% endif %}
+
+                                                                                        <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
+                                                                                            <span class="material-symbols-rounded share-recipe-icon">view_headline</span>
+                                                                                            Quick view
+                                                                                        </a>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> 
+                                                                </a>
                                                             </div>
-                                                        </div> 
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <div class="empty-results dashboard-recipe-tab-empty-results">
-                                                No breakfast recipes available
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <div class="empty-results dashboard-recipe-tab-empty-results">
+                                                            No recipes available !
+                                                        </div>
+                                                    {% endif %}
+                                                {% endwith %}
                                             </div>
-                                        {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            
+                            {% else %}
+                                <div class="dashboard-recipe-container dashboard-recipe-tab-container">
+                                    <div class="empty-results">
+                                        Unavailable for guest user
                                     </div>
                                 </div>
-
-                                <div id="Lunch" class="tabcontent main-tabcontent">
-                                    <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
-                                        {% if lnch %}
-                                            {% for post in lnch %}
-                                                <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
-                                                    <a href="{% url 'viewpost' post.pk %}" class="">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="horiz-card-img-container">
-                                                                {% for i in post.photo_set.all %}
-                                                                {% if forloop.counter0 == 0 %}
-                                                                    <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                                {% endif %}
-                                                                {% empty %}
-                                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                                {% endfor %}
-                                                            </div>
-                                                            <div class="horiz-card-body">
-                                                                <h4>{{post.title}}</h4>
-                                                                <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
-                                                            </div>    
-                                                        </div>  
-                                                        <div class="dashboard-cards-action-btn">
-                                                            <div class="dropdown-center body-detail-dropdown">
-                                                                <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
-                                                                </a>
-                                            
-                                                                <div class="dropdown-menu body-detail-dropdown-content">
-                                                                    <div class="body-detail-dropdown-list">
-                                                                        <div class="dropdown-second-child">
-                                                                            {% if post in user.favourite.all %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% else %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        
-                                                                            {% if user.id == post.author.id %}
-                                                                                <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">edit</span>
-                                                                                    Edit
-                                                                                </a>
-                                                                            
-                                                                                <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">delete</span>
-                                                                                    Delete
-                                                                                </a>
-                                                                                
-                                                                            {% endif %}
-
-                                                                            <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                                                                <span class="material-symbols-rounded share-recipe-icon">dock_to_left</span>
-                                                                                Quick view
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> 
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <div class="empty-results dashboard-recipe-tab-empty-results">
-                                                No lunch recipes available
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div id="Snacks" class="tabcontent main-tabcontent">
-                                    <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
-                                        {% if snack %}
-                                            {% for post in snack %}
-                                                <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
-                                                    <a href="{% url 'viewpost' post.pk %}" class="">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="horiz-card-img-container">
-                                                                {% for i in post.photo_set.all %}
-                                                                {% if forloop.counter0 == 0 %}
-                                                                    <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                                {% endif %}
-                                                                {% empty %}
-                                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                                {% endfor %}
-                                                            </div>
-                                                            <div class="horiz-card-body">
-                                                                <h4>{{post.title}}</h4>
-                                                                <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
-                                                            </div>    
-                                                        </div>  
-                                                        <div class="dashboard-cards-action-btn">
-                                                            <div class="dropdown-center body-detail-dropdown">
-                                                                <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
-                                                                </a>
-                                            
-                                                                <div class="dropdown-menu body-detail-dropdown-content">
-                                                                    <div class="body-detail-dropdown-list">
-                                                                        <div class="dropdown-second-child">
-                                                                            {% if post in user.favourite.all %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% else %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        
-                                                                            {% if user.id == post.author.id %}
-                                                                                <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">edit</span>
-                                                                                    Edit
-                                                                                </a>
-                                                                            
-                                                                                <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">delete</span>
-                                                                                    Delete
-                                                                                </a>
-                                                                                
-                                                                            {% endif %}
-
-                                                                            <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                                                                <span class="material-symbols-rounded share-recipe-icon">dock_to_left</span>
-                                                                                Quick view
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> 
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <div class="empty-results dashboard-recipe-tab-empty-results">
-                                                No snacks recipes available
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                <div id="Dinner" class="tabcontent main-tabcontent">
-                                    <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
-                                        {% if dnr %}
-                                            {% for post in dnr %}
-                                                <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
-                                                    <a href="{% url 'viewpost' post.pk %}" class="">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="horiz-card-img-container">
-                                                                {% for i in post.photo_set.all %}
-                                                                {% if forloop.counter0 == 0 %}
-                                                                    <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                                {% endif %}
-                                                                {% empty %}
-                                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                                {% endfor %}
-                                                            </div>
-                                                            <div class="horiz-card-body">
-                                                                <h4>{{post.title}}</h4>
-                                                                <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
-                                                            </div>    
-                                                        </div>  
-                                                        <div class="dashboard-cards-action-btn">
-                                                            <div class="dropdown-center body-detail-dropdown">
-                                                                <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
-                                                                </a>
-                                            
-                                                                <div class="dropdown-menu body-detail-dropdown-content">
-                                                                    <div class="body-detail-dropdown-list">
-                                                                        <div class="dropdown-second-child">
-                                                                            {% if post in user.favourite.all %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% else %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        
-                                                                            {% if user.id == post.author.id %}
-                                                                                <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">edit</span>
-                                                                                    Edit
-                                                                                </a>
-                                                                            
-                                                                                <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">delete</span>
-                                                                                    Delete
-                                                                                </a>
-                                                                                
-                                                                            {% endif %}
-
-                                                                            <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                                                                <span class="material-symbols-rounded share-recipe-icon">dock_to_left</span>
-                                                                                Quick view
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> 
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <div class="empty-results dashboard-recipe-tab-empty-results">
-                                                No dinner recipes available
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                <div id="Veg" class="tabcontent main-tabcontent">
-                                    <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
-                                        {% if veg_recipe %}
-                                            {% for post in veg_recipe %}
-                                                <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
-                                                    <a href="{% url 'viewpost' post.pk %}" class="">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="horiz-card-img-container">
-                                                                {% for i in post.photo_set.all %}
-                                                                {% if forloop.counter0 == 0 %}
-                                                                    <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                                {% endif %}
-                                                                {% empty %}
-                                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                                {% endfor %}
-                                                            </div>
-                                                            <div class="horiz-card-body">
-                                                                <h4>{{post.title}}</h4>
-                                                                <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
-                                                            </div>    
-                                                        </div>  
-                                                        <div class="dashboard-cards-action-btn">
-                                                            <div class="dropdown-center body-detail-dropdown">
-                                                                <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
-                                                                </a>
-                                            
-                                                                <div class="dropdown-menu body-detail-dropdown-content">
-                                                                    <div class="body-detail-dropdown-list">
-                                                                        <div class="dropdown-second-child">
-                                                                            {% if post in user.favourite.all %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% else %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        
-                                                                            {% if user.id == post.author.id %}
-                                                                                <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">edit</span>
-                                                                                    Edit
-                                                                                </a>
-                                                                            
-                                                                                <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">delete</span>
-                                                                                    Delete
-                                                                                </a>
-                                                                                
-                                                                            {% endif %}
-
-                                                                            <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                                                                <span class="material-symbols-rounded share-recipe-icon">dock_to_left</span>
-                                                                                Quick view
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> 
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <div class="empty-results dashboard-recipe-tab-empty-results">
-                                                No veg recipes available
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                                <div id="Non-veg" class="tabcontent main-tabcontent">
-                                    <div class="dashboard-recipe-data dasboard-recipe-tab d-flex flex-wrap">
-                                        {% if non_veg %}
-                                            {% for post in non_veg %}
-                                                <div class="horiz-card dashboard-recipe-cards" data-post-id="{{ post.pk }}">
-                                                    <a href="{% url 'viewpost' post.pk %}" class="">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="horiz-card-img-container">
-                                                                {% for i in post.photo_set.all %}
-                                                                {% if forloop.counter0 == 0 %}
-                                                                    <img src="{{ i.image.url }}" alt="{{post.title}}">
-                                                                {% endif %}
-                                                                {% empty %}
-                                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}">
-                                                                {% endfor %}
-                                                            </div>
-                                                            <div class="horiz-card-body">
-                                                                <h4>{{post.title}}</h4>
-                                                                <p class="horiz-card-body-para">{{post.get_date}} &#11825; {% get_hit_count for post %} views</p>
-                                                            </div>    
-                                                        </div>  
-                                                        <div class="dashboard-cards-action-btn">
-                                                            <div class="dropdown-center body-detail-dropdown">
-                                                                <a class="more-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="material-symbols-rounded more-horiz-icon">more_vert</span>
-                                                                </a>
-                                            
-                                                                <div class="dropdown-menu body-detail-dropdown-content">
-                                                                    <div class="body-detail-dropdown-list">
-                                                                        <div class="dropdown-second-child">
-                                                                            {% if post in user.favourite.all %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% else %}
-                                                                                <a class="dropdown-links favourite-link" data-post-id="{{ post.id }}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon favourite-icon">favorite</span>
-                                                                                    Favourites
-                                                                                </a>
-                                                                            {% endif %}
-                                                                        
-                                                                            {% if user.id == post.author.id %}
-                                                                                <a class="dropdown-links" href="{% url 'updaterecipe' post.title post.pk %}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">edit</span>
-                                                                                    Edit
-                                                                                </a>
-                                                                            
-                                                                                <a class="dropdown-links" data-bs-toggle="modal" data-bs-target="#deleteModal{{post.pk}}">
-                                                                                    <span class="material-symbols-rounded share-recipe-icon">delete</span>
-                                                                                    Delete
-                                                                                </a>
-                                                                                
-                                                                            {% endif %}
-
-                                                                            <a class="dropdown-links" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                                                                <span class="material-symbols-rounded share-recipe-icon">dock_to_left</span>
-                                                                                Quick view
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div> 
-                                                    </a>
-                                                </div>
-                                            {% endfor %}
-                                        {% else %}
-                                            <div class="empty-results dashboard-recipe-tab-empty-results">
-                                                No non-veg recipes available
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -1072,68 +668,49 @@ document.addEventListener('hidden.bs.modal', function (event) {
 </script>
 {% endif %}
 
-{# Delete Modal #}
-{% for post in all %} 
-<div class="modal fade Modal-delete" id="deleteModal{{post.pk}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content logoutmodal deletemodal">
-            <div class="modal-body">
-                <div class="modal-body-header">
-                    <h2>Delete recipe? </h2>
-                    
-                    <p class="del-te">Are you sure you want to delete <b>'{{post.title}}'</b>?</p>
-                    
-                    <div class="callout callout-warning">
-                        <p><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</p>
-                    </div>
-                </div>
+<script>
+    function recipes(evt, tabName) {
+        document.querySelectorAll('.main-tabcontent').forEach(e => e.style.display = 'none');
+        document.querySelectorAll('.tablinks').forEach(e => e.classList.remove('active'));
 
-                <div class="modal-body-footer delete-modal-footer">
-                    <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger bg-danger text-white delete-post-btn-modal" data-post-id="{{ post.pk }}">Delete</button>
+        const targetTab = document.getElementById(tabName);
+        if (targetTab) {
+            targetTab.style.display = 'block';
+            evt.currentTarget.classList.add('active');
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("defaultOpen").click();
+    });
+</script>
+
+{% endblock %}
+
+{% block modals %}
+    {# Delete Modal #}
+    {% for post in all_recipes %} 
+    <div class="modal fade Modal-delete" id="deleteModal{{post.pk}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content logoutmodal deletemodal">
+                <div class="modal-body">
+                    <div class="modal-body-header">
+                        <h2>Delete recipe? </h2>
+                        
+                        <p class="del-te">Are you sure you want to delete <b>'{{post.title}}'</b>?</p>
+                        
+                        <div class="callout callout-warning">
+                            <p><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-body-footer delete-modal-footer">
+                        <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger bg-danger text-white delete-post-btn-modal" data-post-id="{{ post.pk }}">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endfor %}
-
-<script>
-    function recipes(evt, type) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        
-        for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById(type).style.display = "block";
-        evt.currentTarget.className += " active";
-  }
-  document.getElementById("defaultOpen").click();
-
-  function nonveg(cat, subc) {
-    var i,nonvegcontent, nonvegtab;
-
-    nonvegcontent = document.getElementsByClassName("nonvegcontent");
-    for (i = 0; i < nonvegcontent.length; i++) {
-      nonvegcontent[i].style.display = "none";
-    }    
-
-    nonvegtab = document.getElementsByClassName("nonvegtab");
-    for (i = 0; i < nonvegtab.length; i++) {
-      nonvegtab[i].className = nonvegtab[i].className.replace(" active", "");
-    }
-
-    document.getElementById(subc).style.display = "block";
-    cat.currentTarget.className += " active";
-  }
-
-  document.getElementById("nonvegopen")
-
-</script>
-
+    {% endfor %}
 {% endblock %}

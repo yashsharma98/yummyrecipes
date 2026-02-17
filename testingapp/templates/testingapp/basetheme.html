@@ -14,7 +14,7 @@
     <title>Base theme</title>
 </head>
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated or is_guest %}
 
     {% if user.userprofile.theme == 'Dark theme' or user.userprofile.theme == 'default_dark_theme' or user.userprofile.theme == 'dark_theme1' %}
         <style>
@@ -29,18 +29,9 @@
                 background: #B2B2B2;
             }
         </style>
-
-    {% else %}
-        <style>
-            .accordion-body:not(.all-recipes-cards){
-            background: var(--neutral_secondary);
-            }
-        </style>
-            
     {% endif %}
 
-    {% if request.path == generate_recipe %}
-
+    {% if request.path == generate_recipe and user.userprofile.theme == 'default_dark_theme' or request.path == generate_recipe and guest_user.theme == 'default_dark_theme' %}
         <style>
 
             .navrail-icons-active{
@@ -70,37 +61,74 @@
                 color: #0d3b66;
             }
 
-            body,.navbar,.primary-wrapper,.dynamic-recipes h1 {
-                background-color: #74EBD5;
-                background-image: linear-gradient(90deg, #FCE4EC 0%, #FFF8E1 25%, #E1F5FE 50%, #E8F5E9 75%, #F3E5F5 100%);
+            body,.navbar,.primary-wrapper,.dynamic-recipes h1,.generate-recipe-form-container {
+                background-color: #1A1A1A; 
+                background-image: linear-gradient(90deg, #1E0101 0%, #1E011E 25%, #01041E 50%, #011E01 75%, #1A1A1A 100%); 
                 background-size: 200% 100%;
-                animation: gradientShift 10s linear infinite;
-            }
-
-            @keyframes gradientShift {
-                0% {
-                    background-position: 0% 50%;
-                }
-                50% {
-                    background-position: 100% 50%;
-                }
-                100% {
-                    background-position: 0% 50%;
-                }
-            }
-
-            .generate-recipe-form input,.generate-recipe-form input:focus {
-                background: #FCE4EC;
             }
 
             .navrail,.logout-wrapper {
                 background: transparent;
             }
             
+            .generated-recipe-content table,.generate-recipe-form{
+                background: rgba(30, 30, 30, 1);
+            }
+            
         </style>
 
-    {% else %}
+    {% elif request.path == generate_recipe %}
+        <style>
 
+            .navrail-icons-active{
+                background-color: #74EBD5;
+                background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);
+                /* color: #0d3b66; */
+            }
+
+            .generate-recipe-link:hover .navrail-icons{
+                background-color: #74EBD5;
+                background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);
+                font-variation-settings:
+                'FILL' 1,
+                'wght' 700,
+                'GRAD' 0,
+                'opsz' 48
+            }
+
+            .generate-recipe-link:hover{
+                background-color: #74EBD5;
+                background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);
+            }
+
+            .offcanvas-body-links li:nth-child(7) a.active {
+                background-color: #74EBD5;
+                background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);
+                color: #0d3b66;
+            }
+
+            body,.navbar,.primary-wrapper,.dynamic-recipes h1,.generate-recipe-form-container {
+                background-color: #74EBD5;
+                background-image: linear-gradient(270deg, #FCE4EC 0%, #FFF8E1 25%, #E1F5FE 50%, #E8F5E9 75%, #F3E5F5 100%);
+                background-size: 200% 100%;
+                /* background-attachment: fixed; */
+            }
+
+            .navrail,.logout-wrapper {
+                background: transparent;
+            }
+
+            .generated-recipe-content table{
+                background: #fafafaed;
+            }
+
+            .generate-recipe-form{
+                background: rgb(243, 240, 240);
+            }
+            
+        </style>
+    
+    {% else %}
         <style>
             .generate-recipe-link:hover .navrail-icons{
                 background-color: #74EBD5;
@@ -117,35 +145,18 @@
                 background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%);
             }
         </style>
-
     {% endif %}
 
 {% else %}
-    <style>
-        body,.navbar,.navrail,.primary-wrapper,.dynamic-recipes h1,.explore-tab,.tabcontent h5{
-            background: #F0ECE3;
-        }
 
-        .navbar,.navrail{
-            background: transparent;
-            -webkit-backdrop-filter: blur(40px);
-            backdrop-filter: blur(40px);
-        }
-    </style>
-    
-
-    {% if request.path == landingpg %}
-    <style>
-        body,.navbar,.navrail,.primary-wrapper,.dynamic-recipes h1,.explore-tab,.tabcontent h5{
-            background: transparent;
-        }
-
-        .navbar,.navrail{
-            background: transparent;
-            -webkit-backdrop-filter: blur(40px);
-            backdrop-filter: blur(40px);
-        }
-    </style>
+    {% if request.path == landingpg or request.path == login or request.path == signup %}
+        <style>
+            .navbar,.navrail{
+                background: none;
+                -webkit-backdrop-filter: blur(30px);
+                backdrop-filter: blur(30px);
+            }
+        </style>
     {% endif %}
 
 {% endif %}
@@ -167,6 +178,31 @@
 
 {% endif %}
 
+{# Converting hex to RGBA for transparency #}
+<script>
+    function hexToRgba(hex, alpha = 0.4) {
+    hex = hex.trim().replace(/^#/, '');
+
+    if (hex.length === 3) {
+        hex = hex.split('').map(ch => ch + ch).join('');
+    }
+
+    if (hex.length !== 6) {
+        return `rgba(255,255,255,${alpha})`;
+    }
+
+    let r = parseInt(hex.substring(0, 2), 16);
+    let g = parseInt(hex.substring(2, 4), 16);
+    let b = parseInt(hex.substring(4, 6), 16);
+
+    if (isNaN(r) || isNaN(g) || isNaN(b)) {
+        return `rgba(255,255,255,${alpha})`;
+    }
+
+    return `rgba(${r},${g},${b},${alpha})`;
+}
+</script>
+
 {# primary background color #}
 <script>
        $(document).ready(function() {
@@ -181,18 +217,26 @@
                 var dcpprimaryColor = $('#primary_color').val();
                 var dcpneutralPrimary = $('#neutral_primary').val();
                 var dcpneutralSecondary = $('#neutral_secondary').val();
+                var bgscrollbar = '#000000';
+
+                var primaryRgba_2 = hexToRgba(dcpprimaryColor, 0.8);
+                var neutralPrimaryRgba_2 = hexToRgba(dcpneutralPrimary, 0.4);
+                var neutralSecondaryRgba_2 = hexToRgba(dcpneutralSecondary, 0.95);
 
                 var style = `
                     /* Primary Color */
-                    #nb-rightimg-dropmenu, #offcanvasExample, #logoutcontainer,
+                    .nb-rightimg-dropmenu, #logoutcontainer,
                     .logoutmodal, .footerbtn, .logoutmodal .modal-body a, .alert-notification, .notification-footer button,
-                    #dropmenudetailslinks, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
-                    #reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,.nav-tabs button,.autocomplete-items div::before,
-                    .footer-waveline, .nav-tabs .tab.active {
+                    #reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,
+                    .autocomplete-items div::before,.footer-waveline, .nav-tabs .tab.active {
                         background-color: ${dcpprimaryColor};
                     }
 
-                    .logoutmodal .modal-body a, .footerbtn, .filter-form select, .filter-form input, #nav-tab {
+                    .nav-tabs button, .navbar-guest-user-links a{
+                        background: color-mix(in oklab, ${dcpprimaryColor} 65%, #ffffff 35%);
+                    }
+
+                    .footerbtn, .filter-form select, .filter-form input, #nav-tab {
                         border-color: ${dcpprimaryColor};
                     }
 
@@ -204,15 +248,40 @@
                         fill: ${dcpneutralPrimary};
                     }
 
-                    #nav-tabContent, .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge {
+                    .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge,
+                    .form-submit-btns button:not(.dark-theme-btns button) {
                         background-color: ${dcpneutralSecondary};
                     }
 
                     .navbar-circle-svg-path {
                         fill: ${dcpneutralSecondary};
                     }
+                    
+                    *::-webkit-scrollbar {
+                        width: 8px;
+                    }
+
+                    *::-webkit-scrollbar-thumb {
+                        background: color-mix(in srgb, ${dcpneutralPrimary} 60%, ${bgscrollbar} 40%);
+                    }
+
+                    .offcanvas-body-links li:nth-child(4n+1) .offcanvas-link-icons:not(.body-links-second li:nth-child(4n+1) .offcanvas-link-icons,.body-links-third li:nth-child(4n+1) .offcanvas-link-icons) {
+                        background-color: ${primaryRgba_2};
+                    }
+
+                    .offcanvas-body-links li:nth-child(4n+3) .offcanvas-link-icons {
+                        background-color: ${neutralPrimaryRgba_2};
+                    }
+
+                    .offcanvas-body-links li:nth-child(4n+4) .offcanvas-link-icons {
+                        background-color: ${neutralSecondaryRgba_2};
+                    }
+
+                    .body-links-third li:nth-child(4n+1) .offcanvas-link-icons{
+                        background-color: ${neutralPrimaryRgba_2};
+                    }
                 `;
-                $('head').append(`<style id="dynamic-theme-styles">${style}</style>`);
+                $('head').append(`<style id="dynamic-theme-styles">${style}</>`);
             },
                 error: function(xhr, status, error) {
                     
@@ -236,17 +305,25 @@
                     var dcpsecondaryColor = $('#secondary_color').val();
                     var dcpactivelinkColor = $('#active_link_color').val();
                     var dcphoverColor = $('#hover_color').val();
-                    
+
                     var style = `
                         /* Secondary Color */
-                        #body-color, #navbar, #navrail, #navoffcanvasbody, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
-                        #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2, .modal-body, .modal-body-footer,.logoutmodal .modal-body, .logoutmodal .modal-body-footer, .notification-offcanvas, .searchmodal, .pages-options-autocomplete, 
-                        .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items {
+                        #body-color, .navbar, #navrail, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
+                        #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2{
                             background-color: ${dcpsecondaryColor};
                         }
 
                         .logoutmodal .modal-body a {
                             border-color: ${dcpsecondaryColor};
+                        }
+
+                        .offcanvas,.logoutmodal,.modal-body,.logoutmodal .modal-body,.pages-options-autocomplete,
+                        .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items{
+                            background: color-mix(in oklab, ${dcpsecondaryColor} 70%, #aeaeae 30%);
+                        }
+
+                        .appearance-tab-content{
+                            background: color-mix(in oklab, ${dcpsecondaryColor} 60%, #ffffff 40%);
                         }
 
                         /* Active Link Color */
@@ -256,7 +333,7 @@
                             background-color: ${dcpactivelinkColor};
                         }
 
-                        .nav_link_btn::before,.year_recipe_badge, .nav-tabs .tab.active {
+                        .nav_link_btn::before,.year_recipe_badge {
                             background-color: ${dcpactivelinkColor};
                         }
 
@@ -264,12 +341,21 @@
                         .offcanvas-close-btn:hover,.navbar .navbar-offcanvas-btn:hover,.logout-container .logout-btn:hover,.navrail-links:hover .navrail-icons,.navbar-offcanvas-btn:hover,.offcanvas-body-list ul li:hover,
                         .dropmenu-details-wrapper p:hover:not(.det-wrap-1 p),.body-detail-dropdown-list .dropdown-first-child .dropdown-links:hover,.body-detail-dropdown-list .dropdown-links:hover,.logout-link.clicked,.logout-link:focus,
                         .logout-link::after,.top-nb-dropmenu-content a:hover,.logout-link:active,.dropmenu-details-links a:hover,.rightside-searchbar h5:hover:not(.weather-widget),.filter-form-button button:hover,
-                        .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover {
+                        .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover,
+                        .nav .nav-right-icons-slider,.nav-right-img-dropmenu-slider, .nav-sm-icon-slider, .form-submit-btns button:not(.dark-theme-btns button):hover, .navbar-guest-user-links a:hover {
                             background-color: ${dcphoverColor};
                         }
 
                         .top-nb-dropmenu-content a:hover, .filter-form select:hover, .filter-form input:hover{
                             border: 1.5px solid ${dcphoverColor};
+                        }
+
+                        .primary-wrapper::-webkit-scrollbar-thumb {
+                            border: 3px solid ${dcpsecondaryColor};
+                        }
+
+                        .navbar::before{
+                            background: ${dcpsecondaryColor};
                         }
                     `;
                     $('head').append(`<style id="dynamic-theme-styles">${style}</style>`);
@@ -295,12 +381,15 @@
                 success: function(response) {
                     var dcptertiaryColor = $('#tertiary_color').val();
 
+                    var tertiaryRgba = hexToRgba(dcptertiaryColor, 0.2);
+                    var tertiaryRgba_2 = hexToRgba(dcptertiaryColor, 0.3);
+
                     var style = `
                         /* Tertiary Color */
                         #offcanvaslisttext1, #offcanvaslisttext2, #offcanvaslisttext3, #offcanvaslisttext4, #offcanvaslisttext5, #offcanvaslisttext6, #offcanvaslisttext7, #offcanvaslisttext8, #offcanvaslisttext9, #offcanvaslisttext10,
-                        #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
-                        #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
-                        #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
+                        #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslisttext13, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
+                        #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #offcanvaslinkicons12, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
+                        #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, .form-submit-btns button:not(.dark-theme-btns button),
                         #nb-dropmenu-content, #dropmenu-details-wrapper1, #dropmenu-details-wrapper2, #back-btn-icon, .themetext, #reset-colors, #reset-colors2, #externalButton, #activelink_color_heading, #sidebar-subheading,
                         #navrailicon1, #navrailicon2, #navrailicon3, #navrailicon4, #navrailicon5, #navrailicon6, #navrailicon7, #navrailicon8, #navrailicon9, #navrailicon10,
                         #navrailicon11, #navrailicon12, #navrailicon13, #navrailicon14, #navrailtext1, #navrailtext2, #navrailtext3, #navrailtext4, #navrailtext5, #navrailtext6,
@@ -311,14 +400,46 @@
                         .alert-notification, .notification-footer button, .notification-title, .no-notifications, #idquery, .autocomplete-items .autocomplete-option,.top-nb-dropmenu-content a,
                         .weathermodal .modal-body form input::placeholder, .search-modal-container .search-icon button, .md-top-closeicon, .autocomplete-pages-heading, .logout-container .logout-btn,
                         .additional-option, .searchmodal .modal-header h5, .search-modal-input, .notification-badge, .modal-search form input::placeholder, .filter-form select, .filter-form input,
-                        .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,
+                        .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,.theme-builder-forms h4,
                         .ai-theme-form-content input, .gen-theme-warning-text, .filter-form input::placeholder, .filter-form-button button,.nav-tabs button,.footer-container .column ul li a:not(.landingpg-footer .column ul li a),
-                        .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,.logoutmodal .modal-body a:hover {
+                        .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,
+                        .logoutmodal .modal-body a:hover,.ai-recipe-check-response,.navbar-guest-user-links a, .Modal-search.show::before {
                             color: ${dcptertiaryColor};
                         }
 
                         .top-nb-dropmenu-content a, #ai_theme_label, .modal-header, .footerbtn {
                             border-color: ${dcptertiaryColor};
+                        }
+
+                        .offcanvas-body-links li:nth-child(4n+2) .offcanvas-link-icons {
+                            background-color: ${tertiaryRgba_2};
+                        }
+
+                        .body-links-second li:nth-child(4n+1) .offcanvas-link-icons{
+                            background-color: ${tertiaryRgba_2};
+                        }
+
+                        .comment-input textarea,
+                        .ai-theme-form-content input,
+                        .feedback-offcanvas form input,
+                        .feedback-offcanvas form textarea,
+                        .clipborardmodal .modal-body textarea,
+                        .weathermodal .modal-body form input,
+                        .search-modal-container{
+                            background: ${tertiaryRgba};
+                        }
+
+                        .comment-input textarea:focus,
+                        .ai-theme-form-content input:focus,
+                        .ai-theme-form-content input:active,
+                        .feedback-offcanvas form input:focus,
+                        .feedback-offcanvas form textarea:focus,
+                        .clipborardmodal .modal-body textarea:focus,
+                        .clipborardmodal .modal-body textarea:active,
+                        .weathermodal .modal-body form input:is(:hover, :focus, :active),
+                        .modal-search form input:is(:hover, :focus, :active),
+                        .search-modal-container:has(input:focus){
+                            background: ${tertiaryRgba_2};
                         }
                 `;
                     $('head').append(`<style id="dynamic-theme-styles">${style}</style>`);
@@ -329,6 +450,172 @@
             });
         });
     });
+</script>
+
+<!-- Transparent/frosted theme -->
+<script>
+    function applyFrostedTheme() {
+    $.ajax({
+        url: '/get_transparent_rgba_colors/',
+        method: 'GET',
+        success: function (colors) {
+            const style = `
+                :root {
+                    --primary_rgba: ${colors.primary_rgba};
+                    --secondary_rgba: ${colors.secondary_rgba};
+                    --tertiary_rgba: ${colors.tertiary_rgba};
+                    --active_link_rgba: ${colors.active_link_rgba};
+                    --hover_rgba: ${colors.hover_rgba};
+                    --neutral_primary_rgba: ${colors.neutral_primary_rgba};
+                    --neutral_secondary_rgba: ${colors.neutral_secondary_rgba};
+
+                    --primary_rgba_2: ${colors.primary_rgba_2};
+                    --tertiary_rgba_2: ${colors.tertiary_rgba_2};
+                    --neutral_primary_rgba_2: ${colors.neutral_primary_rgba_2};
+                    --neutral_secondary_rgba_2: ${colors.neutral_secondary_rgba_2};
+                }
+
+                .navbar::before{
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    backdrop-filter: blur(30px);
+                    -webkit-backdrop-filter: blur(30px);
+                    background: var(--secondary_rgba);
+                    mask-image:
+                        linear-gradient(to bottom, rgba(0,0,0,1) 90%, rgba(0,0,0,0)),
+                        linear-gradient(to right, rgba(0,0,0,1) 95%, rgba(0,0,0,0));
+                    mask-composite: intersect;
+                    -webkit-mask-repeat: no-repeat;
+                    -webkit-mask-size: 100% 100%;
+                    mask-repeat: no-repeat;
+                    mask-size: 100% 100%;
+                }
+
+                .nb-rightimg-dropmenu,.body-detail-dropdown-content,.alert-notification, 
+                .notification-footer button{
+                background: var(--primary_rgba);
+                backdrop-filter: blur(30px);
+                -webkit-backdrop-filter: blur(30px);
+                }
+
+                .top-nb-dropmenu-content a {
+                    border: 1px solid var(--tertiary_rgba);
+                }
+
+                .offcanvas,.logoutmodal,.logoutmodal .modal-body:not(.modal-body-footer){
+                    background: var(--primary_rgba);
+                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+                    backdrop-filter: blur(30px);
+                    -webkit-backdrop-filter: blur(30px);
+                }
+
+                .pages-options-autocomplete,
+                .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items,.user-detail-modal .modal-footer,
+                .searched-query-description-block{
+                    background: inherit;
+                }
+
+                .dropmenu-details-wrapper{
+                    background: var(--primary_rgba);
+                }
+
+                .dropmenu-details-links{
+                    background: inherit;
+                    border: 0;
+                }
+                
+                #color-preview-form4,.navrail-icons-active,.explore-tab button.active,.explore-tab button.active:hover.share-sheet-links a,.explore-tab button.clicked,.timeline-tab-1 button.active,.timeline-tab-1 button.clicked,
+                #form-sub-btn,.dashboard-card-body a:is(:hover, :focus),.dropmenu-details-wrapper .child-active,.more-dropdown-btn.show,.upro-second-row input::file-selector-button,.nav_link_btn::before,
+                .accordion-button:not(.collapsed),.offcanvas-body-links li a.active,.more-dropdown-btn[aria-expanded="true"] .more-horiz-icon,.search-modal-open .sm-right-searchbar,.accordion .accordion-active,
+                #listenButton.listenButton-button,.search-modal-open .active-modal-btn-bgcolor,.search-modal-open .active-modal-btn-bgcolor-secondary,.top-offcanvas-open .active-offcanvas-btn-bgcolor,.dashboard-recipe-tab-btns button.active:hover,
+                .top-nb-dropmenu-content .child-active,.offcanvas-comparing-img-item,.weather-modal-open .location-icon-container,.weather-modal-open .sm-weather-container,.preference-option-active,.connections-follower-following-tabs button.active,
+                .explore-tab .nav-link.active button,.connections-follower-following-tabs button.clicked,.connections-follower-following-tabs button.active:hover,.recipe-content-actions button:nth-child(5).show,
+                .tab-grid-container .columns.active,.dashboard-recipe-tab-btns button.active,.dashboard-recipe-tab-btns button.clicked,.share-recipe-modal .modal-body .nav-tabs button.active,
+                .network-history-modal .modal-body button[aria-expanded="true"],.nav-tabs .tab.active,.timeline-tab-1 button.active:hover,.generate_recipe_form_btn.active{
+                    background: var(--active_link_rgba);
+                }
+
+                .timeline-tab-1 .dropdown-btn.show,.timeline-tab-1 .dropdown-btn.show:hover,.timeline-tab-1 .dropdown-btn.active,.child-1 .form-input-switch input[type="checkbox"][role="switch"]:checked::before{
+                    background: var(--active_link_rgba);
+                }
+
+                .offcanvas-close-btn:hover,.navbar .navbar-offcanvas-btn:hover,.logout-container .logout-btn:hover,.navrail-links:hover .navrail-icons,.navbar-offcanvas-btn:hover,.offcanvas-body-list ul li:hover,
+                .form-submit-btns button:not(.dark-theme-btns button):hover, .navbar-guest-user-links a:hover,.reset-color-btn button:hover,.quick-view:hover:not(.popular-recipe-qv),.scroll-btn:hover,.footer-area:hover,.explore-tab button:hover,
+                .timeline-tab-1 button:hover,.logoutmodal .modal-body-footer a:hover,.comment-input button:hover,.rightside-searchbar .weather-placeholder:hover,
+                .logoutmodal .modal-body-footer .footerbtn:hover,.back-btn:hover,.sidebar-cards-qv:hover,#form-sub-btn:hover,#form-clear-btn:hover,.single-recipe-delete .delete-link a:hover,
+                .dcp-forms button:hover,.nav-right-img-dropmenu-slider,.body-detail-dropdown-list .dropdown-first-child .dropdown-links:hover,.body-detail-dropdown-list .dropdown-links:hover,.more-horiz-icon:hover,.logout-link.clicked,.logout-link:focus,
+                .logout-link:active,.deletemodal .modal-body-footer .footerbtn:hover,.accordion-button:hover,.timeline-tab-1 .dropdown-btn:hover,.button-container button:hover,.dropmenu-details-links a:hover,
+                .static-info-cards::after,.recap-card-scrollspy a.active:hover,.recap-card-scrollspy a:hover,.nav .nav-right-icons-slider,.img-del-btn .image-field .image-input:hover,
+                .img-input-btn:hover,.grid-container .columns:nth-child(6) .column-content button:hover,.top-nb-dropmenu-content a:hover,.nav-tabs button:hover,
+                .autocomplete-items div:hover,.autocomplete-active,.popular-recipe-qv:hover,.popular-recipe-card a:hover,
+                .logout-link::after,.sidebar-cards::after,.recipe-cards::after,.bottom-links a::after,.bottom-links button::after,.connections-follower-following-tabs button:hover,
+                .form-btns button::after,.dashboard-recipe-cards::after,.img-remove-button:hover,.notification-footer button:hover,.share-sheet-links a:hover,
+                .additional-option:hover,.compare-recipes-form-container form button:hover,.recipe-content-actions a:hover,.recipe-content-actions a:nth-child(3):hover,.recipe-content-actions a:last-child:hover,.offcanvas-notification .offcanvas-noti-icon:hover,
+                .reciepe-details-follow-user-form button:hover,.recipe-author-data form button:hover,.share-recipe-modal .share-recipe-footerbtn:hover,
+                .tab-grid-container .columns:hover:not(.tab-grid-container .columns.active),.dashboard-activity-tab .recipe-count:hover,.dashboard-recipe-tab-btns button:hover,.dasboard-recipe-tab .card:hover,
+                .profile-card-segmented-button div:last-child button:hover,.filter-form-button button:hover,.feedback-wrapper button:hover,.updaterecipe-buttons-container label:hover,
+                .recipedetail-copy-btn button:hover,.nav-sm-icon-slider,.network-history-modal .modal-body-header button:hover{
+                    background: var(--hover_rgba);
+                }
+
+                .offcanvas-body-links li:nth-child(4n+1) .offcanvas-link-icons {
+                    background-color: var(--primary_rgba_2);
+                }
+
+                .offcanvas-body-links li:nth-child(4n+2) .offcanvas-link-icons {
+                    background-color: var(--tertiary_rgba_2);
+                }
+
+                .offcanvas-body-links li:nth-child(4n+3) .offcanvas-link-icons {
+                    background-color: var(--neutral_primary_rgba_2);
+                }
+
+                .offcanvas-body-links li:nth-child(4n+4) .offcanvas-link-icons {
+                    background-color: var(--neutral_secondary_rgba_2);
+                }
+
+                .body-links-second li:nth-child(4n+1) .offcanvas-link-icons{
+                    background-color: var(--tertiary_rgba_2);
+                }
+
+                .body-links-third li:nth-child(4n+1) .offcanvas-link-icons{
+                    background-color: var(--neutral_primary_rgba_2);
+                }
+
+                .comment-input textarea,
+                .ai-theme-form-content input,
+                .feedback-offcanvas form input,
+                .feedback-offcanvas form textarea,
+                .clipborardmodal .modal-body textarea,
+                .weathermodal .modal-body form input,
+                .search-modal-container{
+                    background: var(--tertiary_rgba);
+                }
+
+                .comment-input textarea:focus,
+                .ai-theme-form-content input:focus,
+                .ai-theme-form-content input:active,
+                .feedback-offcanvas form input:focus,
+                .feedback-offcanvas form textarea:focus,
+                .clipborardmodal .modal-body textarea:focus,
+                .clipborardmodal .modal-body textarea:active,
+                .weathermodal .modal-body form input:is(:hover, :focus, :active),
+                .modal-search form input:is(:hover, :focus, :active),
+                .search-modal-container:has(input:focus){
+                    background: var(--tertiary_rgba_2);
+                }
+            `;
+            $('#dynamic-theme-css').remove();
+
+            $('head').append(`<style id="dynamic-theme-css">${style}</style>`);
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching RGBA colors:', error);
+        }
+    });
+}
+
 </script>
 
 {# Default color palettes color's #}
@@ -356,20 +643,34 @@
                         var dcpneutralPrimary = $('#default_neutral_primary').val();
                         var dcpneutralSecondary = $('#default_neutral_secondary').val();
 
+                        var tertiaryRgba = hexToRgba(dcptertiaryColor, 0.2);
+
+                        var primaryRgba_2 = hexToRgba(dcpprimaryColor, 0.8);
+                        var tertiaryRgba_2 = hexToRgba(dcptertiaryColor, 0.3);
+                        var neutralPrimaryRgba_2 = hexToRgba(dcpneutralPrimary, 0.4);
+                        var neutralSecondaryRgba_2 = hexToRgba(dcpneutralSecondary, 0.95);
+                        
                         $('#dynamic-theme-styles').remove();
 
                         var style = `
                             /* Primary Color */
-                            #nb-rightimg-dropmenu, #offcanvasExample, #logoutcontainer,
+                            .nb-rightimg-dropmenu, #logoutcontainer,
                             .logoutmodal, .footerbtn, .logoutmodal .modal-body a, .alert-notification, .notification-footer button,
-                            #dropmenudetailslinks, #nav-tab, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
-                            #reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,.nav-tabs button,.autocomplete-items div::before,
-                            .footer-waveline {
+                            #nav-tab,#reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,
+                            .autocomplete-items div::before,.footer-waveline {
                                 background-color: ${dcpprimaryColor};
                             }
 
-                            .logoutmodal .modal-body a, .footerbtn, .filter-form select, .filter-form input, #nav-tab {
+                            .footerbtn, .filter-form select, .filter-form input, #nav-tab {
                                 border-color: ${dcpprimaryColor};
+                            }
+
+                            .nav-tabs button, .navbar-guest-user-links a{
+                                background: color-mix(in oklab, ${dcpprimaryColor} 65%, #ffffff 35%);
+                            }
+
+                            .offcanvas-body-links li:nth-child(4n+1) .offcanvas-link-icons:not(.body-links-second li:nth-child(4n+1) .offcanvas-link-icons,.body-links-third li:nth-child(4n+1) .offcanvas-link-icons) {
+                                background-color: ${primaryRgba_2};
                             }
 
                             #logoutlink, .logout-container .logout-btn, .filter-form-button button, .toast {
@@ -380,7 +681,16 @@
                                 fill: ${dcpneutralPrimary};
                             }
 
-                            #nav-tabContent, .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge {
+                            .offcanvas-body-links li:nth-child(4n+3) .offcanvas-link-icons {
+                                background-color: ${neutralPrimaryRgba_2};
+                            }
+
+                            .body-links-third li:nth-child(4n+1) .offcanvas-link-icons{
+                                background-color: ${neutralPrimaryRgba_2};
+                            }
+
+                            .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge,
+                            .form-submit-btns button:not(.dark-theme-btns button) {
                                 background-color: ${dcpneutralSecondary};
                             }
 
@@ -388,10 +698,13 @@
                                 fill: ${dcpneutralSecondary};
                             }
 
+                            .offcanvas-body-links li:nth-child(4n+4) .offcanvas-link-icons {
+                                background-color: ${neutralSecondaryRgba_2};
+                            }
+
                             /* Secondary Color */
-                            #body-color, #navbar, #navrail, #navoffcanvasbody, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
-                            #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2, .modal-body, .modal-body-footer,.logoutmodal .modal-body, .logoutmodal .modal-body-footer, .notification-offcanvas, .searchmodal, .pages-options-autocomplete, 
-                            .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items {
+                            #body-color, .navbar, #navrail, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
+                            #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2{
                                 background-color: ${dcpsecondaryColor};
                             }
 
@@ -399,11 +712,24 @@
                                 border-color: ${dcpsecondaryColor};
                             }
 
+                            .offcanvas,.logoutmodal,.modal-body, .modal-body-footer,.logoutmodal .modal-body,.pages-options-autocomplete,
+                            .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items{
+                                background: color-mix(in oklab, ${dcpsecondaryColor} 70%, #aeaeae 30%);
+                            }
+
+                            .appearance-tab-content{
+                                background: color-mix(in oklab, ${dcpsecondaryColor} 60%, #ffffff 40%);
+                            }
+
+                            .navbar::before{
+                                background: ${dcpsecondaryColor};
+                            }
+
                             /* Tertiary Color */
                             #offcanvaslisttext1, #offcanvaslisttext2, #offcanvaslisttext3, #offcanvaslisttext4, #offcanvaslisttext5, #offcanvaslisttext6, #offcanvaslisttext7, #offcanvaslisttext8, #offcanvaslisttext9, #offcanvaslisttext10,
-                            #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
-                            #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
-                            #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
+                            #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslisttext13, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
+                            #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #offcanvaslinkicons12, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
+                            #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, .form-submit-btns button:not(.dark-theme-btns button),
                             #nb-dropmenu-content, #dropmenu-details-wrapper1, #dropmenu-details-wrapper2, #back-btn-icon, .themetext, #reset-colors, #reset-colors2, #externalButton, #activelink_color_heading, #sidebar-subheading,
                             #navrailicon1, #navrailicon2, #navrailicon3, #navrailicon4, #navrailicon5, #navrailicon6, #navrailicon7, #navrailicon8, #navrailicon9, #navrailicon10,
                             #navrailicon11, #navrailicon12, #navrailicon13, #navrailicon14, #navrailtext1, #navrailtext2, #navrailtext3, #navrailtext4, #navrailtext5, #navrailtext6,
@@ -414,14 +740,46 @@
                             .alert-notification, .notification-footer button, .notification-title, .no-notifications, #idquery, .autocomplete-items .autocomplete-option,.top-nb-dropmenu-content a,
                             .weathermodal .modal-body form input::placeholder, .search-modal-container .search-icon button, .md-top-closeicon, .autocomplete-pages-heading, .logout-container .logout-btn,
                             .additional-option, .searchmodal .modal-header h5, .search-modal-input, .notification-badge, .modal-search form input::placeholder, .filter-form select, .filter-form input,
-                            .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,
+                            .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,.theme-builder-forms h4,
                             .ai-theme-form-content input, .gen-theme-warning-text, .filter-form input::placeholder, .filter-form-button button,.nav-tabs button,.footer-container .column ul li a:not(.landingpg-footer .column ul li a),
-                            .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,.logoutmodal .modal-body a:hover {
+                            .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,
+                            .logoutmodal .modal-body a:hover,.ai-recipe-check-response,.navbar-guest-user-links a, .Modal-search.show::before {
                                 color: ${dcptertiaryColor};
                             }
 
                             .top-nb-dropmenu-content a, #ai_theme_label, .modal-header, .footerbtn {
                                 border-color: ${dcptertiaryColor};
+                            }
+
+                            .offcanvas-body-links li:nth-child(4n+2) .offcanvas-link-icons {
+                                background-color: ${tertiaryRgba_2};
+                            }
+
+                            .body-links-second li:nth-child(4n+1) .offcanvas-link-icons{
+                                background-color: ${tertiaryRgba_2};
+                            }
+
+                            .comment-input textarea,
+                            .ai-theme-form-content input,
+                            .feedback-offcanvas form input,
+                            .feedback-offcanvas form textarea,
+                            .clipborardmodal .modal-body textarea,
+                            .weathermodal .modal-body form input,
+                            .search-modal-container{
+                                background: ${tertiaryRgba};
+                            }
+
+                            .comment-input textarea:focus,
+                            .ai-theme-form-content input:focus,
+                            .ai-theme-form-content input:active,
+                            .feedback-offcanvas form input:focus,
+                            .feedback-offcanvas form textarea:focus,
+                            .clipborardmodal .modal-body textarea:focus,
+                            .clipborardmodal .modal-body textarea:active,
+                            .weathermodal .modal-body form input:is(:hover, :focus, :active),
+                            .modal-search form input:is(:hover, :focus, :active),
+                            .search-modal-container:has(input:focus){
+                                background: ${tertiaryRgba_2};
                             }
 
                             /* Active Link Color */
@@ -431,7 +789,7 @@
                                 background-color: ${dcpactivelinkColor};
                             }
 
-                            .nav_link_btn::before,.year_recipe_badge, .nav-tabs .tab.active {
+                            .nav_link_btn::before,.year_recipe_badge {
                                 background-color: ${dcpactivelinkColor};
                             }
 
@@ -439,7 +797,8 @@
                             .offcanvas-close-btn:hover,.navbar .navbar-offcanvas-btn:hover,.logout-container .logout-btn:hover,.navrail-links:hover .navrail-icons,.navbar-offcanvas-btn:hover,.offcanvas-body-list ul li:hover,
                             .dropmenu-details-wrapper p:hover:not(.det-wrap-1 p),.body-detail-dropdown-list .dropdown-first-child .dropdown-links:hover,.body-detail-dropdown-list .dropdown-links:hover,.logout-link.clicked,.logout-link:focus,
                             .logout-link::after,.top-nb-dropmenu-content a:hover,.logout-link:active,.dropmenu-details-links a:hover,.rightside-searchbar h5:hover:not(.weather-widget),.filter-form-button button:hover,
-                            .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover {
+                            .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover,
+                            .nav .nav-right-icons-slider,.nav-right-img-dropmenu-slider, .nav-sm-icon-slider, .form-submit-btns button:not(.dark-theme-btns button):hover, .navbar-guest-user-links a:hover {
                                 background-color: ${dcphoverColor};
                             }
 
@@ -477,21 +836,34 @@
                 var dcpneutralPrimary = $('#def_dark_neutral_primary').val();
                 var dcpneutralSecondary = $('#def_dark_neutral_secondary').val();
 
+                var tertiaryRgba = hexToRgba(dcptertiaryColor, 0.2);
+
+                var primaryRgba_2 = hexToRgba(dcpprimaryColor, 0.8);
+                var tertiaryRgba_2 = hexToRgba(dcptertiaryColor, 0.3);
+                var neutralPrimaryRgba_2 = hexToRgba(dcpneutralPrimary, 0.4);
+                var neutralSecondaryRgba_2 = hexToRgba(dcpneutralSecondary, 0.95);
 
                 $('#dynamic-theme-styles').remove();
 
                 var style = `
                     /* Primary Color */
-                    #nb-rightimg-dropmenu, #offcanvasExample, #logoutcontainer,
+                    .nb-rightimg-dropmenu, #logoutcontainer,
                     .logoutmodal, .footerbtn, .logoutmodal .modal-body a, .alert-notification, .notification-footer button,
-                    #dropmenudetailslinks, #nav-tab, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
-                    #reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,.nav-tabs button,.autocomplete-items div::before,
-                    .footer-waveline, .nav-tabs .tab.active {
+                    #nav-tab,#reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,
+                    .autocomplete-items div::before, .footer-waveline, .nav-tabs .tab.active {
                         background-color: ${dcpprimaryColor};
                     }
 
-                    .logoutmodal .modal-body a, .footerbtn, .filter-form select, .filter-form input, #nav-tab {
+                    .footerbtn, .filter-form select, .filter-form input, #nav-tab {
                         border-color: ${dcpprimaryColor};
+                    }
+
+                    .nav-tabs button, .navbar-guest-user-links a{
+                        background: color-mix(in oklab, ${dcpprimaryColor} 65%, #ffffff 35%);
+                    }
+
+                    .offcanvas-body-links li:nth-child(4n+1) .offcanvas-link-icons:not(.body-links-second li:nth-child(4n+1) .offcanvas-link-icons,.body-links-third li:nth-child(4n+1) .offcanvas-link-icons) {
+                        background-color: ${primaryRgba_2};
                     }
 
                     #logoutlink, .logout-container .logout-btn, .filter-form-button button, .toast {
@@ -502,7 +874,16 @@
                         fill: ${dcpneutralPrimary};
                     }
 
-                    #nav-tabContent, .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge {
+                    .offcanvas-body-links li:nth-child(4n+3) .offcanvas-link-icons {
+                        background-color: ${neutralPrimaryRgba_2};
+                    }
+
+                    .body-links-third li:nth-child(4n+1) .offcanvas-link-icons{
+                        background-color: ${neutralPrimaryRgba_2};
+                    }
+
+                    .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge,
+                    .form-submit-btns button:not(.dark-theme-btns button) {
                         background-color: ${dcpneutralSecondary};
                     }
 
@@ -510,10 +891,13 @@
                         fill: ${dcpneutralSecondary};
                     }
 
+                    .offcanvas-body-links li:nth-child(4n+4) .offcanvas-link-icons {
+                        background-color: ${neutralSecondaryRgba_2};
+                    }
+
                     /* Secondary Color */
-                    #body-color, #navbar, #navrail, #navoffcanvasbody, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
-                    #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2, .modal-body, .modal-body-footer,.logoutmodal .modal-body, .logoutmodal .modal-body-footer, .notification-offcanvas, .searchmodal, .pages-options-autocomplete, 
-                    .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items {
+                    #body-color, .navbar, #navrail, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
+                    #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2{
                         background-color: ${dcpsecondaryColor};
                     }
 
@@ -521,11 +905,24 @@
                         border-color: ${dcpsecondaryColor};
                     }
 
+                    .offcanvas,.logoutmodal,.modal-body, .modal-body-footer,.logoutmodal .modal-body,.pages-options-autocomplete,
+                    .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items{
+                        background: color-mix(in oklab, ${dcpsecondaryColor} 70%, #aeaeae 30%);
+                    }
+
+                    .appearance-tab-content{
+                        background: color-mix(in oklab, ${dcpsecondaryColor} 60%, #ffffff 40%);
+                    }
+
+                    .navbar::before{
+                        background: ${dcpsecondaryColor};
+                    }
+
                     /* Tertiary Color */
                     #offcanvaslisttext1, #offcanvaslisttext2, #offcanvaslisttext3, #offcanvaslisttext4, #offcanvaslisttext5, #offcanvaslisttext6, #offcanvaslisttext7, #offcanvaslisttext8, #offcanvaslisttext9, #offcanvaslisttext10,
-                    #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
-                    #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
-                    #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
+                    #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslisttext13, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
+                    #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #offcanvaslinkicons12, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
+                    #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, .form-submit-btns button:not(.dark-theme-btns button),
                     #nb-dropmenu-content, #dropmenu-details-wrapper1, #dropmenu-details-wrapper2, #back-btn-icon, .themetext, #reset-colors, #reset-colors2, #externalButton, #activelink_color_heading, #sidebar-subheading,
                     #navrailicon1, #navrailicon2, #navrailicon3, #navrailicon4, #navrailicon5, #navrailicon6, #navrailicon7, #navrailicon8, #navrailicon9, #navrailicon10,
                     #navrailicon11, #navrailicon12, #navrailicon13, #navrailicon14, #navrailtext1, #navrailtext2, #navrailtext3, #navrailtext4, #navrailtext5, #navrailtext6,
@@ -536,14 +933,46 @@
                     .alert-notification, .notification-footer button, .notification-title, .no-notifications, #idquery, .autocomplete-items .autocomplete-option,.top-nb-dropmenu-content a,
                     .weathermodal .modal-body form input::placeholder, .search-modal-container .search-icon button, .md-top-closeicon, .autocomplete-pages-heading, .logout-container .logout-btn,
                     .additional-option, .searchmodal .modal-header h5, .search-modal-input, .notification-badge, .modal-search form input::placeholder, .filter-form select, .filter-form input,
-                    .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,
+                    .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,.theme-builder-forms h4,
                     .ai-theme-form-content input, .gen-theme-warning-text, .filter-form input::placeholder, .filter-form-button button,.nav-tabs button,.footer-container .column ul li a:not(.landingpg-footer .column ul li a),
-                    .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,.logoutmodal .modal-body a:hover {
+                    .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,
+                    .logoutmodal .modal-body a:hover,.ai-recipe-check-response,.navbar-guest-user-links a, .Modal-search.show::before {
                         color: ${dcptertiaryColor};
                     }
 
                     .top-nb-dropmenu-content a, #ai_theme_label, .modal-header, .footerbtn {
                         border-color: ${dcptertiaryColor};
+                    }
+
+                    .offcanvas-body-links li:nth-child(4n+2) .offcanvas-link-icons {
+                        background-color: ${tertiaryRgba_2};
+                    }
+
+                    .body-links-second li:nth-child(4n+1) .offcanvas-link-icons{
+                        background-color: ${tertiaryRgba_2};
+                    }
+
+                    .comment-input textarea,
+                    .ai-theme-form-content input,
+                    .feedback-offcanvas form input,
+                    .feedback-offcanvas form textarea,
+                    .clipborardmodal .modal-body textarea,
+                    .weathermodal .modal-body form input,
+                    .search-modal-container{
+                        background: ${tertiaryRgba};
+                    }
+
+                    .comment-input textarea:focus,
+                    .ai-theme-form-content input:focus,
+                    .ai-theme-form-content input:active,
+                    .feedback-offcanvas form input:focus,
+                    .feedback-offcanvas form textarea:focus,
+                    .clipborardmodal .modal-body textarea:focus,
+                    .clipborardmodal .modal-body textarea:active,
+                    .weathermodal .modal-body form input:is(:hover, :focus, :active),
+                    .modal-search form input:is(:hover, :focus, :active),
+                    .search-modal-container:has(input:focus){
+                        background: ${tertiaryRgba_2};
                     }
 
                     /* Active Link Color */
@@ -553,7 +982,7 @@
                         background-color: ${dcpactivelinkColor};
                     }
 
-                    .nav_link_btn::before,.year_recipe_badge, .nav-tabs .tab.active {
+                    .nav_link_btn::before,.year_recipe_badge {
                         background-color: ${dcpactivelinkColor};
                     }
 
@@ -561,7 +990,8 @@
                     .offcanvas-close-btn:hover,.navbar .navbar-offcanvas-btn:hover,.logout-container .logout-btn:hover,.navrail-links:hover .navrail-icons,.navbar-offcanvas-btn:hover,.offcanvas-body-list ul li:hover,
                     .dropmenu-details-wrapper p:hover:not(.det-wrap-1 p),.body-detail-dropdown-list .dropdown-first-child .dropdown-links:hover,.body-detail-dropdown-list .dropdown-links:hover,.logout-link.clicked,.logout-link:focus,
                     .logout-link::after,.top-nb-dropmenu-content a:hover,.logout-link:active,.dropmenu-details-links a:hover,.rightside-searchbar h5:hover:not(.weather-widget),.filter-form-button button:hover,
-                    .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover {
+                    .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover,
+                    .nav .nav-right-icons-slider,.nav-right-img-dropmenu-slider, .nav-sm-icon-slider, .form-submit-btns button:not(.dark-theme-btns button):hover, .navbar-guest-user-links a:hover {
                         background-color: ${dcphoverColor};
                     }
 
@@ -591,18 +1021,32 @@
         var dcpneutralPrimary = $('#aiform' + formNumber + ' input[name="ai_color6"]').val();
         var dcpneutralSecondary = $('#aiform' + formNumber + ' input[name="ai_color7"]').val();
 
+        var tertiaryRgba = hexToRgba(dcptertiaryColor, 0.2);
+
+        var primaryRgba_2 = hexToRgba(dcpprimaryColor, 0.8);
+        var tertiaryRgba_2 = hexToRgba(dcptertiaryColor, 0.3);
+        var neutralPrimaryRgba_2 = hexToRgba(dcpneutralPrimary, 0.4);
+        var neutralSecondaryRgba_2 = hexToRgba(dcpneutralSecondary, 0.95);
+        
         // Primary color
         var dcpprimaryColorStyle = `
-            #nb-rightimg-dropmenu, #offcanvasExample, #logoutcontainer,
+            .nb-rightimg-dropmenu, #logoutcontainer,
             .logoutmodal, .footerbtn, .logoutmodal .modal-body a, .alert-notification, .notification-footer button,
-            #dropmenudetailslinks, #nav-tab, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
-            #reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,.nav-tabs button,.autocomplete-items div::before,
-            .footer-waveline, .nav-tabs .tab.active {
+            #nav-tab,#reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,
+            .autocomplete-items div::before, .footer-waveline, .nav-tabs .tab.active {
                 background-color: ${dcpprimaryColor};
             }
 
-            .logoutmodal .modal-body a, .footerbtn, .filter-form select, .filter-form input, #nav-tab {
+            .footerbtn, .filter-form select, .filter-form input, #nav-tab {
                 border-color: ${dcpprimaryColor};
+            }
+
+            .nav-tabs button, .navbar-guest-user-links a{
+                background: color-mix(in oklab, ${dcpprimaryColor} 65%, #ffffff 35%);
+            }
+
+            .offcanvas-body-links li:nth-child(4n+1) .offcanvas-link-icons:not(.body-links-second li:nth-child(4n+1) .offcanvas-link-icons,.body-links-third li:nth-child(4n+1) .offcanvas-link-icons) {
+                background-color: ${primaryRgba_2};
             }
         `;
 
@@ -614,15 +1058,28 @@
             .search-svg-path {
                 fill: ${dcpneutralPrimary};
             }
+
+            .offcanvas-body-links li:nth-child(4n+3) .offcanvas-link-icons {
+                background-color: ${neutralPrimaryRgba_2};
+            }
+
+            .body-links-third li:nth-child(4n+1) .offcanvas-link-icons{
+                background-color: ${neutralPrimaryRgba_2};
+            }
         `;
 
         var dcpneutralSecondaryStyle = `
-            #nav-tabContent, .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge {
+            .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge,
+            .form-submit-btns button:not(.dark-theme-btns button) {
                 background-color: ${dcpneutralSecondary};
             }
 
             .navbar-circle-svg-path {
                 fill: ${dcpneutralSecondary};
+            }
+
+            .offcanvas-body-links li:nth-child(4n+4) .offcanvas-link-icons {
+                background-color: ${neutralSecondaryRgba_2};
             }
         `;
 
@@ -632,14 +1089,26 @@
 
         // Secondary color
         var dcpsecondaryColorStyle = `
-            #body-color, #navbar, #navrail, #navoffcanvasbody, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
-            #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2, .modal-body, .modal-body-footer,.logoutmodal .modal-body, .logoutmodal .modal-body-footer, .notification-offcanvas, .searchmodal, .pages-options-autocomplete, 
-            .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items {
+            #body-color, .navbar, #navrail, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
+            #dropmenu-details-wrapper1, #nav-tab{
                 background-color: ${dcpsecondaryColor};
             }
 
             .logoutmodal .modal-body a {
                 border-color: ${dcpsecondaryColor};
+            }
+
+            .offcanvas,.logoutmodal,.modal-body,.logoutmodal .modal-body,.pages-options-autocomplete,
+            .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items{
+                background: color-mix(in oklab, ${dcpsecondaryColor} 70%, #aeaeae 30%);
+            }
+
+            .appearance-tab-content{
+                background: color-mix(in oklab, ${dcpsecondaryColor} 60%, #ffffff 40%);
+            }
+
+            .navbar::before{
+                background: ${dcpsecondaryColor};
             }
         `;
 
@@ -648,9 +1117,9 @@
         // Tertiary color
         var dcptertiaryColorStyle = `
             #offcanvaslisttext1, #offcanvaslisttext2, #offcanvaslisttext3, #offcanvaslisttext4, #offcanvaslisttext5, #offcanvaslisttext6, #offcanvaslisttext7, #offcanvaslisttext8, #offcanvaslisttext9, #offcanvaslisttext10,
-            #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
-            #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
-            #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
+            #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslisttext13, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
+            #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #offcanvaslinkicons12, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
+            #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, .form-submit-btns button:not(.dark-theme-btns button),
             #nb-dropmenu-content, #dropmenu-details-wrapper1, #dropmenu-details-wrapper2, #back-btn-icon, .themetext, #reset-colors, #reset-colors2, #externalButton, #activelink_color_heading, #sidebar-subheading,
             #navrailicon1, #navrailicon2, #navrailicon3, #navrailicon4, #navrailicon5, #navrailicon6, #navrailicon7, #navrailicon8, #navrailicon9, #navrailicon10,
             #navrailicon11, #navrailicon12, #navrailicon13, #navrailicon14, #navrailtext1, #navrailtext2, #navrailtext3, #navrailtext4, #navrailtext5, #navrailtext6,
@@ -661,14 +1130,46 @@
             .alert-notification, .notification-footer button, .notification-title, .no-notifications, #idquery, .autocomplete-items .autocomplete-option,.top-nb-dropmenu-content a,
             .weathermodal .modal-body form input::placeholder, .search-modal-container .search-icon button, .md-top-closeicon, .autocomplete-pages-heading, .logout-container .logout-btn,
             .additional-option, .searchmodal .modal-header h5, .search-modal-input, .notification-badge, .modal-search form input::placeholder, .filter-form select, .filter-form input,
-            .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,
+            .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,.theme-builder-forms h4,
             .ai-theme-form-content input, .gen-theme-warning-text, .filter-form input::placeholder, .filter-form-button button,.nav-tabs button,.footer-container .column ul li a:not(.landingpg-footer .column ul li a),
-            .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,.logoutmodal .modal-body a:hover {
+            .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,
+            .logoutmodal .modal-body a:hover,.ai-recipe-check-response,.navbar-guest-user-links a, .Modal-search.show::before {
                 color: ${dcptertiaryColor};
             }
 
             .top-nb-dropmenu-content a, #ai_theme_label, .modal-header, .footerbtn {
                 border-color: ${dcptertiaryColor};
+            }
+
+            .offcanvas-body-links li:nth-child(4n+2) .offcanvas-link-icons {
+                background-color: ${tertiaryRgba_2};
+            }
+
+            .body-links-second li:nth-child(4n+1) .offcanvas-link-icons{
+                background-color: ${tertiaryRgba_2};
+            }
+
+            .comment-input textarea,
+            .ai-theme-form-content input,
+            .feedback-offcanvas form input,
+            .feedback-offcanvas form textarea,
+            .clipborardmodal .modal-body textarea,
+            .weathermodal .modal-body form input,
+            .search-modal-container{
+                background: ${tertiaryRgba};
+            }
+
+            .comment-input textarea:focus,
+            .ai-theme-form-content input:focus,
+            .ai-theme-form-content input:active,
+            .feedback-offcanvas form input:focus,
+            .feedback-offcanvas form textarea:focus,
+            .clipborardmodal .modal-body textarea:focus,
+            .clipborardmodal .modal-body textarea:active,
+            .weathermodal .modal-body form input:is(:hover, :focus, :active),
+            .modal-search form input:is(:hover, :focus, :active),
+            .search-modal-container:has(input:focus){
+                background: ${tertiaryRgba_2};
             }
         `;
 
@@ -682,7 +1183,7 @@
                 background-color: ${dcpactivelinkColor};
             }
 
-            .nav_link_btn::before,.year_recipe_badge, .nav-tabs .tab.active {
+            .nav_link_btn::before,.year_recipe_badge {
                 background-color: ${dcpactivelinkColor};
             }
         `;
@@ -694,7 +1195,8 @@
             .offcanvas-close-btn:hover,.navbar .navbar-offcanvas-btn:hover,.logout-container .logout-btn:hover,.navrail-links:hover .navrail-icons,.navbar-offcanvas-btn:hover,.offcanvas-body-list ul li:hover,
             .dropmenu-details-wrapper p:hover:not(.det-wrap-1 p),.body-detail-dropdown-list .dropdown-first-child .dropdown-links:hover,.body-detail-dropdown-list .dropdown-links:hover,.logout-link.clicked,.logout-link:focus,
             .logout-link::after,.top-nb-dropmenu-content a:hover,.logout-link:active,.dropmenu-details-links a:hover,.rightside-searchbar h5:hover:not(.weather-widget),.filter-form-button button:hover,
-            .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover {
+            .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover,
+            .nav .nav-right-icons-slider,.nav-right-img-dropmenu-slider, .nav-sm-icon-slider, .form-submit-btns button:not(.dark-theme-btns button):hover, .navbar-guest-user-links a:hover {
                 background-color: ${dcphoverColor};
             }
 
@@ -702,7 +1204,7 @@
                 border: 1.5px solid ${dcphoverColor};
             }
         `;
-        $("<style>" + hoverStyle + "</style>").appendTo("head");            
+        $("<style>" + hoverStyle + "</style>").appendTo("head");
     }
     
 </script>
@@ -730,23 +1232,37 @@
                 var dcpneutralPrimary = $('#ai_neutral_primary').val();
                 var dcpneutralSecondary = $('#ai_neutral_secondary').val();
 
+                var tertiaryRgba = hexToRgba(dcptertiaryColor, 0.2);
+
+                var primaryRgba_2 = hexToRgba(dcpprimaryColor, 0.8);
+                var tertiaryRgba_2 = hexToRgba(dcptertiaryColor, 0.3);
+                var neutralPrimaryRgba_2 = hexToRgba(dcpneutralPrimary, 0.4);
+                var neutralSecondaryRgba_2 = hexToRgba(dcpneutralSecondary, 0.95);
+
                 $('#dynamic-theme-styles').remove();
 
                 var style = `
                     /* Primary Color */
-                    #nb-rightimg-dropmenu, #offcanvasExample, #logoutcontainer,
+                    .nb-rightimg-dropmenu, #logoutcontainer,
                     .logoutmodal, .footerbtn, .logoutmodal .modal-body a, .alert-notification, .notification-footer button,
-                    #dropmenudetailslinks, #nav-tab, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
-                    #reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,.nav-tabs button,.autocomplete-items div::before,
-                    .footer-waveline {
+                    #nav-tab,#reset-colors, #reset-colors2, #externalButton,.filter-form select, .filter-form input,
+                    .autocomplete-items div::before, .footer-waveline, .nav-tabs .tab.active {
                         background-color: ${dcpprimaryColor};
                     }
 
-                    .logoutmodal .modal-body a, .footerbtn, .filter-form select, .filter-form input, #nav-tab {
+                    .footerbtn, .filter-form select, .filter-form input, #nav-tab {
                         border-color: ${dcpprimaryColor};
                     }
 
-                    #logoutlink, .logout-container .logout-btn, .filter-form-button button, .toast, .nav-tabs .tab.active {
+                    .nav-tabs button, .navbar-guest-user-links a{
+                        background: color-mix(in oklab, ${dcpprimaryColor} 65%, #ffffff 35%);
+                    }
+
+                    .offcanvas-body-links li:nth-child(4n+1) .offcanvas-link-icons:not(.body-links-second li:nth-child(4n+1) .offcanvas-link-icons,.body-links-third li:nth-child(4n+1) .offcanvas-link-icons) {
+                        background-color: ${primaryRgba_2};
+                    }
+
+                    #logoutlink, .logout-container .logout-btn, .filter-form-button button, .toast {
                         background-color: ${dcpneutralPrimary};
                     }
 
@@ -754,7 +1270,16 @@
                         fill: ${dcpneutralPrimary};
                     }
 
-                    #nav-tabContent, .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge {
+                    .offcanvas-body-links li:nth-child(4n+3) .offcanvas-link-icons {
+                        background-color: ${neutralPrimaryRgba_2};
+                    }
+
+                    .body-links-third li:nth-child(4n+1) .offcanvas-link-icons{
+                        background-color: ${neutralPrimaryRgba_2};
+                    }
+
+                    .footer-brand-logo, .additional-option, .alert-notification, .rightside-searchbar .notification-badge,
+                    .form-submit-btns button:not(.dark-theme-btns button) {
                         background-color: ${dcpneutralSecondary};
                     }
 
@@ -762,10 +1287,13 @@
                         fill: ${dcpneutralSecondary};
                     }
 
+                    .offcanvas-body-links li:nth-child(4n+4) .offcanvas-link-icons {
+                        background-color: ${neutralSecondaryRgba_2};
+                    }
+
                     /* Secondary Color */
-                    #body-color, #navbar, #navrail, #navoffcanvasbody, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
-                    #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2, .modal-body, .modal-body-footer,.logoutmodal .modal-body, .logoutmodal .modal-body-footer, .notification-offcanvas, .searchmodal, .pages-options-autocomplete, 
-                    .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items {
+                    #body-color, .navbar, #navrail, #logoutwrapper, #primary-wrapper, #dyn-recipes-h1, #sidebar-header, #history-card, #nb-dropmenu-content,
+                    #dropmenu-details-wrapper1, #nav-tab, #dropmenu-details-wrapper2{
                         background-color: ${dcpsecondaryColor};
                     }
 
@@ -773,11 +1301,24 @@
                         border-color: ${dcpsecondaryColor};
                     }
 
+                    .offcanvas,.logoutmodal,.modal-body,.logoutmodal .modal-body,.pages-options-autocomplete,
+                    .history-options-autocomplete, .filter-form select, .filter-form input, .autocomplete-items{
+                        background: color-mix(in oklab, ${dcpsecondaryColor} 70%, #aeaeae 30%);
+                    }
+
+                    .appearance-tab-content{
+                        background: color-mix(in oklab, ${dcpsecondaryColor} 60%, #ffffff 40%);
+                    }
+
+                    .navbar::before{
+                        background: ${dcpsecondaryColor};
+                    }
+
                     /* Tertiary Color */
                     #offcanvaslisttext1, #offcanvaslisttext2, #offcanvaslisttext3, #offcanvaslisttext4, #offcanvaslisttext5, #offcanvaslisttext6, #offcanvaslisttext7, #offcanvaslisttext8, #offcanvaslisttext9, #offcanvaslisttext10,
-                    #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
-                    #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
-                    #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, #primary_color_btn, #secondary_color_btn, #tertiary_color_btn, #activelink_color_btn, #hover_color_btn,
+                    #offcanvaslisttext11, #offcanvaslisttext12, #offcanvaslisttext13, #offcanvaslinkicons1, #offcanvaslinkicons2, #offcanvaslinkicons3, #offcanvaslinkicons4, #offcanvaslinkicons5, #offcanvaslinkicons6, #offcanvaslinkicons7, #offcanvaslinkicons8,
+                    #offcanvaslinkicons9, #offcanvaslinkicons10, #offcanvaslinkicons11, #offcanvaslinkicons12, #bodylinkssecond, #bodylinksthird, #line-sep1, #line-sep2, #dyn-recipes-h1, #subheading, #sidebar-heading-h1,
+                    #navbar-brand-name, #navrail-text-active, #logouticon, #dropmenudetailslinks, .noti-alert-close-icon, .form-submit-btns button:not(.dark-theme-btns button),
                     #nb-dropmenu-content, #dropmenu-details-wrapper1, #dropmenu-details-wrapper2, #back-btn-icon, .themetext, #reset-colors, #reset-colors2, #externalButton, #activelink_color_heading, #sidebar-subheading,
                     #navrailicon1, #navrailicon2, #navrailicon3, #navrailicon4, #navrailicon5, #navrailicon6, #navrailicon7, #navrailicon8, #navrailicon9, #navrailicon10,
                     #navrailicon11, #navrailicon12, #navrailicon13, #navrailicon14, #navrailtext1, #navrailtext2, #navrailtext3, #navrailtext4, #navrailtext5, #navrailtext6,
@@ -788,14 +1329,46 @@
                     .alert-notification, .notification-footer button, .notification-title, .no-notifications, #idquery, .autocomplete-items .autocomplete-option,.top-nb-dropmenu-content a,
                     .weathermodal .modal-body form input::placeholder, .search-modal-container .search-icon button, .md-top-closeicon, .autocomplete-pages-heading, .logout-container .logout-btn,
                     .additional-option, .searchmodal .modal-header h5, .search-modal-input, .notification-badge, .modal-search form input::placeholder, .filter-form select, .filter-form input,
-                    .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,
+                    .trending-searches-container::before, .ranked_recipes_color, .generate-theme-label, .ai-theme-form-content input::placeholder,.ai-theme-form-content input:focus,.nav-tabs button:hover,.theme-builder-forms h4,
                     .ai-theme-form-content input, .gen-theme-warning-text, .filter-form input::placeholder, .filter-form-button button,.nav-tabs button,.footer-container .column ul li a:not(.landingpg-footer .column ul li a),
-                    .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,.logoutmodal .modal-body a:hover {
+                    .rightside-searchbar .notification-badge, .toast .toast-body, .nav-tabs .tab.active, .appearance-theme-nav .nav-link.active, .logoutmodal .modal-body button:hover,
+                    .logoutmodal .modal-body a:hover,.ai-recipe-check-response,.navbar-guest-user-links a, .Modal-search.show::before {
                         color: ${dcptertiaryColor};
                     }
 
                     .top-nb-dropmenu-content a, #ai_theme_label, .modal-header, .footerbtn {
                         border-color: ${dcptertiaryColor};
+                    }
+
+                    .offcanvas-body-links li:nth-child(4n+2) .offcanvas-link-icons {
+                        background-color: ${tertiaryRgba_2};
+                    }
+
+                    .body-links-second li:nth-child(4n+1) .offcanvas-link-icons{
+                        background-color: ${tertiaryRgba_2};
+                    }
+
+                    .comment-input textarea,
+                    .ai-theme-form-content input,
+                    .feedback-offcanvas form input,
+                    .feedback-offcanvas form textarea,
+                    .clipborardmodal .modal-body textarea,
+                    .weathermodal .modal-body form input,
+                    .search-modal-container{
+                        background: ${tertiaryRgba};
+                    }
+
+                    .comment-input textarea:focus,
+                    .ai-theme-form-content input:focus,
+                    .ai-theme-form-content input:active,
+                    .feedback-offcanvas form input:focus,
+                    .feedback-offcanvas form textarea:focus,
+                    .clipborardmodal .modal-body textarea:focus,
+                    .clipborardmodal .modal-body textarea:active,
+                    .weathermodal .modal-body form input:is(:hover, :focus, :active),
+                    .modal-search form input:is(:hover, :focus, :active),
+                    .search-modal-container:has(input:focus){
+                        background: ${tertiaryRgba_2};
                     }
 
                     /* Active Link Color */
@@ -813,7 +1386,8 @@
                     .offcanvas-close-btn:hover,.navbar .navbar-offcanvas-btn:hover,.logout-container .logout-btn:hover,.navrail-links:hover .navrail-icons,.navbar-offcanvas-btn:hover,.offcanvas-body-list ul li:hover,
                     .dropmenu-details-wrapper p:hover:not(.det-wrap-1 p),.body-detail-dropdown-list .dropdown-first-child .dropdown-links:hover,.body-detail-dropdown-list .dropdown-links:hover,.logout-link.clicked,.logout-link:focus,
                     .logout-link::after,.top-nb-dropmenu-content a:hover,.logout-link:active,.dropmenu-details-links a:hover,.rightside-searchbar h5:hover:not(.weather-widget),.filter-form-button button:hover,
-                    .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover {
+                    .nav-tabs button:hover,.offcanvas-notification .offcanvas-noti-icon:hover,.additional-option:hover,.autocomplete-items div:hover, .logoutmodal .modal-body a:hover,
+                    .nav .nav-right-icons-slider,.nav-right-img-dropmenu-slider, .nav-sm-icon-slider, .form-submit-btns button:not(.dark-theme-btns button):hover, .navbar-guest-user-links a:hover {
                         background-color: ${dcphoverColor};
                     }
 

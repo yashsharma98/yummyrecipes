@@ -1,63 +1,57 @@
-from cProfile import Profile
-from distutils.command.upload import upload
-from email.policy import default
-# from hashlib import new
-from django.db import models
-from django.utils import timezone
 import math
-from django.contrib.auth.models import User
-from django.urls import reverse
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from hitcount.models import HitCountMixin, HitCount
-from django.contrib.contenttypes.fields import GenericRelation
+import os
+from datetime import date, datetime
 
-from ckeditor.fields import RichTextField
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericRelation
+from django.core.files.storage import default_storage
 from django.core.validators import MinValueValidator, URLValidator
 
-from django.core.files.storage import default_storage
+# from hashlib import new
+from django.db import models
+from django.db.models import Count, F, Sum
+from django.urls import reverse
+from django.utils import timezone
+from hitcount.models import HitCount, HitCountMixin
+from pgvector.django import VectorField
 from storages.backends import s3boto3
-import os
 from tinymce.models import HTMLField
-from django.db.models import Count, Sum, F
-from datetime import datetime,date
 
 # Create your models here.
 
 
 class profile(models.Model):
-
     GENDER_CHOICES = (
-        ('Male', 'Male'),
-        ('Female', 'Female'),
+        ("Male", "Male"),
+        ("Female", "Female"),
     )
 
     recipes_preference_type = (
-        ('Select', 'Select'),
-        ('Breakfast recipes', 'Breakfast recipes'),
-        ('Lunch recipes', 'Lunch recipes'),
-        ('Evening Snack recipes', 'Evening Snack recipes'),
-        ('Dinner recipes', 'Dinner recipes'),
+        ("Select", "Select"),
+        ("Breakfast recipes", "Breakfast recipes"),
+        ("Lunch recipes", "Lunch recipes"),
+        ("Evening Snack recipes", "Evening Snack recipes"),
+        ("Dinner recipes", "Dinner recipes"),
     )
 
     recipes_preference_category = (
-        ('Select', 'Select'),
-        ('Veg recipes', 'Veg recipes'),
-        ('Non-Veg recipes', 'Non-Veg recipes'),
+        ("Select", "Select"),
+        ("Veg recipes", "Veg recipes"),
+        ("Non-Veg recipes", "Non-Veg recipes"),
     )
 
     recipes_preference_cuisine = (
-        ('Select', 'Select'),
-        ('Indian cuisine', 'Indian cuisine'),
-        ('American cuisine', 'American cuisine'),
-        ('Italian cuisine', 'Italian cuisine'),
+        ("Select", "Select"),
+        ("Indian cuisine", "Indian cuisine"),
+        ("American cuisine", "American cuisine"),
+        ("Italian cuisine", "Italian cuisine"),
     )
 
-
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
-    profile_img = models.ImageField(default='avatar.jpg',upload_to='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_img = models.ImageField(default="avatar.jpg", upload_to="profile")
     dob = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, null=True, blank=True)
-    bio = models.TextField(default='Bio')
+    bio = models.TextField(default="Bio")
     hit_count = models.OneToOneField(HitCount, null=True, blank=True, on_delete=models.CASCADE)
     send_email = models.BooleanField(default=True)
     credits = models.IntegerField(default=10, validators=[MinValueValidator(0)])
@@ -76,58 +70,55 @@ class profile(models.Model):
     preference_category = models.CharField(max_length=100, choices=recipes_preference_category, default="Select")
     preference_cuisine = models.CharField(max_length=100, choices=recipes_preference_cuisine, default="Select")
 
-
     # credits = models.DecimalField(default=5, max_digits=10, decimal_places=2)
 
-    
     def __str__(self):
         return self.user.username + " Profile"
-
 
     # def get_absolute_url(self):
     #     return reverse('profile')
 
-
     def save(self, *args, **kwargs):
-	    super(profile,self).save(*args, **kwargs)
+        super(profile, self).save(*args, **kwargs)
+
 
 class YearlyGoal(models.Model):
-    profile = models.ForeignKey(profile, on_delete=models.CASCADE, related_name='yearly_goals')
+    profile = models.ForeignKey(profile, on_delete=models.CASCADE, related_name="yearly_goals")
     year = models.IntegerField(default=date.today().year)
     goal = models.IntegerField(default=0)
 
     class Meta:
-        unique_together = ('profile', 'year')
+        unique_together = ("profile", "year")
 
     def __str__(self):
         return f"{self.year}: {self.goal} recipes"
 
+
 class post(models.Model, HitCountMixin):
-        
     title = models.CharField(max_length=1500)
     ingredients = models.TextField()
     content = HTMLField(blank=True, null=True)
     # content = RichTextField(blank=True, null=True)
     # content = models.TextField()
-    date_post = models.DateTimeField(auto_now_add= True)
-    author = models.ForeignKey(User,on_delete=models.CASCADE, null=True, blank=True)
+    date_post = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     views = models.IntegerField(default=0)
-    timing = models.IntegerField(default=0)
+    timing = models.IntegerField(default=0, blank=True)
     servings = models.IntegerField(default=0)
-    type = models.CharField(max_length=100,default="type")
-    cuisine = models.CharField(max_length=100,default="cuisine")
-    category = models.CharField(max_length=100,default="category")
+    type = models.CharField(max_length=100, default="type")
+    cuisine = models.CharField(max_length=100, default="cuisine")
+    category = models.CharField(max_length=100, default="category")
     # city = models.CharField(max_length=100, default="city")
     likes = models.ManyToManyField(profile, related_name="likes")
     dislikes = models.ManyToManyField(profile, related_name="dislikes")
-    favourites = models.ManyToManyField(User, related_name='favourite',default=None,blank=True)
+    favourites = models.ManyToManyField(User, related_name="favourite", default=None, blank=True)
     date_modified = models.DateTimeField(auto_now=True)
-    difficulty = models.CharField(max_length=100,default="difficulty")
-    hit_count_generic = GenericRelation(HitCount, object_id_field='object_pk', related_query_name='hit_count_generic_relation')
-    
-    
+    difficulty = models.CharField(max_length=100, default="difficulty")
+    hit_count_generic = GenericRelation(HitCount, object_id_field="object_pk", related_query_name="hit_count_generic_relation")
+    embedding = VectorField(null=True, blank=True)
+
     def __str__(self):
-        return self.title + " - "+self.author.username
+        return self.title + " - " + self.author.username
         # return self.title + " - "+self.author.username
 
     def get_date(self):
@@ -137,10 +128,10 @@ class post(models.Model, HitCountMixin):
         return self.date_modified.date()
 
     def get_absolute_url(self):
-        return reverse('home')
-    
+        return reverse("home")
+
     def read_time(self):
-        words_per_minute = 200  
+        words_per_minute = 200
         total_words = len(self.content.split())
         minutes = total_words / words_per_minute
         return round(minutes)
@@ -153,33 +144,29 @@ class post(models.Model, HitCountMixin):
 
     def whenpublished(self):
         now = timezone.now()
-        
-        diff= now - self.date_post
+
+        diff = now - self.date_post
 
         if diff.days == 0 and diff.seconds >= 0 and diff.seconds < 60:
-            seconds= diff.seconds
-            
+            seconds = diff.seconds
+
             if seconds == 1:
-                return str(seconds) +  "second ago"
-            
+                return str(seconds) + "second ago"
+
             else:
                 return str(seconds) + " seconds ago"
 
-            
-
         if diff.days == 0 and diff.seconds >= 60 and diff.seconds < 3600:
-            minutes= math.floor(diff.seconds/60)
+            minutes = math.floor(diff.seconds / 60)
 
             if minutes == 1:
                 return str(minutes) + " minute ago"
-            
+
             else:
                 return str(minutes) + " minutes ago"
 
-
-
         if diff.days == 0 and diff.seconds >= 3600 and diff.seconds < 86400:
-            hours= math.floor(diff.seconds/3600)
+            hours = math.floor(diff.seconds / 3600)
 
             if hours == 1:
                 return str(hours) + " hour ago"
@@ -189,8 +176,8 @@ class post(models.Model, HitCountMixin):
 
         # 1 day to 30 days
         if diff.days >= 1 and diff.days < 30:
-            days= diff.days
-        
+            days = diff.days
+
             if days == 1:
                 return str(days) + " day ago"
 
@@ -198,8 +185,7 @@ class post(models.Model, HitCountMixin):
                 return str(days) + " days ago"
 
         if diff.days >= 30 and diff.days < 365:
-            months= math.floor(diff.days/30)
-            
+            months = math.floor(diff.days / 30)
 
             if months == 1:
                 return str(months) + " month ago"
@@ -207,9 +193,8 @@ class post(models.Model, HitCountMixin):
             else:
                 return str(months) + " months ago"
 
-
         if diff.days >= 365:
-            years= math.floor(diff.days/365)
+            years = math.floor(diff.days / 365)
 
             if years == 1:
                 return str(years) + " year ago"
@@ -218,22 +203,32 @@ class post(models.Model, HitCountMixin):
                 return str(years) + " years ago"
 
     def get_recipe_url(self):
-        return reverse('viewpost', kwargs={'pk': self.pk})
+        return reverse("viewpost", kwargs={"pk": self.pk})
 
     @classmethod
     def top_performing_recipes(cls, user):
         posts = cls.objects.filter(author=user).annotate(
-            total_likes=Count('likes'),
-            total_views=Sum('hit_count_generic__hits'),
-            total_comments=Count('comments')
+            total_likes=Count("likes"), total_views=Sum("hit_count_generic__hits"), total_comments=Count("comments")
         )
 
-        posts = posts.annotate(
-            performance_score=(2 * F('total_likes') + F('total_views') + F('total_comments'))
-            ).order_by('-performance_score')[:2]
-            # more importance given to likes
-        
+        posts = posts.annotate(performance_score=(2 * F("total_likes") + F("total_views") + F("total_comments"))).order_by("-performance_score")[:2]
+        # more importance given to likes
+
         return posts
+
+    @property
+    def image_url(self):
+        photo_obj = self.photo_set.first()
+        if photo_obj and photo_obj.image:
+            return photo_obj.image.url
+        return None
+
+    @property
+    def author_profile_img(self):
+        if self.author and hasattr(self.author, "profile") and self.author.profile.profile_img:
+            return self.author.profile.profile_img.url
+        return None
+
 
 class photo(models.Model):
     image = models.ImageField(upload_to="images/")
@@ -243,22 +238,21 @@ class photo(models.Model):
         # If the image field is not empty
         if self.image:
             # Switch storage backend based on environment
-            if 'DATABASE_URL' in os.environ:
+            if "DATABASE_URL" in os.environ:
                 # Running on Render (production environment)
                 self.image.storage = s3boto3.S3Boto3Storage()
             else:
                 # Running locally
                 self.image.storage = default_storage
         super().save(*args, **kwargs)
-    
-    def __str__(self):
-        return self.feed.title + " - "+self.feed.author.username
 
+    def __str__(self):
+        return self.feed.title + " - " + self.feed.author.username
 
 
 class UserLocation(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    location = models.CharField(max_length=200, default='Location', null=True, blank=True)
+    location = models.CharField(max_length=200, default="Location", null=True, blank=True)
 
     def __str__(self):
         return self.location
@@ -267,28 +261,28 @@ class UserLocation(models.Model):
 class comments(models.Model):
     date_comment = models.DateTimeField(default=timezone.now)
     date_update_comment = models.DateTimeField(default=timezone.now)
-    post_super = models.ForeignKey(post,on_delete=models.CASCADE)
-    comment_user = models.ForeignKey(User,on_delete=models.CASCADE)
+    post_super = models.ForeignKey(post, on_delete=models.CASCADE)
+    comment_user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.TextField()
 
     def __str__(self):
-        return self.post_super.title +" - "+ self.comment_user.first_name
+        return self.post_super.title + " - " + self.comment_user.first_name
 
     def get_date(self):
         return self.date_comment.date()
-    
+
 
 class BlogHistory(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_histories')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="blog_histories")
     blog_post = models.ForeignKey(post, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.blog_post.title + ' -' + " BlogHistory"
+        return self.blog_post.title + " -" + " BlogHistory"
 
     def time_stamp(self):
         return self.timestamp.date()
-    
+
 
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -296,28 +290,27 @@ class Favorite(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.blog.title + ' -' + " Favorite"
-    
+        return self.blog.title + " -" + " Favorite"
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    primary_color = models.CharField(max_length=20, null=True, blank=True, default='#DBCBBD')
-    secondary_color = models.CharField(max_length=20, null=True, blank=True, default='#F0ECE3')
-    tertiary_color = models.CharField(max_length=20, null=True, blank=True, default='#221e20')
-    active_link_color = models.CharField(max_length=20, null=True, blank=True, default='#9F8772')
-    hover_color = models.CharField(max_length=20, null=True, blank=True, default='#9C938B')
+    primary_color = models.CharField(max_length=20, null=True, blank=True, default="#DBCBBD")
+    secondary_color = models.CharField(max_length=20, null=True, blank=True, default="#F0ECE3")
+    tertiary_color = models.CharField(max_length=20, null=True, blank=True, default="#221e20")
+    active_link_color = models.CharField(max_length=20, null=True, blank=True, default="#9F8772")
+    hover_color = models.CharField(max_length=20, null=True, blank=True, default="#9C938B")
 
-    theme = models.CharField(max_length=100, null=True, blank=True, default='theme')
-    
-    neutral_primary = models.CharField(max_length=20, null=True, blank=True, default='#DBCBBD')
-    
-    neutral_secondary = models.CharField(max_length=20, null=True, blank=True, default='#D8D9DA')
+    theme = models.CharField(max_length=100, null=True, blank=True, default="theme")
+
+    neutral_primary = models.CharField(max_length=20, null=True, blank=True, default="#DBCBBD")
+
+    neutral_secondary = models.CharField(max_length=20, null=True, blank=True, default="#D8D9DA")
 
     use_colors_from_image = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.username
-    
 
 
 class RedeemedCredit(models.Model):
@@ -331,20 +324,20 @@ class RedeemedCredit(models.Model):
 
 class CreditHistory(models.Model):
     CREDIT_ACTIONS = (
-        ('earned', 'Earned'),
-        ('redeemed', 'Redeemed'),
-        ('new_recipe', 'New recipe'),
-        ('deleted', 'Deleted'),
+        ("earned", "Earned"),
+        ("redeemed", "Redeemed"),
+        ("new_recipe", "New recipe"),
+        ("deleted", "Deleted"),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.IntegerField(validators=[MinValueValidator(0)])
     earned_timestamp = models.DateTimeField(auto_now_add=True)
-    credit_action = models.CharField(max_length=20,null=True, choices=CREDIT_ACTIONS)
+    credit_action = models.CharField(max_length=20, null=True, choices=CREDIT_ACTIONS)
 
     def __str__(self):
         return f"{self.user.username} - {self.amount} - {self.earned_timestamp.date()}"
-    
+
 
 class CreditSpentHistory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -354,7 +347,8 @@ class CreditSpentHistory(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.spent_timestamp.date()}"
-    
+
+
 class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -365,47 +359,44 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f"{self.name}"
-    
+
+
 class Follow(models.Model):
-    follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
-    following = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, related_name="following", on_delete=models.CASCADE)
+    following = models.ForeignKey(User, related_name="followers", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('follower', 'following')
+        unique_together = ("follower", "following")
 
     def __str__(self):
         return f"{self.follower.username} follows {self.following.username}"
-    
+
     def follow_since(self):
         now = timezone.now()
-        
-        diff= now - self.created_at
+
+        diff = now - self.created_at
 
         if diff.days == 0 and diff.seconds >= 0 and diff.seconds < 60:
-            seconds= diff.seconds
-            
+            seconds = diff.seconds
+
             if seconds == 1:
-                return str(seconds) +  "second ago"
-            
+                return str(seconds) + "second ago"
+
             else:
                 return str(seconds) + " seconds ago"
 
-            
-
         if diff.days == 0 and diff.seconds >= 60 and diff.seconds < 3600:
-            minutes= math.floor(diff.seconds/60)
+            minutes = math.floor(diff.seconds / 60)
 
             if minutes == 1:
                 return str(minutes) + " minute ago"
-            
+
             else:
                 return str(minutes) + " minutes ago"
 
-
-
         if diff.days == 0 and diff.seconds >= 3600 and diff.seconds < 86400:
-            hours= math.floor(diff.seconds/3600)
+            hours = math.floor(diff.seconds / 3600)
 
             if hours == 1:
                 return str(hours) + " hour ago"
@@ -415,8 +406,8 @@ class Follow(models.Model):
 
         # 1 day to 30 days
         if diff.days >= 1 and diff.days < 30:
-            days= diff.days
-        
+            days = diff.days
+
             if days == 1:
                 return str(days) + " day ago"
 
@@ -424,8 +415,7 @@ class Follow(models.Model):
                 return str(days) + " days ago"
 
         if diff.days >= 30 and diff.days < 365:
-            months= math.floor(diff.days/30)
-            
+            months = math.floor(diff.days / 30)
 
             if months == 1:
                 return str(months) + " month ago"
@@ -433,20 +423,40 @@ class Follow(models.Model):
             else:
                 return str(months) + " months ago"
 
-
         if diff.days >= 365:
-            years= math.floor(diff.days/365)
+            years = math.floor(diff.days / 365)
 
             if years == 1:
                 return str(years) + " year ago"
 
             else:
                 return str(years) + " years ago"
-    
+
+
 class searchedRecipesRanking(models.Model):
-    recipe = models.ForeignKey(post, on_delete=models.CASCADE, related_name='recipe_rankings')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_search_rankings')
+    recipe = models.ForeignKey(post, on_delete=models.CASCADE, related_name="recipe_rankings")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_search_rankings")
     date_searched = models.DateTimeField(default=datetime.now)
 
     class Meta:
-        unique_together = ('recipe', 'user')
+        unique_together = ("recipe", "user")
+
+
+class UserTasteProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    taste_vector = VectorField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username} taste profile"
+
+
+class RecipeRecommendationHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(post, on_delete=models.CASCADE)
+    score = models.FloatField()
+    shown_at = models.DateTimeField(auto_now_add=True)
+    clicked = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} → {self.recipe.title}"

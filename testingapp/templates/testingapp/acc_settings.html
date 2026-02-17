@@ -24,7 +24,7 @@
 
 <body>
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated or is_guest %}
 
   <div class="primary-wrapper">
 
@@ -94,7 +94,7 @@
                                 
                                 <div class="d-flex">
                                   <div class="flex-grow-1">
-                                    <h4>Recieve email notification</h4>
+                                    <h4>Receive email notification</h4>
                                     
                                       <div class="d-flex mt-1">
                                         
@@ -179,7 +179,7 @@
                                                   {% if goal_form.instance.goal %}
                                                     <input type="number" name="goal" value="{{goal_form.instance.goal}}" required="" id="id_goal" placeholder="Set a goal">
                                                   {% else %}
-                                                    <input type="number" name="goal" value="0" required="" id="id_goal" placeholder="Set a goal">
+                                                    <input type="number" name="goal" required="" id="id_goal" placeholder="Set a goal">
                                                   {% endif %}
                                                 </form>
                                               </div>
@@ -251,114 +251,44 @@
 
                             {# type #}
                             <div class="col-lg-4 col-md-12 col-12 col-sm-12">
-                              {% if preference_form.preference_type.value %}
-                                <select name="preference_type" id="preference_type" class="custom-select">
-                                  {% if preference_form.preference_type.value == 'Evening Snack recipes' %}
-                                    <option value="{{preference_form.preference_type.value}}" hidden>Snacks recipes</option>                            
-                                  {% else %}
-                                    <option value="{{preference_form.preference_type.value}}" hidden>{{preference_form.preference_type.value}}</option> 
-                                  {% endif %}                
-
-                                  <option value="Select">Select</option>
-                                  
-                                  {% if preference_form.preference_type.value == 'Breakfast recipes' %}
-                                    <option value="Breakfast recipes" class="preference-option-active">Breakfast recipes</option>
-                                  {% else %}
-                                    <option value="Breakfast recipes">Breakfast recipes</option>
-                                  {% endif %}
-
-                                  {% if preference_form.preference_type.value == 'Lunch recipes' %}
-                                    <option value="Lunch recipes" class="preference-option-active">Lunch recipes</option>
-                                  {% else %}
-                                  <option value="Lunch recipes">Lunch recipes</option>
-                                  {% endif %}
-
-                                  {% if preference_form.preference_type.value == 'Evening Snack recipes' %}
-                                   <option value="Evening Snack recipes" class="preference-option-active">Snacks recipes</option>
-                                  {% else %}
-                                    <option value="Evening Snack recipes">Snacks recipes</option>
-                                  {% endif %}
-
-                                  {% if preference_form.preference_type.value == 'Dinner recipes' %}
-                                    <option value="Dinner recipes" class="preference-option-active">Dinner recipes</option>
-                                  {% else %}
-                                    <option value="Dinner recipes">Dinner recipes</option>
-                                  {% endif %}
-                                </select>
-                              {% elif preference_form.preference_type.value == 'Select' or preference_form.preference_type.value == '' %}
-                                <select name="preference_type" id="preference_type">
-                                  <option value="" hidden>Type preference</option>
-                                  <option value="Breakfast recipes">Breakfast recipes</option>
-                                  <option value="Lunch recipes">Lunch recipes</option>
-                                  <option value="Evening Snack recipes">Snacks recipes</option>
-                                  <option value="Dinner recipes">Dinner recipes</option>
-                                </select>
-                              {% endif %}
+                              <select name="preference_type" id="preference_type" class="custom-select">
+                                {% if preference_form.preference_type.value == 'Select' or not preference_form.preference_type.value %}
+                                  <option value="Select" selected>Food type</option>
+                                {% else %}
+                                  <option value="Select">Food type</option>
+                                {% endif %}
+                                <option value="Breakfast recipes" {% if preference_form.preference_type.value == 'Breakfast recipes' %}selected class="preference-option-active"{% endif %}>Breakfast recipes</option>
+                                <option value="Lunch recipes" {% if preference_form.preference_type.value == 'Lunch recipes' %}selected class="preference-option-active"{% endif %}>Lunch recipes</option>
+                                <option value="Evening Snack recipes" {% if preference_form.preference_type.value == 'Evening Snack recipes' %}selected class="preference-option-active"{% endif %}>Snacks recipes</option>
+                                <option value="Dinner recipes" {% if preference_form.preference_type.value == 'Dinner recipes' %}selected class="preference-option-active"{% endif %}>Dinner recipes</option>
+                              </select>
                             </div>
 
                             {# category #}
                             <div class="col-lg-4 col-md-12 col-sm-12">
-                              {% if preference_form.preference_category.value %}
-                                <select name="preference_category" id="id_preference_category">
-                                  <option value="{{preference_form.preference_category.value}}" hidden>{{preference_form.preference_category.value}}</option>
-                                  
-                                  <option value="Select">Select</option>
-                                  
-                                  {% if preference_form.preference_category.value == 'Veg recipes' %}
-                                    <option value="Veg recipes" class="preference-option-active">Veg recipes</option>
-                                  {% else %}
-                                    <option value="Veg recipes">Veg recipes</option>
-                                  {% endif %}
-                                  
-                                  {% if preference_form.preference_category.value == 'Non-Veg recipes' %}
-                                    <option value="Non-Veg recipes" class="preference-option-active">Non-Veg recipes</option>
-                                  {% else %}
-                                    <option value="Non-Veg recipes">Non-Veg recipes</option>
-                                  {% endif %}
-                                </select>
-                              {% elif preference_form.preference_category.value == 'Select' or preference_form.preference_category.value == '' %}
-                                <select name="preference_category" id="id_preference_category">
-                                  <option value="Select" hidden>Category preference</option>
-                                  <option value="Veg recipes">Veg recipes</option>
-                                  <option value="Non-Veg recipes">Non-Veg recipes</option>
-                                </select>
-                              {% endif %}
+                              <select name="preference_category" id="id_preference_category">
+                                {% if preference_form.preference_category.value == 'Select' or not preference_form.preference_category.value %}
+                                  <option value="Select" selected>Category</option>
+                                {% else %}
+                                  <option value="Select">Category</option>
+                                {% endif %}
+                                <option value="Veg recipes" {% if preference_form.preference_category.value == 'Veg recipes' %}selected class="preference-option-active"{% endif %}>Veg recipes</option>
+                                <option value="Non-Veg recipes" {% if preference_form.preference_category.value == 'Non-Veg recipes' %}selected class="preference-option-active"{% endif %}>Non-Veg recipes</option>
+                              </select>
                             </div>
 
                             {# cuisines #}
                             <div class="col-lg-4 col-md-12 col-sm-12"> 
-                              {% if preference_form.preference_cuisine.value %}
-                                <select name="preference_cuisine" id="id_preference_cuisine">
-                                  <option value="{{preference_form.preference_cuisine.value}}" hidden>{{preference_form.preference_cuisine.value}}</option>
-                                  
-                                  <option value="Select">Select</option>
-
-                                  {% if preference_form.preference_cuisine.value == 'Indian cuisine' %}
-                                    <option value="Indian cuisine" class="preference-option-active">Indian cuisine</option>
-                                  {% else %}
-                                    <option value="Indian cuisine">Indian cuisine</option>
-                                  {% endif %}
-
-                                  {% if preference_form.preference_cuisine.value == 'American cuisine' %}
-                                    <option value="American cuisine" class="preference-option-active">American cuisine</option>
-                                  {% else %}
-                                    <option value="American cuisine">American cuisine</option>
-                                  {% endif %}
-
-                                  {% if preference_form.preference_cuisine.value == 'Italian cuisine' %}
-                                    <option value="Italian cuisine" class="preference-option-active">Italian cuisine</option>
-                                  {% else %}
-                                    <option value="Italian cuisine">Italian cuisine</option>
-                                  {% endif %}
-                                </select>
-                              {% elif preference_form.preference_cuisine.value == 'Select' or preference_form.preference_cuisine.value == '' %}
-                                <select name="preference_cuisine" id="id_preference_cuisine">
-                                  <option value="" hidden>Cuisine preference</option>
-                                  <option value="Indian cuisine">Indian cuisine</option>
-                                  <option value="American cuisine">American cuisine</option>
-                                  <option value="Italian cuisine">Italian cuisine</option>
-                                </select>
-                              {% endif %}
+                              <select name="preference_cuisine" id="id_preference_cuisine">
+                                {% if preference_form.preference_cuisine.value == 'Select' or not preference_form.preference_cuisine.value %}
+                                  <option value="Select" selected>Cuisines</option>
+                                {% else %}
+                                  <option value="Select">Cuisines</option>
+                                {% endif %}
+                                <option value="Indian cuisine" {% if preference_form.preference_cuisine.value == 'Indian cuisine' %}selected class="preference-option-active"{% endif %}>Indian cuisine</option>
+                                <option value="American cuisine" {% if preference_form.preference_cuisine.value == 'American cuisine' %}selected class="preference-option-active"{% endif %}>American cuisine</option>
+                                <option value="Italian cuisine" {% if preference_form.preference_cuisine.value == 'Italian cuisine' %}selected class="preference-option-active"{% endif %}>Italian cuisine</option>
+                              </select>
                             </div>
 
                           </div>
@@ -424,60 +354,6 @@
       recipegoalForm.submit();
     });
 </script>
-
-{# delete account modal #}
-<div class="modal fade Modal-delete" id="accountdeleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content logoutmodal deletemodal accountdeletemodal">
-      <div class="modal-body">
-        <div class="modal-body-header">
-          <h2 class="modal-body-text-color">Delete account?</h2>
-          <p class="del-text modal-body-text-color">Consider downloading your data before account deletion</p>
-        </div>
-
-        <div class="modal-body-footer delete-modal-footer">
-          <div class="d-flex justify-content-between">
-            <div>
-              <button type="button" class="btn btn-transparent data-download-btn" id="dataDownloadButton" data-target-id="downloadDataTarget">Download data</button>
-            </div>
-
-            <div>
-              <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-              <button class="btn btn-transparent" data-bs-target="#confirmAccountDeleteModal" data-bs-toggle="modal">Delete</button>    
-            </div>            
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-{# Confirming the account deletion #}
-<div class="modal fade Modal-delete" id="confirmAccountDeleteModal" aria-hidden="true" aria-labelledby="confirmAccountDeleteModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content logoutmodal deletemodal">
-      <div class="modal-body">
-        <div class="modal-body-header">
-          <h2 class="modal-body-text-color">Confirm account deletion!</h2>
-          <p class="del-text modal-body-text-color">You are about to permanently delete your account and all associated data.</p>
-            
-          <div class="callout callout-warning">
-            <p><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</p>
-          </div>
-        </div>
-
-        <div class="modal-body-footer delete-modal-footer">
-          <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-          
-          <form method="post" action="{% url 'delete_account' %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Delete</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
   <div id="newToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -599,4 +475,60 @@
   {% endfor %}
 {% endif %}
 
+{% endblock %}
+
+{% block modals %}
+  {# delete account modal #}
+  <div class="modal fade Modal-delete" id="accountdeleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content logoutmodal deletemodal accountdeletemodal">
+        <div class="modal-body">
+          <div class="modal-body-header">
+            <h2 class="modal-body-text-color">Delete account?</h2>
+            <p class="del-text modal-body-text-color">Consider downloading your data before account deletion</p>
+          </div>
+
+          <div class="modal-body-footer delete-modal-footer">
+            <div class="d-flex justify-content-between">
+              <div>
+                <button type="button" class="btn btn-transparent data-download-btn" id="dataDownloadButton" data-target-id="downloadDataTarget">Download data</button>
+              </div>
+
+              <div>
+                <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-transparent" data-bs-target="#confirmAccountDeleteModal" data-bs-toggle="modal">Delete</button>    
+              </div>            
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Confirming the account deletion #}
+  <div class="modal fade Modal-delete" id="confirmAccountDeleteModal" aria-hidden="true" aria-labelledby="confirmAccountDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content logoutmodal deletemodal">
+        <div class="modal-body">
+          <div class="modal-body-header">
+            <h2 class="modal-body-text-color">Confirm account deletion!</h2>
+            <p class="del-text modal-body-text-color">You are about to permanently delete your account and all associated data.</p>
+              
+            <div class="callout callout-warning">
+              <p><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> You can't undo this action</p>
+            </div>
+          </div>
+
+          <div class="modal-body-footer delete-modal-footer">
+            <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+            
+            <form method="post" action="{% url 'delete_account' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

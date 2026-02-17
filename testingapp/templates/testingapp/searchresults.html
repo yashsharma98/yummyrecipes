@@ -34,7 +34,7 @@
 
         <main role="main" class="container-main">
 
-          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper generated-recipe-container">
                    
             <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
               Search results
@@ -43,10 +43,44 @@
             <p class="sub-heading">
               {% if results or profile_results %}
                 <span class="sub-heading-secondary">Showing results for </span> <span class="sub-heading-modal" data-bs-toggle="modal" data-bs-target="#searchModal">'{{query}}'</span>
+              {% elif recipe_description %}
+                <span class="sub-heading-secondary">AI overview for </span> <span class="sub-heading-modal" data-bs-toggle="modal" data-bs-target="#searchModal">'{{query}}'</span>
               {% else %}
-                <span class="sub-heading-secondary">No results found for</span> <span class="sub-heading-modal" data-bs-toggle="modal" data-bs-target="#searchModal">'{{query}}'</span>
+                <span class="sub-heading-secondary">No results found for </span> <span class="sub-heading-modal" data-bs-toggle="modal" data-bs-target="#searchModal">'{{query}}'</span>
               {% endif %}
             </p>
+
+            <!-- {% if debug %}
+<hr>
+<div style="color:#0f0;padding:15px;font-family:monospace">
+    <h3>Search Debug</h3>
+
+    <strong>Query:</strong> {{ debug.query }}<br>
+    <strong>Query Type:</strong> {{ debug.query_type }}<br><br>
+
+    <strong>Extracted Filters:</strong>
+    <pre>{{ debug.extracted_filters }}</pre>
+
+    <strong>Timing Intent:</strong>
+    <pre>{{ debug.timing_intent }}</pre>
+
+    <strong>Servings Intent:</strong>
+    <pre>{{ debug.servings_intent }}</pre>
+
+    <strong>Difficulty Intent:</strong>
+    <pre>{{ debug.difficulty_intent }}</pre>
+
+    <strong>After Synonyms:</strong>
+    <pre>{{ debug.after_synonyms }}</pre>
+
+    <strong>DB Results:</strong>
+    <pre>{{ debug.db_results }}</pre>
+
+    <strong>Fallbacks:</strong>
+    <pre>{{ debug.fallbacks }}</pre>
+</div>
+{% endif %} -->
+
 
             {% if results %}
 
@@ -63,9 +97,9 @@
                       {% elif not profile_result.first_name == '' or profile_result.last_name == '' %}
                         <div class="search-profile-cards">
                           <a href="{% url 'userchannelpage' first=profile_result.first_name last=profile_result.last_name pk=profile_result.pk %}" class="">
-                            <div class="row g-0">
+                            <div class="d-flex">
                               <div class="profile-pg-img-container">
-                                <img src="{{ profile_result.profile.profile_img.url }}" class="img-fluid" alt="profile-image">
+                                <img loading="lazy" src="{{ profile_result.profile.profile_img.url }}" class="img-fluid" alt="profile-image">
                               </div>
                               <div class="search-profile-body-container">
                                 <div class="card-body">
@@ -79,16 +113,17 @@
                                       {% else %}
                                         {{ profile_result.followers.count }} follower
                                       {% endif %}
+                                    </small>
 
-                                      &#11825; 
+                                    <small>
                                       {% if profile_result.post_set.count > 1 %}
-                                        {{ profile_result.post_set.count }} recipes
-                                      {% else %}
-                                        {{ profile_result.post_set.count }} recipe
-                                      {% endif %}
+                                      {{ profile_result.post_set.count }} recipes
+                                    {% else %}
+                                      {{ profile_result.post_set.count }} recipe
+                                    {% endif %}
                                     </small>
                                   </div>
-                                  <div><small>{{profile_result.profile.bio}}</small></div>
+                                  
                                   <div>
                                     {% if profile_result != request.user %}
                                       {% for key, value in is_following.items %}
@@ -135,10 +170,10 @@
                         <div class="img-container">
                           {% for i in post.photo_set.all %}
                           {% if forloop.counter0 == 0 %}
-                              <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                              <img loading="lazy" src="{{ i.image.url }}" class="recipe-img" alt="..." >
                           {% endif %}
                           {% empty %}
-                              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                              <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
                           {% endfor %}
 
                           <div class="readtime-container">
@@ -153,7 +188,7 @@
                             {% endif %}
                             <p class="card-text">
                                 <ul>
-                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                    <li><img loading="lazy" src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
                                     <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
                                 </ul>
                             </p>
@@ -161,17 +196,17 @@
                     </a>
                     <div class="quick-view">
                         <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            <span class="material-symbols-rounded recipe-read-more-icon">view_headline</span>
                         </button>
                     </div>
 
                     <div class="favourites">
                       {% if post in user.favourite.all %}
-                      <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                      <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="bs-custom-tooltip" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                           <span class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">favorite</span>
                       </a>
                       {% else %}
-                      <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
+                      <a class="favourite-link" data-post-id="{{ post.id }}" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="bs-custom-tooltip" data-bs-original-title="{% if post in user.favourite.all %}Remove from favourites{% else %}Add to favourites{% endif %}">
                           <span class="material-symbols-rounded favourite-icon">favorite</span>
                       </a>
                       {% endif %}
@@ -184,6 +219,40 @@
 
             {% else %}
 
+              {% if show_google or show_kitchen_ai %}
+
+                <div class="web-searched-result-container">
+                
+                  <!-- {% if recipe_image_url %}
+                    <div class="searched-query-image-block">
+                      <img loading="lazy" src="{{ recipe_image_url }}" alt="{{ query }}" class="recipe-cover-image" />
+                    </div>
+                  {% endif %}
+
+                  <div class="searched-query-description-block">
+                    {{ recipe_description|safe }}
+                  </div> -->
+                  
+                  <div class="searched-query-links">
+                    <ul>
+                      <li>
+                        <a href="https://www.google.com/search?q={{ query }}" target="_blank" rel="noopener noreferrer">
+                          <i class="fa-brands fa-google searched-query-links-icon"></i>
+                          Google "{{query}}"
+                        </a>
+                      </li>
+
+                      <li>
+                        <a href="{% url 'generate_recipe' %}?query={{ query|urlencode }}">
+                          <i class="fa-solid fa-wand-magic-sparkles searched-query-links-icon"></i>
+                          Generate this recipe
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+
+                </div>
+              {% endif %}
 
             {% endif %}
         
@@ -211,7 +280,7 @@
 
         <main role="main" class="container-main">
 
-          <div class="dynamic-recipes tertiary-wrapper">
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper generated-recipe-container">
                   
             <h1>Search results</h1>
 
@@ -224,7 +293,7 @@
             </p>
 
             {% if results %}
-              <div class="dynamic-card-container all-recipes-card-container">
+              <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
                   
                   {% if profile_results %}
 
@@ -237,9 +306,9 @@
                         {% elif not profile_result.first_name == '' or profile_result.last_name == '' %}
                           <div class="search-profile-cards">
                             <a href="{% url 'userchannelpage' first=profile_result.first_name last=profile_result.last_name pk=profile_result.pk %}" class="">
-                              <div class="row g-0">
+                              <div class="d-flex">
                                 <div class="profile-pg-img-container">
-                                  <img src="{{ profile_result.profile.profile_img.url }}" class="img-fluid" alt="profile-image">
+                                  <img loading="lazy" src="{{ profile_result.profile.profile_img.url }}" class="img-fluid" alt="profile-image">
                                 </div>
                                 <div class="search-profile-body-container">
                                   <div class="card-body">
@@ -253,8 +322,9 @@
                                         {% else %}
                                           {{ profile_result.followers.count }} follower
                                         {% endif %}
-  
-                                        &#11825; 
+                                      </small>
+
+                                      <small>
                                         {% if profile_result.post_set.count > 1 %}
                                           {{ profile_result.post_set.count }} recipes
                                         {% else %}
@@ -262,7 +332,6 @@
                                         {% endif %}
                                       </small>
                                     </div>
-                                    <div><small>{{profile_result.profile.bio}}</small></div>
                                   </div>
                                 </div>
                               </div>
@@ -289,10 +358,10 @@
                       <div class="img-container">
                         {% for i in post.photo_set.all %}
                         {% if forloop.counter0 == 0 %}
-                            <img src="{{ i.image.url }}" class="recipe-img" alt="..." >
+                            <img loading="lazy" src="{{ i.image.url }}" class="recipe-img" alt="..." >
                         {% endif %}
                         {% empty %}
-                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                            <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
                         {% endfor %}
 
                         <div class="readtime-container">
@@ -307,7 +376,7 @@
                           {% endif %}
                           <p class="card-text">
                               <ul>
-                                  <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                  <li><img loading="lazy" src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
                                   <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
                               </ul>
                           </p>
@@ -315,7 +384,7 @@
                     </a>
                     <div class="quick-view">
                         <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                            <span class="material-symbols-rounded recipe-read-more-icon">view_headline</span>
                         </button>
                     </div>
                   </div>
@@ -368,7 +437,6 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-
 
 {# if authenticated user tries to following itself #}
 {% if messages %}

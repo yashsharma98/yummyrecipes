@@ -49,17 +49,17 @@
                                         <div class="img-container">
                                         {% for i in post.photo_set.all %}
                                         {% if forloop.counter0 == 0 %}
-                                            <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
+                                            <img loading="lazy" src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
                                         {% endif %}
                                         {% empty %}
-                                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                            <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
                                         {% endfor %}
                                         </div>
                                         <div class="card-body recipe-info">
                                             <h4 class="card-title highlight">{{post.title}}</h4>
                                             <p class="card-text">
                                                 <ul>
-                                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                                    <li><img loading="lazy" src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
                                                     <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
                                                 </ul>
                                             </p>
@@ -67,7 +67,7 @@
                                     </a>
                                     <div class="quick-view">
                                         <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                            <span class="material-symbols-rounded recipe-read-more-icon">view_headline</span>
                                         </button>
                                     </div>
 
@@ -84,17 +84,17 @@
                                         <div class="img-container">
                                         {% for i in post.photo_set.all %}
                                         {% if forloop.counter0 == 0 %}
-                                            <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
+                                            <img loading="lazy" src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
                                         {% endif %}
                                         {% empty %}
-                                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                            <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
                                         {% endfor %}
                                         </div>
                                         <div class="card-body recipe-info">
                                             <h4 class="card-title highlight">{{post.title}}</h4>
                                             <p class="card-text">
                                                 <ul>
-                                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                                    <li><img loading="lazy" src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
                                                     <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
                                                 </ul>
                                             </p>
@@ -102,7 +102,7 @@
                                     </a>
                                     <div class="quick-view">
                                         <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                            <span class="material-symbols-rounded recipe-read-more-icon">view_headline</span>
                                         </button>
                                     </div>
 
@@ -119,17 +119,17 @@
                                         <div class="img-container">
                                         {% for i in post.photo_set.all %}
                                         {% if forloop.counter0 == 0 %}
-                                            <img src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
+                                            <img loading="lazy" src="{{ i.image.url }}" class="recipe-img" alt="{{post.title}}">
                                         {% endif %}
                                         {% empty %}
-                                            <img src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+                                            <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
                                         {% endfor %}
                                         </div>
                                         <div class="card-body recipe-info">
                                             <h4 class="card-title highlight">{{post.title}}</h4>
                                             <p class="card-text">
                                                 <ul>
-                                                    <li><img src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
+                                                    <li><img loading="lazy" src="{{post.author.profile.profile_img.url}}"  alt="Image"></li>
                                                     <li><div>{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.whenpublished}} &#11825; {% get_hit_count for post %} views</li>
                                                 </ul>
                                             </p>
@@ -137,7 +137,7 @@
                                     </a>
                                     <div class="quick-view">
                                         <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                                            <span class="material-symbols-rounded recipe-read-more-icon">dock_to_left</span>
+                                            <span class="material-symbols-rounded recipe-read-more-icon">view_headline</span>
                                         </button>
                                     </div>
 

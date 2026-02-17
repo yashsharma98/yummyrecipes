@@ -103,7 +103,7 @@
 
                                 <div class="compare-recipes-img-conatiner">
                                     {% if photo1 %}
-                                        <img src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
+                                        <img loading="lazy" src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
                                     {% endif %}
                                 </div>
 
@@ -170,7 +170,11 @@
                                 {% if nutrition_widget1|safe %}
 
                                     <div class="qv-offcanvas-table-wrapper compare-recipes-table compare-recipes-table1">
-                                        {{ nutrition_widget1|safe }}
+                                        {% if "Information is not unavailable" in nutrition_widget1 %}
+                                            <div class="nutrition-error-msg">Nutritional information is currently unavailable.</div>
+                                        {% else %}
+                                            {{ nutrition_widget1|safe }}
+                                        {% endif %}
 
                                         <script>
                                             document.addEventListener('DOMContentLoaded', function() {
@@ -241,7 +245,7 @@
 
                                 <div class="compare-recipes-img-conatiner">
                                     {% if photo2 %}
-                                        <img src="{{ photo2.image.url }}" alt="{{ recipe2.title }} Image">
+                                        <img loading="lazy" src="{{ photo2.image.url }}" alt="{{ recipe2.title }} Image">
                                     {% endif %}
                                 </div>
 
@@ -307,9 +311,13 @@
                                 </div>
 
                                 {% if nutrition_widget2|safe %}
-                                    
                                     <div class="qv-offcanvas-table-wrapper compare-recipes-table compare-recipes-table2">
-                                        {{ nutrition_widget2|safe }}
+                                        {% if "Information is not unavailable" in nutrition_widget2 %}
+                                            <div class="nutrition-error-msg">Nutritional information is currently unavailable.</div>
+                                        {% else %}
+                                            {{ nutrition_widget1|safe }}
+                                        {% endif %}
+
                                         <script>
                                                 document.addEventListener('DOMContentLoaded', function() {
                                                 var headingsSalmon = document.querySelectorAll('.spoonacular-caption.spoonacular-salmon');

@@ -113,65 +113,6 @@
 
 </body>
 
-
-{# error message if user already exists #}
-{% if messages %}
-                                  
-  <div class="modal fade" id="messagesModal" tabindex="-1" aria-labelledby="messagesModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-search">
-      <div class="modal-content logoutmodal deletemodal messagemodal">
-          <div class="modal-header">
-              <h5 class="modal-title" id="messagesModalLabel">Error</h5>
-              <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
-          </div>
-          
-          <div class="modal-body">
-          {% for message in messages %}
-          <div class="callout callout-warning">
-              <h5><span class="material-symbols-rounded warning-icon" id="warning-icon">warning</span> {{ message }}</h5>
-          </div>
-              
-          {% endfor %}
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
-          </div>
-      </div>
-      </div>
-  </div>
-
-  <script>
-      $(document).ready(function() {
-      $('#messagesModal').modal('show');
-      });
-  </script>
-
-{% endif %}
-
-{# Bootstrap Modal for Password Mismatch #}
-<div class="modal fade" id="passwordMismatchModal" tabindex="-1" role="dialog" aria-labelledby="passwordMismatchModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-search" role="document">
-    <div class="modal-content logoutmodal deletemodal messagemodal">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="passwordMismatchModalLabel">Password Mismatch</h5>
-        <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="callout callout-warning">
-          <h5><span class="material-symbols-rounded warning-icon" id="warning-icon">password</span> Passwords do not match!</h5>
-      </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelector(".signup-form").addEventListener("submit", function (event) {
@@ -186,27 +127,6 @@
     });
   });
 </script>
-
-
-{# Validation Modal #}
-<div class="modal fade" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="validationModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-search" role="document">
-    <div class="modal-content logoutmodal deletemodal messagemodal">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="validationModalLabel">Validation Error</h5>
-        <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
-      </div>
-
-      <div class="modal-body validation-modal-body">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-light footerbtn" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -266,4 +186,74 @@
   });
 </script>
 
+{% endblock %}
+
+{% block modals %}
+
+{# error message if user already exists #}
+{% if messages %}
+                                  
+  <div class="modal fade" id="messagesModal" tabindex="-1" aria-labelledby="messagesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-search">
+      <div class="modal-content logoutmodal creditmodal messagemodal">
+        <div class="modal-body">
+          {% for message in messages %}
+            <div class="modal-body-header">
+              <h2>Error</h2>
+              <p class="text-center">{{ message }}</p>
+            </div>
+          {% endfor %}
+
+          <div class="modal-body-footer">
+            <button type="button" class="btn btn-transparent footer-btn" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+      $(document).ready(function() {
+      $('#messagesModal').modal('show');
+      });
+  </script>
+
+{% endif %}
+
+  {# Validation Modal #}
+  <div class="modal fade Modal-logout" id="validationModal" tabindex="-1" role="dialog" aria-labelledby="validationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content logoutmodal creditmodal messagemodal">
+        <div class="modal-body">
+          <div class="modal-body-header">
+            <h2>Validation Error</h2>
+            <p class="text-center validation-modal-body"></p>
+          </div>
+
+          <div class="modal-body-footer">
+            <button type="button" class="btn btn-transparent footer-btn" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Password Mismatch #}
+  <div class="modal fade Modal-logout" id="passwordMismatchModal" tabindex="-1" role="dialog" aria-labelledby="passwordMismatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content logoutmodal creditmodal messagemodal">
+        <div class="modal-body">
+          <div class="modal-body-header">
+            <h2>Password Mismatch</h2>
+            <p class="text-center">Passwords do not match!</p>
+          </div>
+
+          <div class="modal-body-footer">
+            <button type="button" class="btn btn-transparent footer-btn" data-bs-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

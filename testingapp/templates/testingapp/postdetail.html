@@ -29,7 +29,7 @@
 
   <div class="primary-wrapper postdetail-primary-wrapper" id="scrollableDiv" data-recipe-id="{{post.pk}}" >
     
-    <div class="secondary-wrapper">
+    <div class="secondary-wrapper postdetail-secondary-wrapper">
 
       <div class="container container-flex">
 
@@ -37,7 +37,7 @@
 
             <div class="dynamic-recipes recipe-detail-wrapper">                    
 
-              <div class="dynamic-card-container carousel-container rcdet-card-container">
+              <div class="dynamic-card-container carousel-container recdet-card-container">
                 
                 <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                   
@@ -53,11 +53,11 @@
                   <div class="carousel-inner">
                     {% for post in post.photo_set.all %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                      <img src="{{ post.image.url }}" class="d-block carousel-image w-100" alt="{{ post.title }}">
+                      <img loading="lazy" src="{{ post.image.url }}" class="d-block carousel-image" alt="{{ post.title }}">
                     </div>
                     {% empty %}
                     <div>
-                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image w-100" alt="{{ post.title }}">
+                      <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image" alt="{{ post.title }}">
                     </div>
                     {% endfor %}
                   </div>
@@ -87,7 +87,7 @@
                       {% if i.user.email == post.author.email %}
                       <div>
                         <a href="{% url 'userchannelpage' first=post.author.first_name last=post.author.last_name pk=post.author.pk %}">
-                          <img src="{{ post.author.profile.profile_img.url }}" alt="Image">
+                          <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="Image">
                         </a>
                       </div>
                       {% endif %}
@@ -98,7 +98,7 @@
                       <div class="card hover-profile-card">
                         <div class="row g-0">
                           <div class="col-lg-4 card-img-container">
-                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                            <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="...">
                           </div>
                           <div class="col-md-8">
                             <div class="card-body">
@@ -176,7 +176,7 @@
                       <div class="card hover-profile-card">
                         <div class="row g-0">
                           <div class="col-lg-4 card-img-container">
-                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                            <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="...">
                           </div>
                           <div class="col-md-8">
                             <div class="card-body">
@@ -202,7 +202,7 @@
                         {% csrf_token %}
                     
                         <button type="submit" class="like-button {% if request.user.profile in post.likes.all %}liked{% endif %}" data-post-id="{{ post.id }}"
-                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="I like this">
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="bs-custom-tooltip" data-bs-original-title="I like this">
                           {% if request.user.profile in post.likes.all %}  
                             <span class="material-symbols-rounded like-dislike-icon liked">thumb_up</span>  
                           {% else %}
@@ -221,7 +221,7 @@
                         {% csrf_token %}
                     
                         <button type="submit" class="dislike-button {% if request.user.profile in post.dislikes.all %}disliked{% endif %}" data-post-id="{{ post.id }}"
-                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="I dislike this">
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="bs-custom-tooltip" data-bs-original-title="I dislike this">
                           {% if request.user.profile in post.dislikes.all %}  
                             <span class="material-symbols-rounded like-dislike-icon disliked">thumb_down</span>  
                           {% else %}
@@ -242,6 +242,7 @@
   
                       <div class="dropdown-menu body-detail-dropdown-content">
                         <div class="body-detail-dropdown-list">
+                          
                           <div class="dropdown-first-child">
                             <button class="dropdown-links" data-bs-toggle="modal" data-bs-target="#shareRecipeModal">
                               <span class="material-symbols-rounded share-recipe-icon">share</span>
@@ -264,11 +265,12 @@
                           </div>
 
                           <div class="dropdown-second-child">
-                            <a class="dropdown-links" href="{% url 'customerrender' feed=post.title pk=post.pk %}">
+                            <a class="dropdown-links" href="{% url 'customerrender' feed=post.title pk=post.pk %}" target="_blank">
                               <span class="material-symbols-rounded share-recipe-icon">file_download</span>
                               Download
                             </a>
                           </div>
+
                         </div>
                       </div>
                     </div>
@@ -320,17 +322,30 @@
                               <td>:</td>
                               <td>{{post.cuisine|cut:" cuisine"}}</td>
                           </tr>
-                          <tr>
-                              <th scope="row" colspan="2">Prep time</th>
-                              <td>:</td>
-                              <td>
-                                {% if post.timing > 1 %}
-                                    {{post.timing}} mins
-                                {% else %}
-                                    {{post.timing}} min
-                                {% endif %}
-                              </td>
-                          </tr>
+                          {% if pred_time %}
+                            <tr>
+                                <th scope="row" colspan="2">Prep time</th>
+                                <td>:</td>
+                                <td>
+                                  {% if pred_time.prep > 1 %}
+                                      {{pred_time.prep}} mins
+                                  {% else %}
+                                      {{pred_time.prep}} min
+                                  {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" colspan="2">Cook time</th>
+                                <td>:</td>
+                                <td>
+                                  {% if pred_time.cook > 1 %}
+                                      {{pred_time.cook}} mins
+                                  {% else %}
+                                      {{pred_time.cook}} min
+                                  {% endif %}
+                                </td>
+                            </tr>
+                          {% endif %}
                           <tr>
                               <th scope="row" colspan="2">Servings</th>
                               <td>:</td>
@@ -367,8 +382,11 @@
                     <div class="right">
                       
                       <div class="recipe-detail-table">
-                        {{ nutrition_widget|safe }}
-
+                        {% if nutrition_error %}
+                          <div class="nutrition-error-msg">Nutritional information is currently unavailable.</div>
+                        {% else %}
+                          {{ nutrition_widget|safe }}
+                        {% endif %}
                         <script>
                           document.addEventListener('DOMContentLoaded', function() {
                               var heading1 = document.querySelector('.spoonacular-caption.spoonacular-salmon');
@@ -404,13 +422,28 @@
                     <span class="material-symbols-rounded recipe-action-icons">compare</span>Compare recipe
                   </a>
 
-                  <button type="button" data-bs-toggle="offcanvas" data-bs-target="#simpleViewModal"><span class="material-symbols-rounded recipe-action-icons">dock_to_left</span>Quick view</button>
+                  <button type="button" data-bs-toggle="offcanvas" data-bs-target="#simpleViewModal"><span class="material-symbols-rounded recipe-action-icons">view_headline</span>Quick view</button>
 
                   <button type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="material-symbols-rounded recipe-action-icons">shopping_cart</span>Shopping list
                   </button> 
 
-                  <div class="dropdown-menu body-detail-dropdown-content recipe-detail-dropdown-content">
+                  <ul class="dropdown-menu body-detail-dropdown-list shopping-btn-dropdown">
+                    <li> 
+                      <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#shoppinglistModal">
+                        <span class="material-symbols-rounded share-recipe-icon">format_list_bulleted</span>
+                        View list
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="{% url 'shopping_list' title=post.title pk=post.pk %}" target="_blank">
+                      <span class="material-symbols-rounded share-recipe-icon">file_download</span>
+                      Download list
+                    </a>
+                    </li>
+                  </ul>
+
+                  <!-- <div class="dropdown-menu body-detail-dropdown-content recipe-detail-dropdown-content">
                     <div class="body-detail-dropdown-list">
                       <div class="dropdown-first-child">
                         <button class="dropdown-links" data-bs-toggle="modal" data-bs-target="#shoppinglistModal">
@@ -426,7 +459,7 @@
                         </a>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
 
                 </div>
 
@@ -535,7 +568,7 @@
                         <figure class="author-recipe-cards author-first-img">
                             {% for i in i.photo_set.all %}
                                 {% if forloop.counter0 == 0 %}
-                                    <img src="{{ i.image.url }}" alt="recipe-image">
+                                    <img loading="lazy" src="{{ i.image.url }}" alt="recipe-image">
                                 {% endif %}
                             {% endfor %}
                             <p>{{ i.title }} </p>
@@ -546,7 +579,7 @@
                             <figure class="author-recipe-cards">
                               {% for i in i.photo_set.all %}
                                   {% if forloop.counter0 == 0 %}
-                                      <img src="{{ i.image.url }}" alt="recipe-image">
+                                      <img loading="lazy" src="{{ i.image.url }}" alt="recipe-image">
                                   {% endif %}
                               {% endfor %}
                               <p>{{ i.title }}</p>
@@ -604,10 +637,10 @@
                         <div class="sidebar-img-container">
                           {% for i in post.photo_set.all %}
                           {% if forloop.counter0 == 0 %}
-                              <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                              <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                           {% endif %}
                             {% empty %}
-                              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                              <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                           {% endfor %}
                         </div>
 
@@ -617,7 +650,7 @@
                       </a>
                       <div class="sidebar-cards-qv" title="Quick view">
                           <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                              <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                              <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                           </button>
                       </div>
                     </div>
@@ -633,10 +666,10 @@
                             <div class="sidebar-img-container">
                               {% for i in brkfst.photo_set.all %}
                               {% if forloop.counter0 == 0 %}
-                                  <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                  <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                               {% endif %}
                                 {% empty %}
-                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                  <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                               {% endfor %}
                             </div>
 
@@ -646,7 +679,7 @@
                           </a>
                           <div class="sidebar-cards-qv" title="Quick view">
                               <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{brkfst.pk}}" aria-controls="quickviewModal">
-                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                               </button>
                           </div>
                       </div>
@@ -667,10 +700,10 @@
                           <div class="sidebar-img-container">
                             {% for i in lnch.photo_set.all %}
                             {% if forloop.counter0 == 0 %}
-                                <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                             {% endif %}
                               {% empty %}
-                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                             {% endfor %}
                           </div>
 
@@ -680,7 +713,7 @@
                         </a>
                         <div class="sidebar-cards-qv" title="Quick view">
                             <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{lnch.pk}}" aria-controls="quickviewModal">
-                                <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                             </button>
                         </div>
                       </div>
@@ -701,10 +734,10 @@
                             <div class="sidebar-img-container">
                               {% for i in evesnack.photo_set.all %}
                               {% if forloop.counter0 == 0 %}
-                                  <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                  <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                               {% endif %}
                                 {% empty %}
-                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                  <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                               {% endfor %}
                             </div>
 
@@ -714,7 +747,7 @@
                           </a>
                           <div class="sidebar-cards-qv" title="Quick view">
                               <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{evesnack.pk}}" aria-controls="quickviewModal">
-                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                               </button>
                           </div>
                         </div>
@@ -736,10 +769,10 @@
                               <div class="sidebar-img-container">
                                 {% for i in dnr.photo_set.all %}
                                 {% if forloop.counter0 == 0 %}
-                                    <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                    <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                                 {% endif %}
                                   {% empty %}
-                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                    <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                                 {% endfor %}
                               </div>
 
@@ -749,7 +782,7 @@
                             </a>
                             <div class="sidebar-cards-qv" title="Quick view">
                                 <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{dnr.pk}}" aria-controls="quickviewModal">
-                                    <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                    <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                                 </button>
                             </div>
                         </div>
@@ -838,11 +871,11 @@
                   <div class="carousel-inner">
                     {% for post in post.photo_set.all %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                      <img src="{{ post.image.url }}" class="d-block carousel-image" alt="{{ post.title }}">
+                      <img loading="lazy" src="{{ post.image.url }}" class="d-block carousel-image" alt="{{ post.title }}">
                     </div>
                     {% empty %}
                     <div>
-                      <img src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image" alt="{{ post.title }}">
+                      <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="d-block carousel-image" alt="{{ post.title }}">
                     </div>
                     {% endfor %}
                   </div>
@@ -872,7 +905,7 @@
                       {% if i.user.email == post.author.email %}
                       <div>
                         <a href="{% url 'userchannelpage' first=post.author.first_name last=post.author.last_name pk=post.author.pk %}">
-                          <img src="{{ post.author.profile.profile_img.url }}" alt="Image">
+                          <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="Image">
                         </a>
                       </div>
                       {% endif %}
@@ -883,7 +916,7 @@
                       <div class="card hover-profile-card">
                         <div class="row g-0">
                           <div class="col-lg-4 card-img-container">
-                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                            <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="...">
                           </div>
                           <div class="col-md-8">
                             <div class="card-body">
@@ -919,7 +952,7 @@
                       <div class="card hover-profile-card">
                         <div class="row g-0">
                           <div class="col-lg-4 card-img-container">
-                            <img src="{{ post.author.profile.profile_img.url }}" alt="...">
+                            <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="...">
                           </div>
                           <div class="col-md-8">
                             <div class="card-body">
@@ -944,7 +977,7 @@
                       <form>
                     
                         <button class="like-button {% if request.user.profile in post.likes.all %}liked{% endif %}"
-                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Login to like" disabled>
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="bs-custom-tooltip" data-bs-original-title="Login to like" disabled>
                           {% if request.user.profile in post.likes.all %}  
                             <span class="material-symbols-rounded like-dislike-icon liked">thumb_up</span>  
                           {% else %}
@@ -962,7 +995,7 @@
                       <form>
                     
                         <button class="dislike-button {% if request.user.profile in post.dislikes.all %}disliked{% endif %}"
-                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-original-title="Login to dislike" disabled>
+                          data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-custom-class="bs-custom-tooltip" data-bs-original-title="Login to dislike" disabled>
                           {% if request.user.profile in post.dislikes.all %}  
                             <span class="material-symbols-rounded like-dislike-icon disliked">thumb_down</span>  
                           {% else %}
@@ -1022,17 +1055,30 @@
                               <td>:</td>
                               <td>{{post.cuisine|cut:" cuisine"}}</td>
                           </tr>
-                          <tr>
-                              <th scope="row" colspan="2">Prep time</th>
-                              <td>:</td>
-                              <td>
-                                {% if post.timing > 1 %}
-                                  {{post.timing}} mins
-                                {% else %}
-                                  {{post.timing}} min
-                                {% endif %}
-                              </td>
-                          </tr>
+                          {% if pred_time %}
+                            <tr>
+                                <th scope="row" colspan="2">Prep time</th>
+                                <td>:</td>
+                                <td>
+                                  {% if pred_time.prep > 1 %}
+                                      {{pred_time.prep}} mins
+                                  {% else %}
+                                      {{pred_time.prep}} min
+                                  {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row" colspan="2">Cook time</th>
+                                <td>:</td>
+                                <td>
+                                  {% if pred_time.cook > 1 %}
+                                      {{pred_time.cook}} mins
+                                  {% else %}
+                                      {{pred_time.cook}} min
+                                  {% endif %}
+                                </td>
+                            </tr>
+                          {% endif %}
                           <tr>
                               <th scope="row" colspan="2">Servings</th>
                               <td>:</td>
@@ -1159,7 +1205,7 @@
                         <figure class="author-recipe-cards author-first-img">
                             {% for i in i.photo_set.all %}
                                 {% if forloop.counter0 == 0 %}
-                                    <img src="{{ i.image.url }}" alt="recipe-image">
+                                    <img loading="lazy" src="{{ i.image.url }}" alt="recipe-image">
                                 {% endif %}
                             {% endfor %}
                             <p>{{ i.title }} </p>
@@ -1170,7 +1216,7 @@
                             <figure class="author-recipe-cards">
                               {% for i in i.photo_set.all %}
                                   {% if forloop.counter0 == 0 %}
-                                      <img src="{{ i.image.url }}" alt="recipe-image">
+                                      <img loading="lazy" src="{{ i.image.url }}" alt="recipe-image">
                                   {% endif %}
                               {% endfor %}
                               <p>{{ i.title }}</p>
@@ -1228,10 +1274,10 @@
                         <div class="sidebar-img-container">
                           {% for i in post.photo_set.all %}
                           {% if forloop.counter0 == 0 %}
-                              <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                              <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                           {% endif %}
                             {% empty %}
-                              <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                              <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                           {% endfor %}
                         </div>
 
@@ -1241,7 +1287,7 @@
                       </a>
                       <div class="sidebar-cards-qv" title="Quick view">
                           <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{post.pk}}" aria-controls="quickviewModal">
-                              <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                              <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                           </button>
                       </div>
                     </div>
@@ -1257,10 +1303,10 @@
                             <div class="sidebar-img-container">
                               {% for i in brkfst.photo_set.all %}
                               {% if forloop.counter0 == 0 %}
-                                  <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                  <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                               {% endif %}
                                 {% empty %}
-                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                  <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                               {% endfor %}
                             </div>
 
@@ -1270,7 +1316,7 @@
                           </a>
                           <div class="sidebar-cards-qv" title="Quick view">
                               <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{brkfst.pk}}" aria-controls="quickviewModal">
-                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                               </button>
                           </div>
                       </div>
@@ -1291,10 +1337,10 @@
                           <div class="sidebar-img-container">
                             {% for i in lnch.photo_set.all %}
                             {% if forloop.counter0 == 0 %}
-                                <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                             {% endif %}
                               {% empty %}
-                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                             {% endfor %}
                           </div>
 
@@ -1304,7 +1350,7 @@
                         </a>
                         <div class="sidebar-cards-qv" title="Quick view">
                             <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{lnch.pk}}" aria-controls="quickviewModal">
-                                <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                             </button>
                         </div>
                       </div>
@@ -1325,10 +1371,10 @@
                             <div class="sidebar-img-container">
                               {% for i in evesnack.photo_set.all %}
                               {% if forloop.counter0 == 0 %}
-                                  <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                  <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                               {% endif %}
                                 {% empty %}
-                                  <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                  <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                               {% endfor %}
                             </div>
 
@@ -1338,7 +1384,7 @@
                           </a>
                           <div class="sidebar-cards-qv" title="Quick view">
                               <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{evesnack.pk}}" aria-controls="quickviewModal">
-                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                  <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                               </button>
                           </div>
                         </div>
@@ -1360,10 +1406,10 @@
                               <div class="sidebar-img-container">
                                 {% for i in dnr.photo_set.all %}
                                 {% if forloop.counter0 == 0 %}
-                                    <img src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
+                                    <img loading="lazy" src="{{ i.image.url }}" class="widget-image" alt="{{post.title}}">
                                 {% endif %}
                                   {% empty %}
-                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
+                                    <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="widget-image">
                                 {% endfor %}
                               </div>
 
@@ -1373,7 +1419,7 @@
                             </a>
                             <div class="sidebar-cards-qv" title="Quick view">
                                 <button class="btn btn-transparent quick-view-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{dnr.pk}}" aria-controls="quickviewModal">
-                                    <span class="material-symbols-rounded sidebar-recipe-read-more-icon">dock_to_left</span>
+                                    <span class="material-symbols-rounded sidebar-recipe-read-more-icon">view_headline</span>
                                 </button>
                             </div>
                         </div>
@@ -1418,6 +1464,74 @@
 
 </body>
 
+{% if not user.is_authenticated %}
+  {# Unauth user free recipe limit toast #}
+  <div class="position-fixed bottom-0 p-2 mb-1 recipe-limit-info-container" style="z-index: 5;">
+    <div class="recipe-target-content">
+      <div class="recipe-limit-data">
+        <div>
+          <p>Previously viewed</p>
+          {% if viewed_recipe_count > 0 %}
+            <ul class="mt-1">
+              {% for viewed_post in viewed_posts %}
+                <li><a href="{% url 'viewpost' post.pk %}">{{ viewed_post.title }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-center p-0 button-container">
+      {% if free_recipes_left != 0 %}
+        <button class="limit-btn recipe-toggle-btn">
+          <span class="material-symbols-rounded">info</span>
+            <strong>{{ free_recipes_left }}</strong> free recipe{{ free_recipes_left|pluralize }} left
+        </button>
+      {% else %}
+        <button class="limit-btn">
+          <span class="material-symbols-rounded">info</span>
+          Limit reached. Login for more
+        </button>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+
+{# Unauth user free recipe limit toast show/hide #}
+<script>
+  $(document).ready(function() {
+      $('.recipe-toggle-btn').click(function(event) {
+          event.stopPropagation();
+          const target = $('.recipe-target-content');
+          const button = $('.limit-btn');
+          if (target.height() === 0) {
+              target.css('height', 'auto');
+              const autoHeight = target.height();
+              target.css('height', 0);
+              button.css('width', '100%');
+              target.animate({ height: autoHeight }, 100);
+          } else {
+              button.css('width', '70%');
+              target.animate({ height: 0 }, 100);
+          }
+      });
+
+      $(document).click(function() {
+          const target = $('.recipe-target-content');
+          const button = $('.limit-btn');
+          if (target.height() !== 0) {
+              button.css('width', '70%');
+              target.animate({ height: 0 }, 100);
+          }
+      });
+
+      $('.recipe-limit-info-container').click(function(event) {
+          event.stopPropagation();
+      });
+  });
+</script>
+
+{# Copying ingredients & instructions to clipboard #}
 <script>
   function copyToClipboard(elementId, buttonElement) {
     const element = document.getElementById(elementId);
@@ -1517,289 +1631,6 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-
-
-{% if user.is_authenticated %}
-
-  <div class="offcanvas offcanvas-bottom comments-offcanvas" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Comments</h5>
-      <button class="cmt-offcanvas-btn">
-        <span class="material-symbols-rounded btn-close cmt-offcanvas-close" data-bs-dismiss="offcanvas" aria-label="Close">close</span>
-      </button>
-      
-      <div class="hstack gap-3 comment-input" id="cmt">
-        <img src="{{ user.profile.profile_img.url }}" class="article-imae">
-        <textarea class="form-control me-auto" id="inputComment" type="text" placeholder="Add a comment..." aria-label="Add your comment"></textarea>
-        <button type="button" class="btn btn-transparent" value="comment" id="commentbutton"><span class="material-symbols-rounded">send</span></button>
-      </div>
-    </div>
-    <div class="offcanvas-body">
-
-      <div id="comments">
-        {% if comments %}
-
-          {% for comment in comments.reverse %}
-            <div class="d-flex position-relative comments-section">
-              <img src="{{ post.author.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="..." style="width: 40px;height: 40px;border-radius: 100%;">
-              <div class="commented-author">
-                <h6>{{ comment.comment_user.first_name }} {{ comment.comment_user.last_name }} &#11825; <span>{{ comment.get_date }}</span> </h6>
-                <p>{{ comment.comment }}</p>
-              </div>
-            </div>
-          
-          {% endfor %}
-
-        {% else %}
-
-          <p class="no-comment">No comments</p>
-
-        {% endif %}
-      </div>
-
-    </div>
-  </div>
-
-{% else %}
-
-  <div class="offcanvas offcanvas-bottom comments-offcanvas" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasBottomLabel">Comments</h5>
-      <button class="cmt-offcanvas-btn">
-        <span class="material-symbols-rounded btn-close cmt-offcanvas-close" data-bs-dismiss="offcanvas" aria-label="Close">close</span>
-      </button>
-    </div>
-    <div class="offcanvas-body nologin-offcanvas-body">
-
-      <div id="comments">
-        {% if comments %}
-
-          {% for comment in comments.reverse %}
-            <div class="d-flex position-relative comments-section">
-              <img src="{{ post.author.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="..." style="width: 40px;height: 40px;border-radius: 100%;">
-              <div class="commented-author">
-                <h6>{{ comment.comment_user.first_name }} {{ comment.comment_user.last_name }} &#11825; <span>{{ comment.get_date }}</span> </h6>
-                <p>{{ comment.comment }}</p>
-              </div>
-            </div>
-          
-          {% endfor %}
-
-        {% else %}
-
-          <p class="no-comment">No comments</p>
-
-        {% endif %}
-      </div>
-
-    </div>
-  </div>
-
-{% endif %}
-
-{# recipe images modal #}
-<div class="modal fade modal-xl" id="spotlightModal{{post.pk}}" tabindex="-1" aria-labelledby="spotlightModalLabel" aria-hidden="true">
-  <div class="modal-dialog spotlight-modal-dialog">
-    <div class="modal-content spotlight-modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="spotlightModalLabel">{{post.title}} | {{post.whenpublished}}</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body spotlight-modal-body">
-
-          <div class="cards-wrapper">
-              
-              <div class="card">
-                  {% for i in post.photo_set.all %}
-                    
-                        <img src="{{ i.image.url }}" class="img-fluid" alt="{{post.title}}">
-                    
-                  {% endfor %}
-
-                <div class="" style="color: black;">
-                  <h3>{{post.title}}</h3>
-                <ul>
-                  <li>{{post.get_date|date:"F j, Y"}}</li>
-                  <li>{{post.date_post.time}}</li>
-                </ul>
-                </div>
-              </div>
-          </div>
-        
-      </div>
-      <div class="modal-footer">
-          <a href="{% url 'viewpost' post.pk %}" class="btn btn-primary">View recipe</a>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-{# quick view offcanvas #}
-{% if all_recipes %} 
-{% for post in all_recipes %}
-<div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="quickviewModalLabel">Yummy Recipes</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body qv-modal-body">
-      <div class="qv-modal-body-container">
-        <article class="article-featured">
-            <div class="qv-offcanvas-img-container">
-                {% for i in post.photo_set.all %}
-                    {% if forloop.counter0 == 0 %}
-                        <img src="{{ i.image.url }}" class="article-image qv-offcanvas-img" alt="{{post.title}}">
-                    {% endif %}
-                    {% empty %}
-                        <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
-                {% endfor %}
-            </div>
-            
-            <div class="qv-offcanvas-title-container">
-                <h3 class="article-title">{{post.title}}</h3>
-                <p>
-                    <ul>
-                      <li>
-                        <img src="{{ post.author.profile.profile_img.url }}" alt="Image" style="width: 30px; height: 30px; border-radius:100px">
-                      </li>
-                        <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views</li>
-                    </ul>
-                </p>
-            </div>
-
-            <div class="qv-offcanvas-table-wrapper">
-                <table class="table">
-                    
-                    <tbody class="qv-table-body">
-                    <tr>
-                        <th scope="row" colspan="2">Type</th>
-                        <td>{{post.type}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Category</th>
-                        <td>{{post.category}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Cuisine</th>
-                        <td>{{post.cuisine}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Prep time</th>
-                        <td>
-                          {% if post.timing > 1 %}
-                            {{post.timing}} mins
-                          {% else %}
-                            {{post.timing}} min
-                          {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Servings</th>
-                        <td>{{post.servings}}</td>
-                    </tr>
-                    <tr>
-                      <th scope="row" colspan="2">Difficulty</th>
-                      <td>{{post.difficulty}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Likes</th>
-                        <td>{{post.total_likes}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="2">Dislikes</th>
-                        <td>{{post.total_dislikes}}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            
-        </article>
-
-        <div class="footer-area">
-            <a href="{% url 'viewpost' post.pk %}" class="qv-offcanvas-footer-link">View <span class="material-symbols-rounded qv-offcanvas-link-icon">trending_flat</span></a>
-        </div>
-      </div>
-    </div>
-</div>
-{% endfor %}
-{% endif %}
-
-{# Simple view modal only for ingredients and instructions #}
-<div class="offcanvas offcanvas-end qv-offcanvas simple-offcanvas" tabindex="-1" id="simpleViewModal" aria-labelledby="simpleViewModalLabel">
-  <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="quickviewModalLabel">
-      <div class="d-flex justify-content-start gap-3">
-        <div>
-          {% for i in post.photo_set.all %}
-          {% if forloop.counter0 == 0 %}
-              <img src="{{ i.image.url }}" class="simple-offcanvas-img" alt="{{post.title}}">
-          {% endif %}
-        {% endfor %}
-        </div>
-        <div class="d-flex align-self-center">
-          <p class="text-truncate">{{post.title}}</p>
-        </div>
-      </div>
-    </h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body simpleview-offcanvas-body">
-    <div class="qv-modal-body-container">
-      <article class="article-featured">
-
-        <div class="modal-body-content">
-          <h4>Ingredients</h4>
-          
-          <div class="simpleview-recipe-body-content">
-            {{post.ingredients|safe}}
-          </div>
-        </div>
-
-        <div class="modal-body-content">
-          <h4>Instructions</h4>
-          
-          <div class="simpleview-recipe-body-content">
-            {{post.content|safe}}
-          </div>
-        </div>
-
-          
-      </article>
-
-      <div class="footer-area" data-bs-dismiss="offcanvas" aria-label="Close">
-          <a class="qv-offcanvas-footer-link">Close</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-{# shopping list modal #}
-<div class="modal fade Modal-logout" id="shoppinglistModal" tabindex="-1" aria-labelledby="shoppinglistModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content logoutmodal share-recipe-modal shopping-list-modal">
-      <div class="modal-body">
-        <div class="modal-body-header">
-          <div class="modal-body-scrollable-container">
-            <h2 class="modal-body-text-color">Ingredients lists</h2>
-            <ul>
-              {% for ingredients in list %}
-                <li>{{ ingredients.item }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-      
-        <div class="modal-body-footer">
-          <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Close</button>
-          <a class="btn btn-transparent modal-logout-btn" href="{% url 'shopping_list' title=post.title pk=post.pk %}">Download list</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 {# scrolling bottom cards #}
 <script>
@@ -2147,60 +1978,72 @@ function scrolltosection(sectionId) {
 
 {# showing comment using ajax #}
 <script>
-  var options = [];
+$(document).ready(function(){
 
-    $( '#commentbutton' ).on( 'click', function( event ) {
-    var comt = $('#inputComment').val();
-    
-    $.ajax(
-    {
-    method: 'POST',
-    url:'',
-    
-    data:{
-    comt: comt,
-    csrfmiddlewaretoken: '{{ csrf_token }}'
-    },
-    
-    success:function(response)
-    {
-      var data_comments = $.parseJSON(response.cmt);
-      var data_f = data_comments[0].fields;
-      
-      $('#inputComment').val("");
+    $('#commentbutton').on('click', function(){
 
-      var formattedDate = new Intl.DateTimeFormat('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-              }).format(new Date(data_f.date_comment));
+        var comt = $('#inputComment').val().trim();
 
-      $('#comments').prepend('<div class="d-flex position-relative comments-section">'+
-      '<img src="{{ post.author.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="Image" style="width: 40px;height: 40px;border-radius: 100%;">'+
-      '<div class="commented-author"><h6>{{ request.user.first_name }} {{ request.user.last_name }} &#11825; ' + formattedDate + ' </h6>'+
-      
+        if (!comt) return;
 
-      '<p>'+  data_f.comment +'</p>'+'</div>');
-      '</div>'
+        $.ajax({
+            method: 'POST',
+            url: '',
+            data: {
+                comt: comt,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
 
-                var newCommentsCount = parseInt($('.tot_recipe_badge').text()) + 1;
-                $('.tot_recipe_badge').text(newCommentsCount);
-      },
-      
-      failure: function(data)
-      {
-      alert("error occured ")
-      }
-      
-      });
-      });
+            success: function(response){
+
+                $('#inputComment').val("");
+
+                if ($('.no-comment').length) {
+                    $('.no-comment').remove();
+                }
+
+                var commentHTML = `
+                    <div class="d-flex position-relative comments-section">
+                        <img loading="lazy"
+                             src="${response.profile_img}"
+                             class="flex-shrink-0 me-3"
+                             style="width:40px;height:40px;border-radius:100%;">
+
+                        <div class="commented-author">
+                            <h6>
+                                ${response.first_name} ${response.last_name}
+                                &#11825;
+                                <span>${response.date}</span>
+                            </h6>
+                            <p>${response.comment}</p>
+                        </div>
+                    </div>
+                `;
+
+                $('#comments').prepend(commentHTML);
+
+                var badge = $('.tot_recipe_badge');
+                if (badge.length) {
+                    badge.text(parseInt(badge.text()) + 1);
+                }
+            },
+
+            error: function(){
+                alert("Error posting comment");
+            }
+        });
+
+    });
+
+});
 </script> 
 
 {# scroll progress indicator on navbar with bgcolor and rotating logo svg #}
+{% if user.is_authenticated and user.userprofile.theme == 'transparent_theme' %}
 <script>
   let scrollTimeout;
-  document.getElementById('scrollableDiv').addEventListener('scroll', function() {
-    const logoSvg = document.querySelector('.nvarbar-circle-svg')
+
+  document.getElementById('scrollableDiv').addEventListener('scroll', function () {
     const scrollTop = this.scrollTop;
     const scrollHeight = this.scrollHeight - this.clientHeight;
     const scrollPercentage = (scrollTop / scrollHeight) * 100;
@@ -2209,98 +2052,82 @@ function scrolltosection(sectionId) {
     const scrollPercentValue = document.querySelector('.scroll-value');
 
     const logo = document.querySelector('.nrweb-logo');
+    const logoSvg = document.querySelector('.nvarbar-circle-svg');
+    const navbar_new = document.querySelector('.frosted-scroll-indicator');
 
-    const navbar = document.querySelector('.navbar');
-    const progressNavbarColor = navbar.getAttribute('data-primary-color');
-  
+    const progressColor = navbar_new.getAttribute('data-primary-color') || '#8e44ad';
 
     if (scrollPercentage === 0) {
       logoSvg.style.transform = 'rotate(0deg)';
-      navbar.style.background = 'transparent';
+      navbar_new.style.background = 'transparent';
       scrollIndicator.style.opacity = '0';
       logo.style.opacity = 1;
-    } 
-    else {
-      const rotationDegree = (scrollPercentage / 100) * 360; 
+    } else {
+      const rotationDegree = (scrollPercentage / 100) * 360;
       logoSvg.style.transform = `rotate(${rotationDegree}deg)`;
-      navbar.style.background = `linear-gradient(to right, ${progressNavbarColor} ${scrollPercentage}%, transparent ${scrollPercentage}%)`;
       scrollIndicator.style.opacity = '1';
       scrollPercentValue.innerText = `${Math.round(scrollPercentage)}%`;
       logo.style.opacity = 0;
+      navbar_new.style.background = `conic-gradient(${progressColor} ${rotationDegree}deg, transparent ${rotationDegree}deg 360deg)`;
     }
 
     if (scrollTimeout) {
       clearTimeout(scrollTimeout);
     }
 
-    scrollTimeout = setTimeout(function() {
+    scrollTimeout = setTimeout(() => {
       scrollIndicator.style.opacity = '0';
       logo.style.opacity = 1;
     }, 1000);
-
   });
+
 </script>
+{% else %}
+  <script>
+      let newscrollTimeout;
+      document.getElementById('scrollableDiv').addEventListener('scroll', function() {
+      const logoSvg = document.querySelector('.nvarbar-circle-svg')
+      const scrollTop = this.scrollTop;
+      const scrollHeight = this.scrollHeight - this.clientHeight;
+      const scrollPercentage = (scrollTop / scrollHeight) * 100;
 
-{# share recipe modal #}
-<div class="modal fade Modal-logout" id="shareRecipeModal" tabindex="-1" aria-labelledby="shareRecipeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content logoutmodal share-recipe-modal">
-      <div class="modal-body">
-        <div class="modal-body-header">
-          <h2 class="modal-body-text-color">Share</h2>
-          
-          <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <button class="nav-link active" id="nav-social-media-tab" data-bs-toggle="tab" data-bs-target="#nav-social-media" type="button" role="tab" aria-controls="nav-social-media" aria-selected="true">Links</button>
-            <button class="nav-link" id="nav-qr-code-tab" data-bs-toggle="tab" data-bs-target="#nav-qr-code" type="button" role="tab" aria-controls="nav-qr-code" aria-selected="false">QR Code</button>
-          </div>
-          <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-social-media" role="tabpanel" aria-labelledby="nav-social-media-tab" tabindex="0">
-              <div class="share-links-container">
-                <div class="share-sheet-links">
-                  <a href="https://www.gmail.com/" class="fa-solid fa-envelope" target="_blank"></a>
-                </div>
-                <div class="share-sheet-links">
-                  <a href="https://www.facebook.com/" class="fa-brands fa-facebook-f" target="_blank"></a>
-                </div>
-                <div class="share-sheet-links">
-                  <a href="https://www.instagram.com/" class="fa-brands fa-instagram" target="_blank"></a>
-                </div>
-                <div class="share-sheet-links">
-                  <a href="https://telegram.org/" class="fa-brands fa-telegram" target="_blank"></a>
-                </div>
-                <div class="share-sheet-links" id="shoe-div">
-                  <a href="" id="whatsapp-share-button" class="fa-brands fa-whatsapp"></a>
-                </div>
-                <div class="share-sheet-links">
-                  <a href="https://x.com/?lang=en" class="fa-brands fa-x-twitter" target="_blank"></a>
-                </div>
-              </div>
-            </div>
-            <div class="tab-pane fade" id="nav-qr-code" role="tabpanel" aria-labelledby="nav-qr-code-tab" tabindex="0">
-              <div class="qr-code-container d-flex justify-content-center">
-                <div class="d-flex justify-content-center align-items-center">
-                  <img src="data:image/png;base64,{{ img_data }}" alt="QR Code" style="border-radius: 10px;">
-                </div>
-              </div>
-            </div>
-          </div>
+      const scrollIndicator = document.querySelector('.scroll-indicator');
+      const scrollPercentValue = document.querySelector('.scroll-value');
 
-          <button class="clipboard share-recipe-footerbtn" id="copylink" onclick="Copy();">
-            <span class="material-symbols-rounded share-recipe-icon">content_copy</span>
-            <span class="button-text">Copy link</span> &nbsp; <span id="linktext"></span>
-          </button>
-        </div>
+      const logo = document.querySelector('.nrweb-logo');
 
-        <div class="modal-body-footer">
-          <div class="modal-body-footer">
-            <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+      const navbar = document.querySelector('.navbar');
+      const progressNavbarColor = navbar.getAttribute('data-primary-color');
     
+
+      if (scrollPercentage === 0) {
+        logoSvg.style.transform = 'rotate(0deg)';
+        navbar.style.background = 'transparent';
+        scrollIndicator.style.opacity = '0';
+        logo.style.opacity = 1;
+      } 
+      else {
+        const rotationDegree = (scrollPercentage / 100) * 360; 
+        logoSvg.style.transform = `rotate(${rotationDegree}deg)`;
+        navbar.style.background = `linear-gradient(to right, ${progressNavbarColor} ${scrollPercentage}%, transparent ${scrollPercentage}%)`;
+        scrollIndicator.style.opacity = '1';
+        scrollPercentValue.innerText = `${Math.round(scrollPercentage)}%`;
+        logo.style.opacity = 0;
+      }
+
+      if (newscrollTimeout) {
+        clearTimeout(newscrollTimeout);
+      }
+
+      newscrollTimeout = setTimeout(function() {
+        scrollIndicator.style.opacity = '0';
+        logo.style.opacity = 1;
+      }, 1000);
+
+    });
+  </script>
+{% endif %}
+
 {# open whatsapp desktop app if installed to share link #}
 <script>
   $(document).ready(function() {
@@ -2360,4 +2187,251 @@ function scrolltosection(sectionId) {
 
 </script>
     
+{% endblock %}
+
+{% block modals %}
+  {# share recipe modal #}
+  <div class="modal fade Modal-logout" id="shareRecipeModal" tabindex="-1" aria-labelledby="shareRecipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content logoutmodal share-recipe-modal">
+        <div class="modal-body">
+          <div class="modal-body-header">
+            <h2 class="modal-body-text-color">Share</h2>
+            
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+              <button class="nav-link active" id="nav-social-media-tab" data-bs-toggle="tab" data-bs-target="#nav-social-media" type="button" role="tab" aria-controls="nav-social-media" aria-selected="true"><span class="tab-btns-label">Links</span></button>
+              <button class="nav-link" id="nav-qr-code-tab" data-bs-toggle="tab" data-bs-target="#nav-qr-code" type="button" role="tab" aria-controls="nav-qr-code" aria-selected="false"><span class="tab-btns-label">QR Code</span></button>
+            </div>
+            <div class="tab-content" id="nav-tabContent">
+              <div class="tab-pane fade show active" id="nav-social-media" role="tabpanel" aria-labelledby="nav-social-media-tab" tabindex="0">
+                <div class="share-links-container">
+                  <div class="share-sheet-links">
+                    <a href="https://www.gmail.com/" class="fa-solid fa-envelope" target="_blank"></a>
+                  </div>
+                  <div class="share-sheet-links">
+                    <a href="https://www.facebook.com/" class="fa-brands fa-facebook-f" target="_blank"></a>
+                  </div>
+                  <div class="share-sheet-links">
+                    <a href="https://www.instagram.com/" class="fa-brands fa-instagram" target="_blank"></a>
+                  </div>
+                  <div class="share-sheet-links">
+                    <a href="https://telegram.org/" class="fa-brands fa-telegram" target="_blank"></a>
+                  </div>
+                  <div class="share-sheet-links" id="shoe-div">
+                    <a href="" id="whatsapp-share-button" class="fa-brands fa-whatsapp"></a>
+                  </div>
+                  <div class="share-sheet-links">
+                    <a href="https://x.com/?lang=en" class="fa-brands fa-x-twitter" target="_blank"></a>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="nav-qr-code" role="tabpanel" aria-labelledby="nav-qr-code-tab" tabindex="0">
+                <div class="qr-code-container d-flex justify-content-center">
+                  <div class="d-flex justify-content-center align-items-center">
+                    <img loading="lazy" src="data:image/png;base64,{{ img_data }}" alt="QR Code" style="border-radius: 10px;">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="clipboard share-recipe-footerbtn" id="copylink" onclick="Copy();">
+              <span class="material-symbols-rounded share-recipe-icon">content_copy</span>
+              <span class="button-text">Copy link</span> &nbsp; <span id="linktext"></span>
+            </button>
+          </div>
+
+          <div class="modal-body-footer">
+            <div class="modal-body-footer">
+              <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# shopping list modal #}
+  <div class="modal fade Modal-logout" id="shoppinglistModal" tabindex="-1" aria-labelledby="shoppinglistModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content logoutmodal share-recipe-modal shopping-list-modal">
+        <div class="modal-body">
+          <div class="modal-body-header">
+            <div class="modal-body-scrollable-container">
+              <h2 class="modal-body-text-color">Ingredients lists</h2>
+                <p>{{ingredients|safe}}</p>
+            </div>
+          </div>
+        
+          <div class="modal-body-footer">
+            <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Close</button>
+            <a class="btn btn-transparent modal-logout-btn" href="{% url 'shopping_list' title=post.title pk=post.pk %}" target="_blank">Download list</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# recipe images modal #}
+  <div class="modal fade modal-xl" id="spotlightModal{{post.pk}}" tabindex="-1" aria-labelledby="spotlightModalLabel" aria-hidden="true">
+    <div class="modal-dialog spotlight-modal-dialog">
+      <div class="modal-content spotlight-modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="spotlightModalLabel">{{post.title}} | {{post.whenpublished}}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body spotlight-modal-body">
+
+            <div class="cards-wrapper">
+                
+                <div class="card">
+                    {% for i in post.photo_set.all %}
+                      
+                          <img loading="lazy" src="{{ i.image.url }}" class="img-fluid" alt="{{post.title}}">
+                      
+                    {% endfor %}
+
+                  <div class="" style="color: black;">
+                    <h3>{{post.title}}</h3>
+                  <ul>
+                    <li>{{post.get_date|date:"F j, Y"}}</li>
+                    <li>{{post.date_post.time}}</li>
+                  </ul>
+                  </div>
+                </div>
+            </div>
+          
+        </div>
+        <div class="modal-footer">
+            <a href="{% url 'viewpost' post.pk %}" class="btn btn-primary">View recipe</a>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block offcanvas %}
+  {# Simple view modal only for ingredients and instructions #}
+  <div class="offcanvas offcanvas-end qv-offcanvas simple-offcanvas" tabindex="-1" id="simpleViewModal" aria-labelledby="simpleViewModalLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="quickviewModalLabel">   
+        <div>
+          <p class="text-truncate">{{post.title}}</p>
+        </div>
+      </h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body simpleview-offcanvas-body">
+      <div class="image-wrapper text-center mb-3">
+        {% for i in post.photo_set.all %}
+          {% if forloop.counter0 == 0 %}
+            <img loading="lazy" src="{{ i.image.url }}" class="simple-offcanvas-img img-fluid" alt="{{ post.title }}">
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="article-featured">
+        <div class="article-content">
+          <div class="modal-body-content">
+            <h4>Ingredients</h4>
+            
+            <div class="simpleview-recipe-body-content">
+              {{post.ingredients|safe}}
+            </div>
+          </div>
+
+          <div class="modal-body-content">
+            <h4>Instructions</h4>
+            
+            <div class="simpleview-recipe-body-content">
+              {{post.content|safe}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="footer-area" data-bs-dismiss="offcanvas" aria-label="Close">
+          <a class="qv-offcanvas-footer-link">Close</a>
+      </div> -->
+    </div>
+  </div>
+
+    {% if user.is_authenticated %}
+
+    <div class="offcanvas offcanvas-end comments-offcanvas" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasBottomLabel">Comments</h5>
+        <!-- <button class="cmt-offcanvas-btn">
+          <span class="material-symbols-rounded btn-close cmt-offcanvas-close" data-bs-dismiss="offcanvas" aria-label="Close">close</span>
+        </button> -->
+
+        <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="offcanvas" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
+        
+        <div class="hstack gap-1 comment-input" id="cmt">
+          <img loading="lazy" src="{{ user.profile.profile_img.url }}" class="article-imae">
+          <textarea class="form-control me-auto" id="inputComment" type="text" placeholder="Add a comment..." aria-label="Add your comment"></textarea>
+          <button type="button" class="btn btn-transparen cmt-btn" value="comment" id="commentbutton"><span class="material-symbols-rounded">send</span></button>
+        </div>
+      </div>
+      <div class="offcanvas-body">
+
+        <div id="comments">
+          {% if comments %}
+
+            {% for comment in comments.reverse %}
+              <div class="d-flex position-relative comments-section">
+                <img loading="lazy" src="{{ comment.comment_user.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="..." style="width: 40px;height: 40px;border-radius: 100%;">
+                <div class="commented-author">
+                  <h6>{{ comment.comment_user.first_name }} {{ comment.comment_user.last_name }} &#11825; <span>{{ comment.get_date }}</span> </h6>
+                  <p>{{ comment.comment }}</p>
+                </div>
+              </div>
+            
+            {% endfor %}
+
+          {% else %}
+
+            <p class="no-comment">No comments</p>
+
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+  {% else %}
+
+    <div class="offcanvas offcanvas-end comments-offcanvas" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasBottomLabel">Comments</h5>
+        <button class="cmt-offcanvas-btn">
+          <span class="material-symbols-rounded btn-close cmt-offcanvas-close" data-bs-dismiss="offcanvas" aria-label="Close">close</span>
+        </button>
+      </div>
+      <div class="offcanvas-body nologin-offcanvas-body">
+
+        <div id="comments">
+          {% if comments %}
+
+            {% for comment in comments.reverse %}
+              <div class="d-flex position-relative comments-section">
+                <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" class="flex-shrink-0 me-3" alt="..." style="width: 40px;height: 40px;border-radius: 100%;">
+                <div class="commented-author">
+                  <h6>{{ comment.comment_user.first_name }} {{ comment.comment_user.last_name }} &#11825; <span>{{ comment.get_date }}</span> </h6>
+                  <p>{{ comment.comment }}</p>
+                </div>
+              </div>
+            
+            {% endfor %}
+
+          {% else %}
+
+            <p class="no-comment">No comments</p>
+
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+  {% endif %}
 {% endblock %}

@@ -74,8 +74,9 @@
   
   <link id="mystylesheet" rel="stylesheet" href="{% static 'testingapp/base_navbar.css' %}">
   <link rel="stylesheet" href="{% static 'testingapp/main.css' %}">  
+  <link href="https://api.fontshare.com/v2/css?f[]=melodrama@500&display=swap" rel="stylesheet">
 
-  {% if user.is_authenticated %}
+  {% if user.is_authenticated or is_guest %}
     <link rel="stylesheet" type="text/css" href="{% url 'dynamic_css' %}">
   {% endif %}
 
@@ -89,7 +90,7 @@
 
     {% if not DEBUG %}
         <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-        <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
+        <noscript><img loading="lazy" src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
     
         <script type="text/javascript">
             ;window.NREUM||(NREUM={});NREUM.init={distributed_tracing:{enabled:true},privacy:{cookies_enabled:true},ajax:{deny_list:["bam.nr-data.net"]}};
@@ -112,7 +113,7 @@
 {% include 'testingapp/basetheme.html' %}
 
 <body id="body-color">
-{% if user.is_authenticated %}
+{% if user.is_authenticated or is_guest %}
 
     {# navbar #}
     <nav class="navbar fixed-top navbar-expand-lg" id="navbar" data-primary-color="{{ user.userprofile.primary_color }}">
@@ -128,9 +129,10 @@
                     </path>
                 </svg>
     
-                <img src="{% static 'testingapp/media/NewLogo.png' %}" class="nrweb-logo" alt="Yummy Recipes" srcset="">
+                <img loading="lazy" src="{% static 'testingapp/media/NewLogo.png' %}" class="nrweb-logo" alt="Yummy Recipes" srcset="">
 
                 <div class="scroll-indicator"><div class="scroll-value">0%</div></div>
+                <div class="frosted-scroll-indicator" data-primary-color="{{ user.userprofile.neutral_primary }}"></div>
             </div>
 
             <div class="navbar-brand-name">
@@ -154,6 +156,27 @@
                     {% endif %}
                 </a>
             </div>
+
+            <!-- <div class="dropdown btn-group dropstart navbar-right-list-items">
+                <ul class="nav justify-content-end">
+
+                    <div class="nav-topright-icon-container">
+               
+                    <li class="nav-item">
+                        <div class="rightside-searchbar sm-weather-container">
+                            <h5 class="active-modal-btn-bgcolor"><a data-bs-toggle="modal" data-bs-target="#weatherModal"><span class="material-symbols-rounded rightside-searchicon rightside-locationicon">add_location</span></a></h5>
+                        </div>
+                    </li>
+
+                    <li class="nav-item">
+                        <div class="rightside-searchbar sm-weather-container">
+                            <h5 class="active-modal-btn-bgcolor"><a data-bs-toggle="modal" data-bs-target="#weatherModal"><span class="material-symbols-rounded rightside-searchicon rightside-locationicon">add_location</span></a></h5>
+                        </div>
+                    </li>
+                    
+                    </div>
+                </ul>
+            </div> -->
             
                 
                 <div class="navbar-sm-weather">
@@ -161,46 +184,43 @@
                         <div class="container">
 
                             <div class="hstack gap-2">
-                                
-                                {% block sm_weather %}
-                                    <div class="p-1">
-                                        {% if user.userlocation.location == '' %}
+                                {% if not is_guest %}
+                                    {% block sm_weather %}
 
-                                        <div class="hstack gap-4" data-bs-toggle="modal" data-bs-target="#weatherModal" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Click to add location">
-                                            <div class="col-1">
-                                                <span class="material-symbols-rounded sm-location-icon rightside-searchicon" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Click to add location">add_location</span> 
-                                            </div>
-        
-                                        </div>
-                                        
+                                        {% if user.userlocation.location == '' %}
+                                            <div class="p-1 sm-searchbar">
+                                                <div class="rightside-searchbar sm-weather-container">
+                                                    <h5><a data-bs-toggle="modal" data-bs-target="#weatherModal"><span class="material-symbols-rounded rightside-searchicon rightside-locationicon">add_location</span></a></h5>
+                                                </div>
+                                            </div> 
                                         {% else %}
-            
-                                        <div class="row" data-bs-toggle="modal" data-bs-target="#weatherModal">
-                                            <div class="col-4" style="padding: 0">
-                                                <img id="navbarweatherIcon2">
+                                            <div class="p-1">
+                                                <div class="row homenav-weathercontainer" data-bs-toggle="modal" data-bs-target="#weatherModal">
+                                                    <div class="col-4 navbarIconWrapper">
+                                                        <img class="navbarweatherIcon">
+                                                    </div>
+                        
+                                                    <div class="col-6 weather-data navbarTempWrapper">
+                                                        <span class="navbartemperature"></span> <span class="temp-unit">°C</span> 
+                                                    </div>
+                        
+                                                </div>
                                             </div>
-                
-                                            <div class="col-6 rightside-searchicon weather-data" style="padding: 0;padding-left:5px;display: flex;align-items: center;">
-                                                <span id="navbartemperature2"></span> &nbsp; <span>°C</span> 
-                                            </div>
-                
-                                        </div>
-            
-                                    {% endif %}
-                                    </div>
-                                {% endblock %}
+                                        {% endif %}
+
+                                    {% endblock %}
+                                {% endif %}
 
                                 <div class="p-1 sm-searchbar">
                                     {% block sm_search-btn %}
-                                    <div class="rightside-searchbar">
-                                        <h5 class="active-modal-btn-bgcolor"><a data-bs-toggle="modal" data-bs-target="#searchModal"><span class="material-symbols-rounded rightside-searchicon">search</span></a></h5>
-                                    
+                                    <div class="rightside-searchbar sm-right-searchbar">
+                                        <h5><a data-bs-toggle="modal" data-bs-target="#searchModal"><span class="material-symbols-rounded rightside-searchicon">search</span></a></h5>
                                     </div>
 
                                     {% endblock %}
                                 </div>
 
-                            </div>
+                            </div> 
 
                         </div>
 
@@ -214,62 +234,62 @@
             <div class="dropdown btn-group dropstart navbar-right-list-items">
                 <ul class="nav justify-content-end">
 
-                    {% block weather_widget %}
-                    <li class="nav-item">
-                        <div class="rightside-searchbar">
-                            <div class="weather-widget">
-                                <div class="container">
+                    <div class="nav-topright-icon-container">
+                        {% block weather_widget %}
+                        <li class="nav-item">
+                            <div class="rightside-searchbar">
+                                <div class="weather-widget">
+                                    <div class="container">
 
-                                    <div class="row" data-bs-toggle="modal" data-bs-target="#weatherModal">
-                                        <div class="col-4" style="padding: 0">
-                                            <img id="navbarweatherIcon">
-                                        </div>
+                                        <div class="row" data-bs-toggle="modal" data-bs-target="#weatherModal">
+                                            <div class="col-4 navbarIconWrapper" style="padding: 0">
+                                                <img class="navbarweatherIcon">
+                                            </div>
 
-                                        <div class="col-6" style="padding: 0;padding-left:5px;display: flex;align-items: center;">
-                                            <span id="navbartemperature"></span> &nbsp; <span>°C</span> 
+                                            <div class="col-6 navbarTempWrapper" style="padding: 0;padding-left:5px;display: flex;align-items: center;">
+                                                <span class="navbartemperature"></span> <span class="temp-unit">°C</span> 
+                                            </div>
+
                                         </div>
 
                                     </div>
-
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                    {% endblock %}
-
-
-
-                    <li class="nav-item">
-                        {% block search-btn %}
-                        <div class="rightside-searchbar">
-                            <span data-bs-toggle="modal" data-bs-target="#searchModal">
-                                <h5 class="active-modal-btn-bgcolor"><span class="material-symbols-rounded rightside-searchicon navicons">search</span></h5>
-                            </span>
-                        </div>
+                        </li>
                         {% endblock %}
-                    </li>
 
-                    {# Offcanvas top notifications #}
-                    <li class="nav-item">
-                        <div class="rightside-searchbar">
-                            <span type="button" id="topoffcanvas" class="position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop">
-                                <h5 class="active-offcanvas-btn-bgcolor">
-                                    {% if notifications %}
-                                    <span class="material-symbols-rounded rightside-searchicon change-notify-icon navicons notification-active">notifications_active</span>
-                                    <span class="notification-badge">{% live_notify_badge %}</span>
-                                    {% else %}
-                                    <span class="material-symbols-rounded change-notify-icon rightside-searchicon navicons">notifications</span>
+                        <li class="nav-item">
+                            {% block search-btn %}
+                            <div class="rightside-searchbar">
+                                <span data-bs-toggle="modal" data-bs-target="#searchModal">
+                                    <h5 class="active-modal-btn-bgcolor-secondary"><span class="material-symbols-rounded rightside-searchicon">search</span></h5>
+                                </span>
+                            </div>
+                            {% endblock %}
+                        </li>
 
-                                    {% endif %}
-                                </h5>
-                            </span>
-                        </div>
-                    </li>
+                        {# Offcanvas top notifications #}
+                        <li class="nav-item">
+                            <div class="rightside-searchbar">
+                                <span type="button" id="topoffcanvas" class="position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop">
+                                    <h5 class="active-offcanvas-btn-bgcolor">
+                                        {% if notifications %}
+                                        <span class="material-symbols-rounded rightside-searchicon change-notify-icon  notification-active">notifications_active</span>
+                                        <span class="notification-badge">{% live_notify_badge %}</span>
+                                        {% else %}
+                                        <span class="material-symbols-rounded change-notify-icon rightside-searchicon ">notifications</span>
+
+                                        {% endif %}
+                                    </h5>
+                                </span>
+                            </div>
+                        </li>
+                    </div>
 
                     {# loggedin user image and dropdown #}
                     <li class="nav-item">
                         <div class="dropdown-center">
-                            <button class="nb-img-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <button class="nb-img-btn {% if is_guest %}guest-nb-img-btn{% endif %}" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <svg class="user-profile-circle-svg" jsname="maK7T" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg">
                                     <defs>
                                         <mask id="mask-image" class="efadfa" x="0" y="0" width="100%" height="100%">
@@ -277,14 +297,22 @@
                                             </path>
                                         </mask>
                                     </defs>
-                                    <image href="{{ user.profile.profile_img.url }}" mask="url(#mask-image)" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+                                    {% if not is_guest %}
+                                        <image href="{{ user.profile.profile_img.url }}" mask="url(#mask-image)" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+                                    {% else %}
+                                        <image href="{% static 'testingapp/media/avatar.jpg' %}" mask="url(#mask-image)" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+                                    {% endif %}
                                 </svg>
                             </button>
 
                             <div class="dropdown-menu nb-rightimg-dropmenu" id="nb-rightimg-dropmenu" onclick="event.stopPropagation()">
                                 
                                 <div class="top-nb-dropmenu-content">
-                                    <p>{{request.user.email}}</p>
+                                    {% if not is_guest %}
+                                        <p>{{request.user.email}}</p>
+                                    {% else %}
+                                        <p>{{ guest_user.email }}</p>
+                                    {% endif %}
                                     <div class="top-nb-dropmenu-img">
                                         <svg class="user-profile-circle-svg nb-profile-circle-svg" jsname="maK7T" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg">
                                             <defs>
@@ -293,34 +321,43 @@
                                                     </path>
                                                 </mask>
                                             </defs>
-                                            <image href="{{ user.profile.profile_img.url }}" mask="url(#mask-image)" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+                                            {% if not is_guest %}
+                                                <image href="{{ user.profile.profile_img.url }}" mask="url(#mask-image)" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+                                            {% else %}
+                                                <image href="{% static 'testingapp/media/avatar.jpg' %}" mask="url(#mask-image)" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
+                                            {% endif %}
                                         </svg>
                                     </div>
                                     <h5>
                                         {% if user.profile.dob == todays_date %}
                                             <b>Happy birthday, {{ request.user.first_name }}!</b>
                                         {% else %}
-                                            Hi, {{ request.user.first_name }}!
+                                            {% if not is_guest %}
+                                                Hi, {{ request.user.first_name }}!
+                                            {% else %}
+                                                Hi, {{ guest_user.name }} (Guest)
+                                            {% endif %}
                                         {% endif %}
                                     </h5>
                                     
-                                    {% if request.path == account_settings %}
-                                        <a href="{% url 'account_settings' %}" class="dropdown top-nb-dropmenu-content-links child-active"><span class="dropmenu-text">Account settings</span>
-                                        </a>
-                                    {% else %}
-                                        <a href="{% url 'account_settings' %}" class="dropdown top-nb-dropmenu-content-links"><span class="dropmenu-text">Account settings</span>
-                                        </a>
-                                    {% endif %}
+                                    {% if not is_guest %}
+                                        {% if request.path == account_settings %}
+                                            <a href="{% url 'account_settings' %}" class="dropdown top-nb-dropmenu-content-links child-active"><span class="dropmenu-text">Account settings</span>
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'account_settings' %}" class="dropdown top-nb-dropmenu-content-links"><span class="dropmenu-text">Account settings</span>
+                                            </a>
+                                        {% endif %}
 
-                                    {% if user.profile.dob == todays_date %}
-                                        <div class="confetti-animation">
-                                            <dotlottie-player src="https://lottie.host/b25db31b-46a9-4746-8a0e-aed9ccc222e3/pMFX1Y1pk5.json" class="dotlottie-confetti" background="transparent" speed="1" loop autoplay></dotlottie-player>
-                                        </div>
+                                        {% if user.profile.dob == todays_date %}
+                                            <div class="confetti-animation">
+                                                <dotlottie-player src="https://lottie.host/b25db31b-46a9-4746-8a0e-aed9ccc222e3/pMFX1Y1pk5.json" class="dotlottie-confetti" background="transparent" speed="1" loop autoplay></dotlottie-player>
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                                 
                                 <div class="dropmenu-container">
-                                    
                                     <div class="dropmenu-details-wrapper dropmenu-details1" id="dropmenu-details-wrapper2"> 
                                 
                                         {% if request.path == profile %}
@@ -334,7 +371,7 @@
 
                                         {% endif %}
 
-                                        {% if request.path == favourites %} 
+                                        {% if request.path == favourites %}
                                             <a href="{% url 'favourites' %}">
                                                 <p class="dropdown-second-child child-active"><span class="material-symbols-rounded nb-dropmenu-icons">star</span> <span class="dropmenu-text">Favourites</span></p>
                                             </a>
@@ -354,6 +391,16 @@
                                             </a>
                                         {% endif %}
 
+                                        {% if request.path == feedback %}
+                                            <a href="{% url 'feedback' %}">
+                                                <p class="dropdown-second-child child-active"><span class="material-symbols-rounded nb-dropmenu-icons">feedback</span> <span class="dropmenu-text">Feedback</span></p>
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'feedback' %}">
+                                                <p class="dropdown-second-child"><span class="material-symbols-rounded nb-dropmenu-icons">feedback</span> <span class="dropmenu-text">Feedback</span></p>
+                                            </a>
+                                        {% endif %}
+
                                         {% if request.path == appearance %}
                                             <a href="{% url 'appearance' %}">
                                                 <p class="dropdown-second-child2 dropdown-second-child child-active" id="dropmenu-child-active2"><span class="material-symbols-rounded nb-dropmenu-icons">palette</span> <span class="dropmenu-text">Appearance</span>
@@ -367,30 +414,24 @@
                                                 </p>
                                             </a>
                                         {% endif %}
-                                        
                                     </div>
 
-                                    {% if request.path == profile or request.path == feedback %}
-                                        <div class="dropmenu-details-wrapper dropmenu-details1 dropmenu-details2" id="dropmenu-details-wrapper2"> 
-                                            {% if request.path == feedback %}
-                                                <a href="{% url 'feedback' %}">
-                                                    <p class="dropdown-second-child feedback child-active"><span class="material-symbols-rounded nb-dropmenu-icons">feedback</span> <span class="dropmenu-text">Feedback</span></p>
-                                                </a>
-                                            {% else %}
-                                                <a href="{% url 'feedback' %}">
-                                                    <p class="dropdown-second-child feedback"><span class="material-symbols-rounded nb-dropmenu-icons">feedback</span> <span class="dropmenu-text">Feedback</span></p>
-                                                </a>
-                                            {% endif %}
+                                    {% if is_guest %}
+                                        <div class="dropmenu-details-wrapper dropmenu-details1 navbar-guest-user-links" id="dropmenu-details-wrapper3">
+                                            <div class="d-flex guest-user-links-container">
+                                                <div><a href="{% url 'login' %}">Login</a></div>
+                                                <div><a href="/" data-bs-toggle="modal" data-bs-target="#guestSignupModal">Signup</a></div>
+                                            </div>
                                         </div>
                                     {% endif %}
-
                             
-                                    <div class="dropmenu-details-wrapper dropmenu-details-links" id="dropmenudetailslinks">                                        
-
-                                        <p>Last Login : {{user.last_login.date}}</p>
-
+                                    <div class="dropmenu-details-wrapper dropmenu-details-links" id="dropmenudetailslinks">
+                                        {% if not is_guest %}
+                                            <p>Last Login : {{user.last_login.date}}</p>
+                                        {% else %}
+                                            <p>Joined : {{guest_user.formatted_date}}</p>
+                                        {% endif %}
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -400,7 +441,7 @@
             
           </div>
         </div>
-    </nav>
+    </nav>                
 
     {# offcanvas #}
     <div class="offcanvas offcanvas-start nav-offcanvas main-offcanvas" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
@@ -418,10 +459,10 @@
                     <div class="offcanvas-notification" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop">
                         <div class="notification-body rightside-searchbar">
                             {% if notifications %}
-                            <span class="material-symbols-rounded offcanvas-noti-icon rightside-searchicon change-notify-icon navicons notification-active">notifications_active</span>
+                            <span class="material-symbols-rounded offcanvas-noti-icon rightside-searchicon change-notify-icon  notification-active">notifications_active</span>
                             <span class="notification-badge">{% live_notify_badge %}</span>
                             {% else %}
-                            <span class="material-symbols-rounded offcanvas-noti-icon change-notify-icon rightside-searchicon navicons">notifications</span>
+                            <span class="material-symbols-rounded offcanvas-noti-icon change-notify-icon rightside-searchicon ">notifications</span>
 
                             {% endif %}
                         </div>
@@ -453,7 +494,7 @@
                                                 {% for post in post.photo_set.all %}
                                                     {% if forloop.first %}
                                                         <div class="offcanvas-img-stack">
-                                                            <img src="{{ post.image.url }}" alt="{{ post.title }} Image">
+                                                            <img loading="lazy" src="{{ post.image.url }}" alt="{{ post.title }} Image">
                                                         </div>
                                                     {% endif %}
                                                 {% endfor %}
@@ -474,7 +515,7 @@
                                         <span class="material-symbols-rounded offcanvas-link-icons">
                                             <div class="offcanvas-recipe-img">
                                                 <div class="offcanvas-img-stack">
-                                                    <img src="{{ photo1.image.url }}">
+                                                    <img loading="lazy" src="{{ photo1.image.url }}">
                                                 </div>
                                             </div>
                                         </span> 
@@ -492,10 +533,10 @@
                                         <span class="material-symbols-rounded offcanvas-link-icons">
                                             <div class="offcanvas-comparing-img-stack image-stack">
                                                 <div class="offcanvas-comparing-img-item image-item">
-                                                    <img src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
+                                                    <img loading="lazy" src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
                                                 </div>
                                                 <div class="offcanvas-comparing-img-item image-item">
-                                                    <img src="{{ photo2.image.url }}" alt="{{ recipe2.title }} Image">
+                                                    <img loading="lazy" src="{{ photo2.image.url }}" alt="{{ recipe2.title }} Image">
                                                 </div>
                                             </div>
                                         </span>
@@ -554,7 +595,7 @@
 
                         <li>
                             <a class="main-links {% if request.path == trending %} active {% endif %}" href="{% url 'trending' %}" id="offcanvaslisttext6">
-                                <span class="material-symbols-rounded offcanvas-link-icons" id="offcanvaslinkicons6">trending_up</span> 
+                                <span class="material-symbols-rounded offcanvas-link-icons" id="offcanvaslinkicons6">mode_heat</span> 
                                 Trending
                             </a>
                         </li>
@@ -567,19 +608,8 @@
                         </li>
 
                         <li>
-                            <a class="main-links generate-recipe-link {% if request.path == generate_recipe %} active {% endif %}" href="{% url 'generate_recipe' %}" id="offcanvaslisttext6">
-                                <svg width="30px" height="30px" class="offcanvas-link-icons" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" style="stop-color:#ff7d1a;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#6610fc;stop-opacity:1" />
-                                        </linearGradient>
-                                    </defs>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <path d="M7.45284 2.71266C7.8276 1.76244 9.1724 1.76245 9.54716 2.71267L10.7085 5.65732C10.8229 5.94743 11.0526 6.17707 11.3427 6.29148L14.2873 7.45284C15.2376 7.8276 15.2376 9.1724 14.2873 9.54716L11.3427 10.7085C11.0526 10.8229 10.8229 11.0526 10.7085 11.3427L9.54716 14.2873C9.1724 15.2376 7.8276 15.2376 7.45284 14.2873L6.29148 11.3427C6.17707 11.0526 5.94743 10.8229 5.65732 10.7085L2.71266 9.54716C1.76244 9.1724 1.76245 7.8276 2.71267 7.45284L5.65732 6.29148C5.94743 6.17707 6.17707 5.94743 6.29148 5.65732L7.45284 2.71266Z" fill="url(#grad1)"></path>
-                                        <path opacity="0.5" d="M16.9245 13.3916C17.1305 12.8695 17.8695 12.8695 18.0755 13.3916L18.9761 15.6753C19.039 15.8348 19.1652 15.961 19.3247 16.0239L21.6084 16.9245C22.1305 17.1305 22.1305 17.8695 21.6084 18.0755L19.3247 18.9761C19.1652 19.039 19.039 19.1652 18.9761 19.3247L18.0755 21.6084C17.8695 22.1305 17.1305 22.1305 16.9245 21.6084L16.0239 19.3247C15.961 19.1652 15.8348 19.039 15.6753 18.9761L13.3916 18.0755C12.8695 17.8695 12.8695 17.1305 13.3916 16.9245L15.6753 16.0239C15.8348 15.961 15.961 15.8348 16.0239 15.6753L16.9245 13.3916Z" fill="url(#grad1)"></path>
-                                    </g>
-                                </svg>
+                            <a class="main-links generate-recipe-link {% if request.path == generate_recipe %} active {% endif %}" href="{% url 'generate_recipe' %}" id="offcanvaslisttext13">
+                                <span class="material-symbols-rounded offcanvas-link-icons {% if request.path == generate_recipe %} offcanvas-link-icons-active {% endif %}" id="offcanvaslinkicons12">wand_stars</span> 
                                 KitchenAI
                             </a>
                         </li>
@@ -643,7 +673,7 @@
                 <span>
                     <ul>                         
                         <li>
-                            <img src="{{ user.profile.profile_img.url }}" class="navbar-userprofile" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ request.user.get_full_name}}" style="width: 38px; height: 38px; border-radius:100%" alt="Image">
+                            <img loading="lazy" src="{{ user.profile.profile_img.url }}" class="navbar-userprofile" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ request.user.get_full_name}}" style="width: 38px; height: 38px; border-radius:100%" alt="Image">
                         </li>
                     </ul>
                 </span>
@@ -665,7 +695,7 @@
                
             <div class="navrail-content">
     
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'home' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'home' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == home %} 
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive1">home</span></li>
@@ -678,7 +708,7 @@
                 </a>
     
                 {% if viewpost %} 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links viewpost-listitems" href="{% url 'viewpost' post.pk %}">
+                <a class="w3-bar-item w3-button navrail-links viewpost-listitems" href="{% url 'viewpost' post.pk %}">
                     <ul class="navrail-listitems" data-bs-custom-class="custom-popover" tabindex="0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="<b>{{post.title}}</b>">
                         {% if post %}
                             <li>
@@ -686,7 +716,7 @@
                                     <div class="first-compare-image image-item">
                                         {% for post in post.photo_set.all %}
                                             {% if forloop.first %}
-                                                <img src="{{ post.image.url }}" alt="{{ post.title }} Image">
+                                                <img loading="lazy" src="{{ post.image.url }}" alt="{{ post.title }} Image">
                                             {% endif %}
                                         {% endfor %}
                                     </div>
@@ -700,13 +730,13 @@
                 </a>
 
                 {% elif compare_recipes %} 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'compare_recipes' pk %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'compare_recipes' pk %}">
                     <ul class="navrail-listitems">
                         <li>
                             {% if photo1 %}
                                 <div class="image-stack">
                                     <div class="first-compare-image image-item">
-                                        <img src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
+                                        <img loading="lazy" src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
                                     </div>
                                 </div>
                             {% else %}
@@ -718,16 +748,16 @@
                 </a>
 
                 {% elif comparing_recipes %} 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links viewpost-listitems" href="" tabindex="0" data-bs-toggle="popover" data-bs-custom-class="custom-popover" data-bs-html="true" data-bs-trigger="hover focus" data-bs-content="<b>Comparing :</b> <br><br> <b>'{{recipe1.title}}</b> <br> with <br> <b>'{{recipe2.title}}'</b>">
+                <a class="w3-bar-item w3-button navrail-links viewpost-listitems" href="" tabindex="0" data-bs-toggle="popover" data-bs-custom-class="custom-popover" data-bs-html="true" data-bs-trigger="hover focus" data-bs-content="<b>Comparing :</b> <br><br> <b>'{{recipe1.title}}</b> <br> with <br> <b>'{{recipe2.title}}'</b>">
                     <ul class="navrail-listitems">
                         <li>
                             {% if photo1 and photo2 %}
                                 <div class="image-stack">
                                     <div class="image-item">
-                                        <img src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
+                                        <img loading="lazy" src="{{ photo1.image.url }}" alt="{{ recipe1.title }} Image">
                                     </div>
                                     <div class="image-item">
-                                        <img src="{{ photo2.image.url }}" alt="{{ recipe2.title }} Image">
+                                        <img loading="lazy" src="{{ photo2.image.url }}" alt="{{ recipe2.title }} Image">
                                     </div>
                                 </div>
                             {% endif %}
@@ -737,7 +767,7 @@
                 </a>
 
                 {% elif query %} 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="">
+                <a class="w3-bar-item w3-button navrail-links" href="">
                     <ul class="navrail-listitems">
                         <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">action_key</span></li>
                         <li><span class="navrail-text navrail-text-active" id="navrail-text-active">Search</span></li>
@@ -745,7 +775,7 @@
                 </a>
 
                 {% elif request.path == year_recap %} 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="">
+                <a class="w3-bar-item w3-button navrail-links" href="">
                     <ul class="navrail-listitems">
                         <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">fast_rewind</span></li>
                         <li><span class="navrail-text navrail-text-active" id="navrail-text-active">{% now 'Y' %}</span></li>
@@ -753,7 +783,7 @@
                 </a>
 
                 {% elif updaterecipe %}
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links">
+                <a class="w3-bar-item w3-button navrail-links">
                     <ul class="navrail-listitems">
                         <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive4">edit_note</span></li>
                         <li><span class="navrail-text navrail-text-active" id="navrail-text-active">Edit</span></li>
@@ -761,7 +791,7 @@
                 </a>
                 {% endif %}
 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'createpost' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'createpost' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == createpost %}
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive4">add_circle</span></li>
@@ -773,7 +803,7 @@
                     </ul>
                 </a>
 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'dashboard' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'dashboard' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == dashboard %}
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive5">grid_view</span></li>
@@ -785,7 +815,7 @@
                     </ul>
                 </a>
     
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'explore' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'explore' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == explore %} 
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive7">explore</span></li>
@@ -797,52 +827,26 @@
                     </ul>
                 </a>
     
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'trending' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'trending' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == trending %}
-                            <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive8">trending_up</span></li>
+                            <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive8">mode_heat</span></li>
                             <li><span class="navrail-text navrail-text-active" id="navrail-text-active">Trending</span></li>
                         {% else %}
-                            <li><span class="material-symbols-rounded navrail-icons" id="navrailicon6">trending_up</span></li>
+                            <li><span class="material-symbols-rounded navrail-icons" id="navrailicon6">mode_heat</span></li>
                             <li><span class="navrail-text" id="navrailtext6">Trending</span></li>
                         {% endif %}
                     </ul>
                 </a>
                 
                 {# ai-link with gradient bg is above in base.html #}
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links generate-recipe-link" id="ai-link" href="{% url 'generate_recipe' %}"> 
+                <a class="w3-bar-item w3-button navrail-links generate-recipe-link" id="ai-link" href="{% url 'generate_recipe' %}"> 
                     <ul class="navrail-listitems">
                         {% if request.path == generate_recipe %}
-                            <li>
-                                <svg width="55px" height="30px" class="navrail-icons navrail-icons-active" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" style="stop-color:#ff7d1a;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#6610fc;stop-opacity:1" />
-                                        </linearGradient>
-                                    </defs>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <path d="M7.45284 2.71266C7.8276 1.76244 9.1724 1.76245 9.54716 2.71267L10.7085 5.65732C10.8229 5.94743 11.0526 6.17707 11.3427 6.29148L14.2873 7.45284C15.2376 7.8276 15.2376 9.1724 14.2873 9.54716L11.3427 10.7085C11.0526 10.8229 10.8229 11.0526 10.7085 11.3427L9.54716 14.2873C9.1724 15.2376 7.8276 15.2376 7.45284 14.2873L6.29148 11.3427C6.17707 11.0526 5.94743 10.8229 5.65732 10.7085L2.71266 9.54716C1.76244 9.1724 1.76245 7.8276 2.71267 7.45284L5.65732 6.29148C5.94743 6.17707 6.17707 5.94743 6.29148 5.65732L7.45284 2.71266Z" fill="url(#grad1)"></path>
-                                        <path opacity="0.5" d="M16.9245 13.3916C17.1305 12.8695 17.8695 12.8695 18.0755 13.3916L18.9761 15.6753C19.039 15.8348 19.1652 15.961 19.3247 16.0239L21.6084 16.9245C22.1305 17.1305 22.1305 17.8695 21.6084 18.0755L19.3247 18.9761C19.1652 19.039 19.039 19.1652 18.9761 19.3247L18.0755 21.6084C17.8695 22.1305 17.1305 22.1305 16.9245 21.6084L16.0239 19.3247C15.961 19.1652 15.8348 19.039 15.6753 18.9761L13.3916 18.0755C12.8695 17.8695 12.8695 17.1305 13.3916 16.9245L15.6753 16.0239C15.8348 15.961 15.961 15.8348 16.0239 15.6753L16.9245 13.3916Z" fill="url(#grad1)"></path>
-                                    </g>
-                                </svg>
-                            </li>
+                            <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailiconactive9">wand_stars</span></li>
                             <li><span class="navrail-text navrail-text-active" id="navrail-text-active">KitchenAI</span></li>
                         {% else %}
-                        <li>
-                            <svg width="55px" height="30px" class="navrail-icons" viewBox="0 0 24.00 24.00" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" style="stop-color:#ff7d1a;stop-opacity:1" />
-                                        <stop offset="100%" style="stop-color:#6610fc;stop-opacity:1" />
-                                    </linearGradient>
-                                </defs>
-                                <g id="SVGRepo_iconCarrier">
-                                    <path d="M7.45284 2.71266C7.8276 1.76244 9.1724 1.76245 9.54716 2.71267L10.7085 5.65732C10.8229 5.94743 11.0526 6.17707 11.3427 6.29148L14.2873 7.45284C15.2376 7.8276 15.2376 9.1724 14.2873 9.54716L11.3427 10.7085C11.0526 10.8229 10.8229 11.0526 10.7085 11.3427L9.54716 14.2873C9.1724 15.2376 7.8276 15.2376 7.45284 14.2873L6.29148 11.3427C6.17707 11.0526 5.94743 10.8229 5.65732 10.7085L2.71266 9.54716C1.76244 9.1724 1.76245 7.8276 2.71267 7.45284L5.65732 6.29148C5.94743 6.17707 6.17707 5.94743 6.29148 5.65732L7.45284 2.71266Z" fill="url(#grad1)"></path>
-                                    <path opacity="0.5" d="M16.9245 13.3916C17.1305 12.8695 17.8695 12.8695 18.0755 13.3916L18.9761 15.6753C19.039 15.8348 19.1652 15.961 19.3247 16.0239L21.6084 16.9245C22.1305 17.1305 22.1305 17.8695 21.6084 18.0755L19.3247 18.9761C19.1652 19.039 19.039 19.1652 18.9761 19.3247L18.0755 21.6084C17.8695 22.1305 17.1305 22.1305 16.9245 21.6084L16.0239 19.3247C15.961 19.1652 15.8348 19.039 15.6753 18.9761L13.3916 18.0755C12.8695 17.8695 12.8695 17.1305 13.3916 16.9245L15.6753 16.0239C15.8348 15.961 15.961 15.8348 16.0239 15.6753L16.9245 13.3916Z" fill="url(#grad1)"></path>
-                                </g>
-                            </svg>
-                        </li>
+                            <li><span class="material-symbols-rounded navrail-icons" id="navrailicon7">wand_stars</span></li>
                             <li><span class="navrail-text" id="navrailtext8">KitchenAI</span></li>
                         {% endif %}
                     </ul>
@@ -876,7 +880,7 @@
                     </path>
                 </svg>
                 
-                <img src="{% static 'testingapp/media/NewLogo.png' %}" class="nrweb-logo" alt="Yummy Recipes" srcset="">
+                <img loading="lazy" src="{% static 'testingapp/media/NewLogo.png' %}" class="nrweb-logo" alt="Yummy Recipes" srcset="">
             </div>
 
             <div class="navbar-brand-name">
@@ -895,7 +899,7 @@
 
                             <div class="p-1 sm-searchbar">
                                 {% block sm_search-btn2 %}
-                                <div class="rightside-searchbar">
+                                <div class="rightside-searchbar rightside-searchbar-unauth">
                                     <h5 class="active-modal-btn-bgcolor"><a data-bs-toggle="modal" data-bs-target="#searchModal"><span class="material-symbols-rounded rightside-searchicon">search</span></a></h5>
                                 </div>
                                 {% endblock %}
@@ -913,7 +917,7 @@
                 <ul class="nav justify-content-end">
                     <li class="nav-item">
                         {% block search-btn2 %}
-                        <div class="rightside-searchbar">
+                        <div class="rightside-searchbar rightside-searchbar-unauth">
                             <h5 class="active-modal-btn-bgcolor"><a data-bs-toggle="modal" data-bs-target="#searchModal"><span class="material-symbols-rounded rightside-searchicon">search</span></a></h5>
                         </div>
                         {% endblock %}
@@ -1021,7 +1025,7 @@
 
                         <li>
                             <a class="main-links {% if request.path == trending %} active {% endif %}" href="{% url 'trending' %}">
-                                <span class="material-symbols-rounded offcanvas-link-icons">trending_up</span> 
+                                <span class="material-symbols-rounded offcanvas-link-icons">mode_heat</span> 
                                 Trending
                             </a>
                         </li>
@@ -1042,7 +1046,7 @@
                
             <div class="navrail-content">
     
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'landingpg' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'landingpg' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == landingpg %}
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active" id="navrailicon1">food_bank</span></li>
@@ -1055,13 +1059,13 @@
                 </a>
 
                 {% if viewpost %} 
-                    <a class="dropdown-ite w3-bar-item w3-button navrail-links viewpost-listitems" href="{% url 'viewpost' post.pk %}">
+                    <a class="w3-bar-item w3-button navrail-links viewpost-listitems" href="{% url 'viewpost' post.pk %}">
                         <ul class="navrail-listitems" data-bs-custom-class="custom-popover" tabindex="0" data-bs-html="true" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-content="<b>{{post.title}}</b>">
                             {% if recipe_img %}
                                 <li>
                                     <div class="image-stack">
                                         <div class="first-compare-image image-item" style="margin-left: -5px;">
-                                            <img src="{{ recipe_img.image.url }}" alt="{{ recipe1.title }} Image">
+                                            <img loading="lazy" src="{{ recipe_img.image.url }}" alt="{{ recipe1.title }} Image">
                                         </div>
                                     </div>
                                 </li>
@@ -1073,7 +1077,7 @@
                     </a>
                     
                 {% elif query %} 
-                    <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="">
+                    <a class="w3-bar-item w3-button navrail-links" href="">
                         <ul class="navrail-listitems">
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">action_key</span></li>
                             <li><span class="navrail-text navrail-text-active" id="navrail-text-active">Search</span></li>
@@ -1083,7 +1087,7 @@
                 {% endif %}
         
                 {% if request.path == login %} 
-                    <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'login' %}">
+                    <a class="w3-bar-item w3-button navrail-links" href="{% url 'login' %}">
                         <ul class="navrail-listitems"> 
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">login</span></li>
                             <li><span class="navrail-text navrail-text-active">Login</span></li>
@@ -1091,7 +1095,7 @@
                     </a>
 
                 {% elif request.path == topostlogin %} 
-                    <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="">
+                    <a class="w3-bar-item w3-button navrail-links" href="">
                         <ul class="navrail-listitems"> 
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">login</span></li>
                             <li><span class="navrail-text navrail-text-active">Login</span></li>
@@ -1099,7 +1103,7 @@
                     </a>
                     
                 {% else %}
-                    <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'login' %}">
+                    <a class="w3-bar-item w3-button navrail-links" href="{% url 'login' %}">
                         <ul class="navrail-listitems"> 
                             <li><span class="material-symbols-rounded navrail-icons" id="navrailicon1">login</span></li>
                             <li><span class="navrail-text">Login</span></li>
@@ -1108,7 +1112,7 @@
                 {% endif %}
 
 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'signup' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'signup' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == signup %}
                             <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">account_circle</span></li>
@@ -1123,7 +1127,7 @@
                 {% if request.path == landingpg %}
 
                 {% else %}
-                    <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'explore' %}">
+                    <a class="w3-bar-item w3-button navrail-links" href="{% url 'explore' %}">
                         <ul class="navrail-listitems">
                             {% if request.path == explore %} 
                                 <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">explore</span></li>
@@ -1137,13 +1141,13 @@
                 {% endif %}
                 
 
-                <a class="dropdown-ite w3-bar-item w3-button navrail-links" href="{% url 'trending' %}">
+                <a class="w3-bar-item w3-button navrail-links" href="{% url 'trending' %}">
                     <ul class="navrail-listitems">
                         {% if request.path == trending %}
-                            <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">trending_up</span></li>
+                            <li><span class="material-symbols-rounded navrail-icons navrail-icons-active">mode_heat</span></li>
                             <li><span class="navrail-text navrail-text-active">Trending</span></li>
                         {% else %}
-                            <li><span class="material-symbols-rounded navrail-icons" id="navrailicon1">trending_up</span></li>
+                            <li><span class="material-symbols-rounded navrail-icons" id="navrailicon1">mode_heat</span></li>
                             <li><span class="navrail-text">Trending</span></li>
                         {% endif %}
                     </ul>
@@ -1158,13 +1162,19 @@
 
 {% endif %}
 
+    <div class="scaled-down-animation">
+        {% block content %}
 
-{% block content %}
+        {% endblock %}
+    </div>
 
+    {% block modals %}
     
+    {% endblock %}
 
+    {% block offcanvas %}
 
-{% endblock %}
+    {% endblock %}
 
 </body>
 
@@ -1175,7 +1185,9 @@
     <div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel" data-bgcolor="{{ post.color_3 }}">
         <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="quickviewModalLabel" data-color="{{ post.color_7 }}">Yummy Recipes</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <button type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+            <span class="material-symbols-rounded">close</span>
+        </button>
         </div>
         <div class="offcanvas-body qv-modal-body">
 
@@ -1184,10 +1196,10 @@
                     <div class="qv-offcanvas-img-container">
                         {% for i in post.photo_set.all %}
                             {% if forloop.counter0 == 0 %}
-                                <img src="{{ i.image.url }}" class="qv-offcanvas-img" alt="{{post.title}}">
+                                <img loading="lazy" src="{{ i.image.url }}" class="qv-offcanvas-img" alt="{{post.title}}">
                             {% endif %}
                             {% empty %}
-                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
+                                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
                         {% endfor %}
                     </div>
                     
@@ -1195,7 +1207,7 @@
                         <h3 class="article-title">{{post.title}}</h3>
                         <p>
                             <ul>
-                                <li><img src="{{ post.author.profile.profile_img.url }}" alt="Image"></li>
+                                <li><img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="Image"></li>
                                 <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views &#11825; {{ post.read_time|pluralize_min }}</li>
                             </ul>
                         </p>
@@ -1248,7 +1260,7 @@
                     </div>
 
                     {% if not post.get_date == post.get_modified_date %}
-                        <div class="d-flex justify-content-center gap-3 mt-2 qv-modified-date-container">
+                        <div class="d-flex justify-content-center gap-3 mt-2 qv-modified-date-container opacity-75">
                             <div><small>Updated</small></div>
                             <div>            
                                 <small>{{post.get_modified_date}}</small>
@@ -1274,7 +1286,9 @@
     <div class="offcanvas offcanvas-end qv-offcanvas" tabindex="-1" id="quickviewModal{{post.pk}}" aria-labelledby="quickviewModalLabel">
         <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="quickviewModalLabel">Yummy Recipes</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <button type="button" data-bs-dismiss="offcanvas" aria-label="Close">
+            <span class="material-symbols-rounded">close</span>
+        </button>
         </div>
         <div class="offcanvas-body qv-modal-body">
             <div class="qv-modal-body-container">
@@ -1282,10 +1296,10 @@
                     <div class="qv-offcanvas-img-container">
                         {% for i in post.photo_set.all %}
                             {% if forloop.counter0 == 0 %}
-                                <img src="{{ i.image.url }}" class="qv-offcanvas-img" alt="{{post.title}}">
+                                <img loading="lazy" src="{{ i.image.url }}" class="qv-offcanvas-img" alt="{{post.title}}">
                             {% endif %}
                             {% empty %}
-                                <img src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
+                                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="modal-rec-img">
                         {% endfor %}
                     </div>
                     
@@ -1293,7 +1307,7 @@
                         <h3 class="article-title">{{post.title}}</h3>
                         <p>
                             <ul>
-                                <li><img src="{{ post.author.profile.profile_img.url }}" alt="Image"></li>
+                                <li><img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="Image"></li>
                                 <li><div class="text-truncate">{{post.author.first_name}} {{post.author.last_name}}</div>  {{post.get_date}} &#11825; {% get_hit_count for post %} views &#11825; {{ post.read_time|pluralize_min }}</li>
                             </ul>
                         </p>
@@ -1347,7 +1361,7 @@
                     </div>
                     
                     {% if not post.get_date == post.get_modified_date %}
-                        <div class="d-flex justify-content-center gap-3 mt-2 qv-modified-date-container">
+                        <div class="d-flex justify-content-center gap-3 mt-2 qv-modified-date-container opacity-75">
                             <div><small>Updated</small></div>
                             <div>            
                                 <small>{{post.get_modified_date}}</small>
@@ -1418,7 +1432,7 @@
 </div>
 
 {# Custom clipboard modal #}
-<div class="modal fade" id="customClipboardModal" tabindex="-1" aria-labelledby="customClipboardModalLabel" aria-hidden="true">
+<div class="modal fade Modal-logout" id="customClipboardModal" tabindex="-1" aria-labelledby="customClipboardModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
         <div class="modal-content logoutmodal clipborardmodal">
             <div class="modal-body">
@@ -1502,7 +1516,7 @@
         selector: 'textarea:not(#customClipboardModalText)',
         cleanup_on_startup: true,
         custom_undo_redo_levels: 20,
-        plugins: 'save link image media preview codesample contextmenu table code lists insertdatetime nonbreaking contextmenu directionality searchreplace wordcount visualblocks visualchars code autolink lists charmap anchor pagebreak',
+        plugins: 'save link image media preview codesample table code lists insertdatetime nonbreaking directionality searchreplace wordcount visualblocks visualchars code autolink lists charmap anchor pagebreak',
         toolbar1: 'fullscreen preview bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft alignright aligncenter alignjustify | indent outdent | bullist numlist table | link image media | codesample |',
         toolbar2: 'visualblocks visualchars charmap hr pagebreak nonbreaking anchor | code',       
         content_css: "{% url 'dynamic_css' %}",
@@ -1638,6 +1652,10 @@ $(document).ready(function() {
 });
 </script>
 
+<script>
+    
+</script>
+
 {# navrail items to scale to animate  #}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -1656,7 +1674,27 @@ $(document).ready(function() {
     });
 </script>
 
-{# Adding class to keep the background color to logout while logout modal is opened #}
+{# Removing active class from navrail-links and adding to clicked link instantly #}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const navLinks = document.querySelectorAll(".navrail-links");
+
+        navLinks.forEach(link => {
+            link.addEventListener("click", () => {
+            document.querySelectorAll(".navrail-icons-active, .navrail-text-active")
+                .forEach(el => el.classList.remove("navrail-icons-active", "navrail-text-active"));
+
+            const icons = link.querySelector(".navrail-icons");
+            const text = link.querySelector(".navrail-text");
+
+            if (icons) icons.classList.add("navrail-icons-active");
+            if (text) text.classList.add("navrail-text-active");
+            });
+        });
+    });
+</script>
+
+{# Keep the background color color active while logout modal is opened #}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const logoutLink = document.getElementById("logoutlink");
@@ -1671,7 +1709,7 @@ $(document).ready(function() {
         });
     });
 </script>
-      
+    
 <script>
     let dropdowns = document.querySelectorAll('.dropdown-toggle')
     dropdowns.forEach((dd)=>{
@@ -1700,13 +1738,18 @@ $(document).ready(function() {
         <div class="modal-content logoutmodal">
             <div class="modal-body">
                 <div class="modal-body-header">
-                    <h2 class="modal-body-text-color">Confirm logout</h2>
-                    <p class="del-text modal-body-text-color">Are you sure you want to logout?</p>
+                    {% if not is_guest %}
+                        <h2 class="modal-body-text-color">Confirm logout</h2>
+                        <p class="del-text modal-body-text-color">Are you sure you want to logout?</p>
+                    {% else %}
+                        <h2 class="modal-body-text-color">End guest session</h2>
+                        <p class="del-text modal-body-text-color">Your guest session will be closed</p>
+                    {% endif %}
                 </div>
 
                 <div class="modal-body-footer" id="logoutfooter">
                     <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
-                    <a class="btn btn-transparent modal-logout-btn" href="{% url 'logout' %}">Logout</a>
+                    <a class="btn btn-transparent modal-logout-btn" href="{% url 'logout' %}">{% if not is_guest %}Logout {% else %}End{% endif %}</a>
                 </div>
             </div>
         </div>
@@ -1715,152 +1758,153 @@ $(document).ready(function() {
 
 {# Recipe search modal #}
 <div class="modal fade Modal-search" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-search modal-dialog-scrollable modal-fullscreen">
+    <div class="modal-dialog modal-search modal-dialog-scrollable modal-fullscreen-lg-down">
         <div class="modal-content logoutmodal searchmodal">
             <div class="modal-header">
                 <h5 class="modal-title search-modal-title" id="modal-header-container">Search</h5>
                 <button type="button" class="btn btn-transparent modal-close-btn" data-bs-dismiss="modal" aria-label="Close"><span class="material-symbols-rounded md-top-closeicon">close</span></button>
             </div>
 
-                <div class="search-modal-body" id="search-modal-body">
-                    <form method="GET" id="searchform" action="{% url 'searchresults' %}" class="searchbar" autocomplete="off">
+            <div class="search-modal-body" id="search-modal-body">
+                <form method="GET" id="searchform" action="{% url 'searchresults' %}" class="searchbar" autocomplete="off">
 
-                        <div class="search-modal-container">
-                            
-                            <div class="search-modal-input-container">
-                            {% if query %}
-                                <input id="idquery" class="search-modal-input" type="text" name="query" placeholder="Find something delicious!" title="Search recipes" required="required" value="{{query}}">
-                            {% elif profile_details %}
-                                <input id="idquery" class="search-modal-input" type="text" name="query" placeholder="Find something delicious!" title="Search recipes" required="required" value="{{profile_details.get_full_name}}">
-                            {% else %}
-                                <input id="idquery" class="search-modal-input" type="text" name="query" placeholder="Find something delicious!" title="Search recipes" required="required">
-                            {% endif %}
-                            </div>
-                            <div class="search-icon">
-                                <button type="submit" onclick="submitForm()">
-                                    <span class="material-symbols-rounded">search</span>
-                                </button>
-                            </div>
-
-                            <svg class="search-circle-svg" jsname="maK7T" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg">
-                                <path class="search-svg-path" opacity="1.0" d="M34.4458 5.34261C37.6659 5.30972 40.4257 7.83079 40.6834 11.0408C40.8308 12.8764 41.8179 14.5725 43.3585 15.6372C46.0524 17.499 46.8569 21.1021 45.1766 23.7809C44.2158 25.3127 44.0347 27.227 44.6859 28.9685C45.8248 32.0139 44.3666 35.3228 41.3901 36.4472C39.6881 37.0902 38.408 38.4915 37.9212 40.2446C37.0698 43.3103 33.9061 45.061 30.7703 44.2016C28.9772 43.7101 27.087 44.0631 25.6481 45.1583C23.1318 47.0733 19.4708 46.5972 17.3736 44.0822C16.1742 42.644 14.396 41.8139 12.5546 41.8327C9.33445 41.8656 6.5747 39.3445 6.31696 36.1345C6.16958 34.2989 5.18246 32.6028 3.64192 31.5381C0.947945 29.6763 0.143532 26.0732 1.82378 23.3944C2.78462 21.8626 2.96568 19.9483 2.31445 18.2068C1.17563 15.1614 2.63381 11.8525 5.61024 10.7281C7.3123 10.0851 8.59239 8.68384 9.07922 6.93071C9.93055 3.86498 13.0943 2.11426 16.2301 2.9737C18.0232 3.46517 19.9134 3.11215 21.3523 2.01704C23.8686 0.101991 27.5295 0.578086 29.6268 3.09312C30.8261 4.53133 32.6044 5.36141 34.4458 5.34261Z">
-                                </path>
-                            </svg>
-
+                    <div class="search-modal-container">
+                        
+                        <div class="search-modal-input-container">
+                        {% if query %}
+                            <input id="idquery" class="search-modal-input" type="text" name="query" placeholder="Find something delicious!" title="Search recipes" required="required" value="{{query}}">
+                        {% elif profile_details %}
+                            <input id="idquery" class="search-modal-input" type="text" name="query" placeholder="Find something delicious!" title="Search recipes" required="required" value="{{profile_details.get_full_name}}">
+                        {% else %}
+                            <input id="idquery" class="search-modal-input" type="text" name="query" placeholder="Find something delicious!" title="Search recipes" required="required">
+                        {% endif %}
+                        </div>
+                        <div class="search-icon">
+                            <button type="submit" onclick="submitForm()">
+                                <span class="material-symbols-rounded">search</span>
+                            </button>
                         </div>
 
-                    </form>    
+                        <svg class="search-circle-svg" jsname="maK7T" viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg">
+                            <path class="search-svg-path" opacity="1.0" d="M34.4458 5.34261C37.6659 5.30972 40.4257 7.83079 40.6834 11.0408C40.8308 12.8764 41.8179 14.5725 43.3585 15.6372C46.0524 17.499 46.8569 21.1021 45.1766 23.7809C44.2158 25.3127 44.0347 27.227 44.6859 28.9685C45.8248 32.0139 44.3666 35.3228 41.3901 36.4472C39.6881 37.0902 38.408 38.4915 37.9212 40.2446C37.0698 43.3103 33.9061 45.061 30.7703 44.2016C28.9772 43.7101 27.087 44.0631 25.6481 45.1583C23.1318 47.0733 19.4708 46.5972 17.3736 44.0822C16.1742 42.644 14.396 41.8139 12.5546 41.8327C9.33445 41.8656 6.5747 39.3445 6.31696 36.1345C6.16958 34.2989 5.18246 32.6028 3.64192 31.5381C0.947945 29.6763 0.143532 26.0732 1.82378 23.3944C2.78462 21.8626 2.96568 19.9483 2.31445 18.2068C1.17563 15.1614 2.63381 11.8525 5.61024 10.7281C7.3123 10.0851 8.59239 8.68384 9.07922 6.93071C9.93055 3.86498 13.0943 2.11426 16.2301 2.9737C18.0232 3.46517 19.9134 3.11215 21.3523 2.01704C23.8686 0.101991 27.5295 0.578086 29.6268 3.09312C30.8261 4.53133 32.6044 5.36141 34.4458 5.34261Z">
+                            </path>
+                        </svg>
 
-                    <div class="filter-form-wrapper">
-                        <div class="filter-form-container">
-                            <form class="filter-form" id="filterform">
-                                <div class="row">
-                                    <div class="col">
-                                        <select class="form-select filter-form-select-input" id="typeSelect" name="type" title="Type of the recipe">
-                                            <option value="">{% if filter_values.type %} {{filter_values.type}} {% else %} Type {% endif %}</option>
-                                            <option value="Breakfast">Breakfast</option>
-                                            <option value="Lunch">Lunch</option>
-                                            <option value="Evening Snack">Evening Snack</option>
-                                            <option value="Dinner">Dinner</option>
-                                        </select>
-                                    </div>
-                                    <div class="col">
-                                        <select class="form-select filter-form-select-input" id="cuisineSelect" name="cuisine" title="Cuisine">
-                                            <option value="">{% if filter_values.cuisine %} {{filter_values.cuisine}} {% else %} Cuisine {% endif %}</option>
-                                            <option value="Indian cuisine">Indian cuisine</option>
-                                            <option value="American cuisine">American cuisine</option>
-                                            <option value="Italian cuisine">Italian cuisine</option>
-                                        </select>
-                                    </div>
-                                    <div class="col">
-                                        {% if filter_values.timing %}
-                                            <input type="number" class="form-control filter-form-select-input" id="timeInput" name="timing" value="{{filter_values.timing}}" min="1" placeholder="Time (in min)" title="Preparation time">
-                                        {% else %}
-                                            <input type="number" class="form-control filter-form-select-input" id="timeInput" name="timing" min="1" placeholder="Time (in min)" title="Preparation time">
-                                        {% endif %}
-                                    </div>
-                                    <div class="col">
-                                        <select class="form-select filter-form-select-input" id="categorySelect" name="category" title="Category">
-                                            <option value="">{% if filter_values.category %} {{filter_values.category}} {% else %} Category {% endif %}</option>
-                                            <option value="Veg">Veg</option>
-                                            <option value="Non-Veg">Non-Veg</option>
-                                        </select>
-                                    </div>
-                                    <div class="col">
-                                        <select class="form-select filter-form-select-input" id="difficultySelect" name="difficulty" title="Difficulty">
-                                            <option value="">{% if filter_values.difficulty %} {{filter_values.difficulty}} {% else %} Difficulty {% endif %}</option>
-                                            <option value="Easy">Easy</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="Hard">Hard</option>
-                                        </select>
-                                    </div>
-                                    <div class="col">
-                                        {% if filter_values.servings %}
-                                            <input type="number" id="servingsInput" name="servings" value="{{filter_values.servings}}" class="form-control filter-form-select-input" min="1" placeholder="Serves" title="Serving">
-                                        {% else %}
-                                            <input type="number" id="servingsInput" name="servings" class="form-control filter-form-select-input" min="1" placeholder="Serves" title="Serving">
-                                        {% endif %}
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-
-                        <div class="filter-form-button">
-                            <button type="button" id="filterButton" class="btn btn-light filter-form-btn">Filter</button>
-                        </div>
                     </div>
-                   
-                    <div class="autocomplete-widget">
-                        <div class="autocomplete-options-container" id="autocomplete-options-container">
-                            {% if user.is_authenticated %}
-                                <div class="autocomplete-pages-history-container">
-                                    <div class="pages-options-autocomplete"></div>
 
-                                    <div class="history-options-autocomplete"></div>
+                </form>    
+
+                <div class="filter-form-wrapper">
+                    <div class="filter-form-container">
+                        <form class="filter-form" id="filterform">
+                            <div class="row">
+                                <div class="col">
+                                    <select class="form-select filter-form-select-input" id="typeSelect" name="type" title="Type of the recipe">
+                                        <option value="">{% if filter_values.type %} {{filter_values.type}} {% else %} Type {% endif %}</option>
+                                        <option value="Breakfast">Breakfast</option>
+                                        <option value="Lunch">Lunch</option>
+                                        <option value="Evening Snack">Evening Snack</option>
+                                        <option value="Dinner">Dinner</option>
+                                    </select>
                                 </div>
-                            {% endif %}
-                        </div>
+                                <div class="col">
+                                    <select class="form-select filter-form-select-input" id="cuisineSelect" name="cuisine" title="Cuisine">
+                                        <option value="">{% if filter_values.cuisine %} {{filter_values.cuisine}} {% else %} Cuisine {% endif %}</option>
+                                        <option value="Indian cuisine">Indian cuisine</option>
+                                        <option value="American cuisine">American cuisine</option>
+                                        <option value="Italian cuisine">Italian cuisine</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    {% if filter_values.timing %}
+                                        <input type="number" class="form-control filter-form-select-input" id="timeInput" name="timing" value="{{filter_values.timing}}" min="1" placeholder="Time (in min)" title="Preparation time">
+                                    {% else %}
+                                        <input type="number" class="form-control filter-form-select-input" id="timeInput" name="timing" min="1" placeholder="Time (in min)" title="Preparation time">
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <select class="form-select filter-form-select-input" id="categorySelect" name="category" title="Category">
+                                        <option value="">{% if filter_values.category %} {{filter_values.category}} {% else %} Category {% endif %}</option>
+                                        <option value="Veg">Veg</option>
+                                        <option value="Non-Veg">Non-Veg</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <select class="form-select filter-form-select-input" id="difficultySelect" name="difficulty" title="Difficulty">
+                                        <option value="">{% if filter_values.difficulty %} {{filter_values.difficulty}} {% else %} Difficulty {% endif %}</option>
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    {% if filter_values.servings %}
+                                        <input type="number" id="servingsInput" name="servings" value="{{filter_values.servings}}" class="form-control filter-form-select-input" min="1" placeholder="Serves" title="Serving">
+                                    {% else %}
+                                        <input type="number" id="servingsInput" name="servings" class="form-control filter-form-select-input" min="1" placeholder="Serves" title="Serving">
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <div class="filter-form-button">
+                        <button type="button" id="filterButton" class="btn btn-light filter-form-btn">Filter</button>
                     </div>
                 </div>
-                {% if recipes_rankings %}
-                    <div class="ranked_recipes">
-                        <div class="mb-3">
-                            <h6 class="ranked_recipes_color">Trending searches</h6>
-                        </div>
-                    
-                        {% for recipes in recipes_rankings %}
-                            <div class="d-flex position-relative trending-searches-container">
-                                {% for i in recipes.photo_set.all %}
-                                {% if forloop.counter0 == 0 %}
-                                    <img src="{{ i.image.url }}" class="flex-shrink-0 search-chips" alt="{{recipes.title}}">
-                                {% endif %}
-                                {% empty %}
-                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 search-chips">
-                                {% endfor %}
-                                <div class="d-flex flex-column justify-content-center">
-                                    <h6 class="ranked_recipes_color mx-2">{{recipes.title}}</h6>
-                                    <a href="{% url 'viewpost' recipes.pk %}" class="stretched-link"></a>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                
+                <div class="autocomplete-widget">
+                    <div class="autocomplete-options-container" id="autocomplete-options-container">
+                        {% if user.is_authenticated %}
+                            <div class="autocomplete-pages-history-container">
+                                <div class="pages-options-autocomplete"></div>
 
+                                <div class="history-options-autocomplete"></div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- {% if recipes_rankings %}
+                <div class="ranked_recipes">
+                    <div class="mb-3">
+                        <h6 class="ranked_recipes_color">Trending searches</h6>
+                    </div>
+                
+                    {% for recipes in recipes_rankings %}
+                        <div class="d-flex position-relative trending-searches-container">
+                            {% for i in recipes.photo_set.all %}
+                            {% if forloop.counter0 == 0 %}
+                                <img loading="lazy" src="{{ i.image.url }}" class="flex-shrink-0 search-chips" alt="{{recipes.title}}">
+                            {% endif %}
+                            {% empty %}
+                                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 search-chips">
+                            {% endfor %}
+                            <div class="d-flex flex-column justify-content-center">
+                                <h6 class="ranked_recipes_color mx-2">{{recipes.title}}</h6>
+                                <a href="{% url 'viewpost' recipes.pk %}" class="stretched-link"></a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %} -->
         </div>
     </div>
 </div>
 
 {# show/hide the most searched recipes when input is not empty #}
 <script>
-   $('#idquery').keyup(function() {
-        if ($(this).val().length == 0) {
-            $('.ranked_recipes').show();
+    $('#idquery').on('input', function () {
+        if ($(this).val().length === 0) {
+            $('.ranked_recipes').removeClass('hidden');
+            $('.autocomplete-widget').addClass('hidden');
         } 
         else {
-            $('.ranked_recipes').hide();
+            $('.ranked_recipes').addClass('hidden');
+            $('.autocomplete-widget').removeClass('hidden');
         }
-    }).keyup();
+    }).trigger('input');
 </script>
 
 {# appending filter form fields to search input for custom filtering #}
@@ -1951,6 +1995,201 @@ $(document).ready(function() {
     {% endfor %}
 {% endif %}
 
+{# Navigation icons & image dropdown slider animation #}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // For nav right image dropdown
+        const dropmenuWrapper = document.querySelector('.dropmenu-details-wrapper');
+        if (dropmenuWrapper) {
+            const dropmenuItems = dropmenuWrapper.querySelectorAll('.dropdown-second-child');
+            const dropmenuSlider = document.createElement('div');
+            dropmenuSlider.classList.add('nav-right-img-dropmenu-slider');
+            dropmenuSlider.style.position = 'absolute';
+            dropmenuSlider.style.transition = 'all 0.3s ease';
+            dropmenuSlider.style.pointerEvents = 'none';
+            dropmenuSlider.style.display = 'none';
+            dropmenuSlider.style.zIndex = '0';
+            dropmenuWrapper.style.position = 'relative';
+            dropmenuWrapper.appendChild(dropmenuSlider);
+    
+            const updateDropmenuSlider = (item) => {
+                const rect = item.getBoundingClientRect();
+                const parentRect = dropmenuWrapper.getBoundingClientRect();
+                const top = rect.top - parentRect.top;
+                const height = rect.height;
+    
+                dropmenuSlider.style.top = `${top}px`;
+                dropmenuSlider.style.left = '0';
+                dropmenuSlider.style.width = '100%';
+                dropmenuSlider.style.height = `${height}px`;
+                dropmenuSlider.style.display = 'block';
+                dropmenuSlider.style.opacity = '1';
+    
+                dropmenuSlider.style.borderRadius = '0';
+                const isFirst = item.classList.contains('first_child');
+                const isLast = item.classList.contains('last-child') || item.classList.contains('dropdown-second-child2');
+    
+                if (isFirst) {
+                    dropmenuSlider.style.borderRadius = '25px 25px 0 0';
+                } else if (isLast) {
+                    dropmenuSlider.style.borderRadius = '0 0 25px 25px';
+                }
+            };
+    
+            const hideDropmenuSlider = () => {
+                dropmenuSlider.style.opacity = '0';
+                dropmenuSlider.style.display = 'none';
+            };
+    
+            dropmenuItems.forEach(item => {
+                item.addEventListener('mouseenter', () => updateDropmenuSlider(item));
+                item.addEventListener('mouseleave', () => {
+                    if (!dropmenuWrapper.matches(':hover')) hideDropmenuSlider();
+                });
+            });
+    
+            dropmenuWrapper.addEventListener('mouseleave', () => hideDropmenuSlider());
+        }
+    
+        // For nav right icons
+        const navList = document.querySelector('.nav');
+        if (navList) {
+            const listItems = document.querySelectorAll('.nav-topright-icon-container .nav-item');
+            let isMouseOverNav = false;
+    
+            const navSlider = document.createElement('div');
+            navSlider.classList.add('nav-right-icons-slider');
+            navSlider.style.pointerEvents = 'none';
+            navList.appendChild(navSlider);
+    
+            const updateNavSlider = (item) => {
+                const h5 = item.querySelector('h5');
+                if (!h5) return;
+    
+                const targetRect = h5.getBoundingClientRect();
+                const listRect = navList.getBoundingClientRect();
+                const targetLeft = targetRect.left - listRect.left;
+                const targetWidth = targetRect.width;
+                const targetHeight = targetRect.height;
+                const targetTop = targetRect.top - listRect.top;
+    
+                navSlider.style.left = `${targetLeft}px`;
+                navSlider.style.width = `${targetWidth}px`;
+                navSlider.style.height = `${targetHeight}px`;
+                navSlider.style.top = `${targetTop}px`;
+                navSlider.style.display = 'block';
+                navSlider.style.opacity = '1';
+            };
+    
+            const hideNavSlider = () => {
+                navSlider.style.opacity = '0';
+                setTimeout(() => {
+                    if (navSlider.style.opacity === '0') navSlider.style.display = 'none';
+                }, 300);
+            };
+    
+            navList.addEventListener('mouseenter', () => isMouseOverNav = true);
+            navList.addEventListener('mouseleave', () => {
+                isMouseOverNav = false;
+                const active = navList.querySelector('.nav-item[data-bs-toggle-active]');
+                if (!active) hideNavSlider();
+            });
+    
+            listItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    if (!item.hasAttribute('data-bs-toggle-active')) updateNavSlider(item);
+                });
+            });
+    
+            navList.addEventListener('mousemove', (e) => {
+                const item = e.target.closest('.nav-item');
+                const isInsideTestDivv = item && item.closest('.nav-topright-icon-container');
+                if (item && isInsideTestDivv && !item.hasAttribute('data-bs-toggle-active')) {
+                    updateNavSlider(item);
+                }
+            });
+    
+            const activateNavItem = (navItem) => {
+                navItem.setAttribute('data-bs-toggle-active', '');
+                navItem.classList.add('nav-item--active-bg');
+                hideNavSlider();
+            };
+    
+            const deactivateNavItem = (navItem) => {
+                navItem.classList.remove('nav-item--active-bg');
+                navItem.removeAttribute('data-bs-toggle-active');
+                if (isMouseOverNav) updateNavSlider(navItem);
+                else hideNavSlider();
+            };
+    
+            document.querySelectorAll('[data-bs-toggle="modal"]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const navItem = el.closest('.nav-item');
+                    if (navItem) activateNavItem(navItem);
+                });
+            });
+    
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('hidden.bs.modal', () => {
+                    const navItem = navList.querySelector(`[data-bs-target="#${modal.id}"]`)?.closest('.nav-item');
+                    if (navItem) deactivateNavItem(navItem);
+                });
+            });
+    
+            document.querySelectorAll('[data-bs-toggle="offcanvas"]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const navItem = el.closest('.nav-item');
+                    if (navItem) activateNavItem(navItem);
+                });
+            });
+    
+            document.querySelectorAll('.offcanvas').forEach(offcanvas => {
+                offcanvas.addEventListener('hidden.bs.offcanvas', () => {
+                    const navItem = navList.querySelector(`[data-bs-target="#${offcanvas.id}"]`)?.closest('.nav-item');
+                    if (navItem) deactivateNavItem(navItem);
+                });
+            });
+        }
+    
+        // For sm nav icons (location & search)
+        const weatherBar = document.querySelector('.navbar-sm-weather .hstack');
+        if (weatherBar) {
+            const weatherItems = document.querySelectorAll('.navbar-sm-weather .sm-searchbar');
+            if (weatherItems.length > 0) {
+                const weatherSlider = document.createElement('div');
+                weatherSlider.classList.add('nav-sm-icon-slider');
+                weatherSlider.style.pointerEvents = 'none';
+                weatherBar.appendChild(weatherSlider);
+    
+                const updateWeatherSlider = (item) => {
+                    const rect = item.getBoundingClientRect();
+                    const parentRect = weatherBar.getBoundingClientRect();
+                    const left = rect.left - parentRect.left;
+                    const top = rect.top - parentRect.top;
+    
+                    weatherSlider.style.left = `${left}px`;
+                    weatherSlider.style.top = `${top}px`;
+                    weatherSlider.style.width = `${rect.width}px`;
+                    weatherSlider.style.height = `${rect.height}px`;
+                    weatherSlider.style.display = 'block';
+                    weatherSlider.style.opacity = '1';
+                };
+    
+                const hideWeatherSlider = () => {
+                    weatherSlider.style.opacity = '0';
+                    setTimeout(() => {
+                        if (weatherSlider.style.opacity === '0') weatherSlider.style.display = 'none';
+                    }, 300);
+                };
+    
+                weatherItems.forEach(item => {
+                    item.addEventListener('mouseenter', () => updateWeatherSlider(item));
+                    item.addEventListener('mouseleave', () => hideWeatherSlider());
+                });
+            }
+        }
+    });
+</script>
 
 {# Notification offcanvas #}
 <div class="offcanvas offcanvas-end notification-offcanvas" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
@@ -1990,7 +2229,7 @@ $(document).ready(function() {
                         {# When current user starts following to other user #}
                         {% if 'following' in notification.verb %}
                             <div class="p-1">
-                                <img src="{{ notification.actor.profile.profile_img.url }}">
+                                <img loading="lazy" src="{{ notification.actor.profile.profile_img.url }}">
                             </div>
                         {% endif %}
 
@@ -2196,7 +2435,6 @@ $(document).ready(function () {
         $chips.removeClass('active').addClass('hidden');
         $filterForm.removeClass('active').addClass('hidden');
         $ranked_recipes.removeClass('active').addClass('hidden');
-
     });
 
 });
@@ -2231,23 +2469,36 @@ $(document).ready(function () {
     $(document).ready(function() {
         $('#logoutlink').on('click', function() {
         $(this).addClass('clicked');
-    });
+        });
 
-    $('#logoutModal').on('show.bs.modal', function() {
-        $('#logoutlink').addClass('clicked');
-    });
+        $('#logoutModal').on('show.bs.modal', function() {
+            $('#logoutlink').addClass('clicked');
+        });
 
-    $('#logoutModal').on('hidden.bs.modal', function() {
-        $('#logoutlink').removeClass('clicked');
-    });
+        $('#logoutModal').on('hidden.bs.modal', function() {
+            $('#logoutlink').removeClass('clicked');
+        });
     });
 
 </script>
 
+<script>
+    $(document).ready(function() {
+    $('.recipe-cards,.sidebar-cards').on('click', function() {
+        var $card = $(this);
+        $card.addClass('clicked');
+
+        setTimeout(function() {
+            $card.removeClass('clicked');
+        }, 200);
+    });
+});
+</script>
+
 
 {# weather modal #}
-<div class="modal fade" id="weatherModal" tabindex="-1" aria-labelledby="weatherModalLabel" aria-hidden="true"> 
-    <div class="modal-dialog modal-dialog-centered modal-search">
+<div class="modal fade Modal-logout" id="weatherModal" tabindex="-1" aria-labelledby="weatherModalLabel" aria-hidden="true"> 
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content logoutmodal creditmodal weathermodal">
 
             <div class="modal-body">
@@ -2258,6 +2509,7 @@ $(document).ready(function () {
                         {% csrf_token %}
                     
                         <input type="text" name="location" maxlength="100" value="{{user.userlocation.location}}" required="required" id="id_location" placeholder="Search for a location">
+                        <div id="autocomplete-list" class="autocomplete-suggestions"></div>
                     </form>
                     
                     {% if not user.userlocation.location == '' %}
@@ -2351,6 +2603,188 @@ $(document).ready(function () {
 
 {# submit & fetching weather data #}
 <script>
+$(document).ready(function () {
+
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    $.ajaxSetup({
+        headers: {
+            "X-CSRFToken": getCSRFToken()
+        }
+    });
+
+    let pollingInterval = null;
+    let activeLocation = null;
+
+    /* ---------- WEATHER UI ---------- */
+    function updateWeatherUI(weather) {
+        if (!weather) return;
+
+        $('#Location').text(weather.location);
+        $('#temperature').text(weather.temp);
+        $('#Description').text(weather.des);
+        $('#Humidity').text(weather.humidity);
+        $('#Wind_speed').text(weather.wind_speed);
+        $('#Min_temperature').text(weather.min);
+        $('#Max_temperature').text(weather.max);
+        $('#ai_summary').text(weather.summary);
+
+        if (weather.icon) {
+            $('#weatherIcon').attr(
+                'src',
+                'http://openweathermap.org/img/w/' + weather.icon + '.png'
+            ).addClass('show-temp');
+
+            $('.navbarweatherIcon').attr(
+                'src',
+                'http://openweathermap.org/img/w/' + weather.icon + '.png'
+            ).addClass('show-temp');
+        } 
+        else {
+            $('#weatherIcon').removeClass('show-temp');
+            $('.navbarweatherIcon').removeClass('show-temp');
+        }
+
+        if (weather.temp !== undefined && weather.temp !== null) {
+            $('.navbartemperature').text(weather.temp);
+            $('.navbarTempWrapper').addClass('show-temp');
+        } 
+        else {
+            $('.navbartemperature').text('');
+            $('.navbarTempWrapper').removeClass('show-temp');
+        }
+    }
+
+    /* ---------- RECIPES UI ---------- */
+    function updateRecipesUI(recipes, location) {
+        if (!recipes || recipes.length === 0) return;
+
+        const $container = $('#suggested-recipes-container');
+        $container.empty();
+
+        $('#suggested-recipes-header').html(
+            `<h1>Dishes to match ${location}'s climate</h1>`
+        );
+
+        let html = '';
+        recipes.forEach(function (recipe) {
+            const recipeUrl = recipe.id ? `/recipe/${recipe.id}` : "#";
+            html += `
+                <div class="recipe-cards all-recipes-cards weather-based-recipe-cards">
+                    <a href="${recipeUrl}">
+                        <div class="img-container">
+                            <img loading="lazy" src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+                        </div>
+                        <div class="recipe-info">
+                            <h4 class="card-title highlight">${recipe.title}</h4>
+                            <p><div class="text-truncate">${recipe.description}</div></p>
+                        </div>
+                    </a>
+                </div>
+            `;
+        });
+
+        $container.html(html);
+    }
+
+    /* ---------- POLLING ---------- */
+    function startPolling() {
+        if (pollingInterval || !activeLocation) return;
+
+        pollingInterval = setInterval(function () {
+            $.ajax({
+                url: "{% url 'save_location' %}",
+                type: "POST",
+                data: { location: activeLocation },
+                success: handleResponse
+            });
+        }, 2000);
+    }
+
+    function stopPolling() {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    }
+
+    /* ---------- RESPONSE HANDLER ---------- */
+    function handleResponse(response) {
+        if (!response) return;
+
+        // Always update weather if available
+        if (response.weather_data) {
+            updateWeatherUI(response.weather_data);
+            $('#submitButton').text('Save').prop('disabled', false);
+        }
+
+        if (response.status === "fetching") {
+            // Only show this if weather is NOT ready yet
+            if (!response.weather_data) {
+                $('#ai_summary').text('Fetching summary...');
+            }
+            startPolling();
+        }
+
+        if (response.status === "partial") {
+            
+            startPolling();
+        }
+
+        if (response.status === "ready") {
+            stopPolling();
+            return;
+        }
+    }
+
+    /* ---------- PAGE LOAD (load cached weather) ---------- */
+    (function loadCachedWeather() {
+        const location = $('#id_location').val();
+        if (!location) return;
+
+        $.ajax({
+            url: "{% url 'save_location' %}",
+            type: "POST",
+            data: { location: location },
+            success: handleResponse
+        });
+    })();
+
+    /* ---------- INPUT CHANGE (do NOT fetch) ---------- */
+    $('#id_location').on('input', function () {
+        stopPolling();
+        activeLocation = null;
+
+        $('#submitButton')
+            .text('Save')
+            .prop('disabled', false);
+    });
+
+    /* ---------- SUBMIT LOCATION ---------- */
+    $('#submitButton').on('click', function (e) {
+        e.preventDefault();
+
+        activeLocation = $('#id_location').val().trim();
+        if (!activeLocation) return;
+
+        const $btn = $(this);
+        $btn.text('Fetching...').prop('disabled', true);
+
+        $.ajax({
+            url: "{% url 'save_location' %}",
+            type: "POST",
+            data: { location: activeLocation },
+            success: handleResponse
+        });
+    });
+
+});
+</script>
+
+
+<!-- <script>
     $(document).ready(function() {
         function navbarupdateWeatherData() {
 
@@ -2394,8 +2828,8 @@ $(document).ready(function () {
                 $('#ai_summary').text(weatherData.summary);
                 $('#weatherIcon').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
 
-                $('#navbartemperature').text(weatherData.temp);
-                $('#navbarweatherIcon').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
+                $('.navbartemperature').text(weatherData.temp);
+                $('.navbarweatherIcon').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
             }
 
             if (suggestedRecipes.length > 0) {
@@ -2410,7 +2844,7 @@ $(document).ready(function () {
                         <div class="recipe-card mb-3">
                             <a href="${recipeUrl}">
                                 <div class="img-container">
-                                    <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+                                    <img loading="lazy" src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
                                 </div>
                                 <div class="recipe-info">
                                     <h4 class="card-title highlight">${recipe.title}</h4>  
@@ -2455,11 +2889,11 @@ $(document).ready(function () {
 
                         $('#weatherIcon').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
 
-                        $('#navbartemperature').text(weatherData.temp);
-                        $('#navbarweatherIcon').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
+                        $('.navbartemperature').text(weatherData.temp);
+                        $('.navbarweatherIcon').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
 
-                        $('#navbartemperature2').text(weatherData.temp);
-                        $('#navbarweatherIcon2').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
+                        $('.navbartemperature2').text(weatherData.temp);
+                        $('.navbarweatherIcon2').attr('src', 'http://openweathermap.org/img/w/' + weatherData.icon + '.png');
                          
                         // Displaying suggested recipes based on weather data
                         var $recipesContainer = $('#suggested-recipes-container');
@@ -2476,7 +2910,7 @@ $(document).ready(function () {
                                     <div class="recipe-cards all-recipes-cards weather-based-recipe-cards">
                                         <a href="${recipeUrl}">
                                             <div class="img-container">
-                                                <img src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
+                                                <img loading="lazy" src="${recipe.image}" alt="${recipe.title}" class="recipe-image">
                                             </div>
                                             <div class="recipe-info">
                                                 <h4 class="card-title highlight">${recipe.title}</h4>  
@@ -2517,14 +2951,14 @@ $(document).ready(function () {
         });
 
         // fetch weather data and update HTML every 10 minutes
-        setInterval(navbarupdateWeatherData, 10 * 60 * 1000); 
+        // setInterval(navbarupdateWeatherData, 10 * 60 * 1000); 
 
         $('#submitButton').on('click', function(event) {
             event.preventDefault();
             navbarsubmitForm();
         });
     });
-</script>
+</script> -->
 
 
 {# Search autocomplete (from context_processors.py file for showing autocomplete in each template) #}
@@ -2635,7 +3069,9 @@ function autocomplete(inp, data) {
     function updateAdditionalOptions(val, suggestions) {
         var additionalOptionsContainer = document.querySelector(".pages-options-autocomplete");
         additionalOptionsContainer.innerHTML = "";
-        var additionalOptions = ['Home', 'New recipe', 'Profile', 'Trending', 'Dashboard', 'Credits', 'Explore', 'Timeline', 'Favourites', 'History', 'Appearance', 'Account settings', 'Update profile', 'Liked recipes', 'Disliked recipes', 'Views', 'Network', 'KitchenAI'];
+        var additionalOptions = ['Home', 'New recipe', 'Profile', 'Trending', 'Dashboard', 'Credits', 'Explore', 
+        'Timeline', 'Favourites', 'History', 'Appearance', 'Account settings', 'Update profile', 'Liked recipes', 
+        'Disliked recipes', 'Views', 'Network', 'KitchenAI', 'Feedback'];
         var hasOptions = false;
         additionalOptions.forEach(option => {
             if (option.toUpperCase().indexOf(val.toUpperCase()) !== -1) {
@@ -2686,24 +3122,32 @@ function autocomplete(inp, data) {
     }
 }
 
-var autocomplete_results = {
-    'suggestions': [
-        '{% for results in autocomplete_list.suggestions %}',
-        "{{ results }}",
-        '{% endfor %}'
-    ],
-    'history': [
-        '{% for history_results in autocomplete_list.history %}',
-        "{{ history_results }}",
-        '{% endfor %}'
-    ]
-};
+// var autocomplete_results = {
+//     'suggestions': [
+//         '{% for results in autocomplete_list.suggestions %}',
+//         "{{ results }}",
+//         '{% endfor %}'
+//     ],
+//     'history': [
+//         '{% for history_results in autocomplete_list.history %}',
+//         "{{ history_results }}",
+//         '{% endfor %}'
+//     ]
+// };
+
+var autocomplete_results = JSON.parse('{{ autocomplete_list_json|safe }}');
+
+console.log('autocomplete_results');
+
 
 autocomplete(document.getElementById("idquery"), autocomplete_results);
 
-</script>
+</script> 
 
-{# To check if connected of internet  #}
+
+
+
+{# To check if connected to internet  #}
 <script>
     function checkInternet() {
       if (!navigator.onLine) {
@@ -2724,4 +3168,92 @@ autocomplete(document.getElementById("idquery"), autocomplete_results);
     });
 </script>
 
+<!-- {# Guest user modal #}
+<div class="modal fade Modal-logout" id="guestUserModal" tabindex="-1" aria-labelledby="guestUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content logoutmodal">
+            <div class="modal-body">
+                <div class="modal-body-header">
+                    <h2 class="modal-body-text-color">Login required {% if show_guest_modal %} {{guest_uaer.name}} {% endif %} </h2>
+                    <p class="del-text modal-body-text-color">Currently unavailable for guest user</p>
+                </div>
+
+                <div class="modal-body-footer" id="logoutfooter">
+                    <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                    <a class="btn btn-transparent modal-logout-btn" href="{% url 'login' %}">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+{# Guest user signup modal #}
+<div class="modal fade Modal-logout" id="guestSignupModal" tabindex="-1" aria-labelledby="guestSignupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content logoutmodal">
+            <div class="modal-body">
+                <div class="modal-body-header">
+                    <h2 class="modal-body-text-color">Signup</h2>
+                    <p class="del-text modal-body-text-color">This session will be closed.</p>
+                </div>
+
+                <div class="modal-body-footer" id="logoutfooter">
+                    <button type="button" class="btn btn-transparent footer-btn cancel-btn" data-bs-dismiss="modal">Cancel</button>
+                    <a class="btn btn-transparent modal-logout-btn" href="{% url 'logout' %}?next=signup">Signup</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Deleting cookie and clearing localStorage immediately after guest user logout #}
+<script>
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    const guestToClear = getCookie('guest_uuid_to_clear');
+
+    if (guestToClear) {
+        Object.keys(localStorage).forEach(key => {
+            if (key.endsWith(`_${guestToClear}`)) {
+                localStorage.removeItem(key);
+            }
+        });
+
+        document.cookie = "guest_uuid_to_clear=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    }
+</script>
+
+
+{% if user.is_authenticated %}
+    {# Background shift (scale) animation #}
+    <script>
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('show.bs.modal', () => {
+                document.body.classList.add('background-effect');
+            });
+
+            modal.addEventListener('hide.bs.modal', () => {
+                setTimeout(() => {
+                    document.body.classList.remove('background-effect');
+                }, 50);
+            });
+        });
+
+        document.querySelectorAll('.offcanvas').forEach(offcanvas => {
+            offcanvas.addEventListener('show.bs.offcanvas', () => {
+                document.body.classList.add('background-effect');
+            });
+            
+            offcanvas.addEventListener('hide.bs.offcanvas', () => {
+                setTimeout(() => {
+                    document.body.classList.remove('background-effect');
+                }, 50);
+            });
+        });
+    </script>
+{% endif %}
 </html>

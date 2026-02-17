@@ -1,22 +1,27 @@
 from django.contrib import admin
-from .models import post
-from .models import profile
-from .models import comments
-from .models import photo
-from .models import BlogHistory
-from .models import UserProfile
-from .models import UserLocation
-from .models import Favorite
-from .models import RedeemedCredit
-from .models import CreditHistory
-from .models import CreditSpentHistory
-from .models import Feedback
-from .models import Follow
-from .models import searchedRecipesRanking
-from .models import YearlyGoal
 
+from .models import (
+    BlogHistory,
+    CreditHistory,
+    CreditSpentHistory,
+    Favorite,
+    Feedback,
+    Follow,
+    RecipeRecommendationHistory,
+    RedeemedCredit,
+    UserLocation,
+    UserProfile,
+    UserTasteProfile,
+    YearlyGoal,
+    comments,
+    photo,
+    post,
+    profile,
+    searchedRecipesRanking,
+)
 
 # Register your models here.
+
 
 class photoInline(admin.TabularInline):
     model = photo
@@ -26,6 +31,7 @@ class postAdmin(admin.ModelAdmin):
     inlines = [
         photoInline,
     ]
+
 
 admin.site.register(post, postAdmin)
 
@@ -56,3 +62,7 @@ admin.site.register(Follow)
 admin.site.register(searchedRecipesRanking)
 
 admin.site.register(YearlyGoal)
+
+admin.site.register(UserTasteProfile)
+
+admin.site.register(RecipeRecommendationHistory)

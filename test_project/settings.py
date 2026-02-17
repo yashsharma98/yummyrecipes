@@ -9,16 +9,21 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-from lib2to3.pytree import Base
-import os
-from pathlib import Path
-import dj_database_url
-import os
-import pdfkit
 
+import os
+import sys
+import warnings
+from pathlib import Path
+
+import dj_database_url
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+sys.path.insert(0, os.path.join(BASE_DIR, "third_party"))
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.environ.get('SECRET_KEY', default='django-insecure-67u-yp=hkj)j^h-%r%@a*oab7zc17$m7qxicb&x2s$0h5e2z+=')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -37,94 +42,137 @@ DEBUG = False
 # DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 
-# ALLOWED_HOSTS = ['192.168.1.5','127.0.0.1','192.168.29.52','localhost']
-
 # ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 
 APPEND_SLASH = True
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+# SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+# CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
+# Using Redis Cache
 CACHES = {
-'default': {
-'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
-}
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SSL": True,
+            "SSL_PARAMETERS": {
+                "ssl_cert_reqs": "required",
+                "ssl_version": "PROTOCOL_TLSv1_2",
+            },
+        },
+    }
 }
 
-# Application definition
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+SESSION_COOKIE_AGE = 86400
+
+# Celery
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = os.environ.get("CELERY_TIMEZONE", "UTC")
+CELERY_BROKER_USE_SSL = False
+CELERY_REDIS_BACKEND_USE_SSL = False
 
 INSTALLED_APPS = [
-    'testingapp.apps.TestingappConfig',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'hitcount',
-    'django_browser_reload',
-    'rest_framework',
-    'django.contrib.humanize',
-    'wkhtmltopdf',
-    'ckeditor',
-    'chartjs',
-    'anymail',
-    'import_export',
-    'django_htmx',
-    'gtts',
-    'storages',
-    'notifications',
-    'tinymce',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
+    "testingapp.apps.TestingappConfig",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "hitcount",
+    "django_browser_reload",
+    "rest_framework",
+    "django.contrib.humanize",
+    "wkhtmltopdf",
+    "chartjs",
+    "anymail",
+    "import_export",
+    "gtts",
+    "storages",
+    "notifications",
+    "tinymce",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.middleware.locale.LocaleMiddleware",
-    'testingapp.middleware.TrailingSlashMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'testingapp.middleware.CheckPasswordMiddleware',
-    'testingapp.middleware.ClearExistingUserFirstnameMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
+    "testingapp.middleware.CheckPasswordMiddleware",
+    "testingapp.middleware.ClearExistingUserFirstnameMiddleware",
+    "testingapp.middleware.GuestMiddleware",
 ]
 
 # X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Open weather api
-OPENWEATHERMAP_API_KEY = os.environ.get('OPENWEATHERMAP_API_KEY')
+OPENWEATHERMAP_API_KEY = os.environ.get("OPENWEATHERMAP_API_KEY")
 
-SPOONACULAR_API_KEY = os.environ.get('SPOONACULAR_API_KEY')
+SPOONACULAR_API_KEY = os.environ.get("SPOONACULAR_API_KEY")
 
-# Openai api
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+# Fetch and auto update weather every 2 hours (fetching location from db)
 
-NUTRITION_API_KEY = os.environ.get('NUTRITION_API_KEY')
+# CELERY_BEAT_SCHEDULE = {
+#     "refresh-weather-every-2-hours-for-active-users": {
+#         "task": "testingapp.tasks.refresh_recent_user_weather",
+#         "schedule": crontab(minute=0, hour="*/2"),
+#     }
+# }
 
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+CELERY_BEAT_SCHEDULE = {
+    "backfill-recipe-embeddings": {
+        "task": "testingapp.tasks.text_embeddings_tasks.generate_recipe_embeddings",
+        "schedule": 300.0,
+    },
+    "refresh-user-tastes-nightly": {
+        "task": "testingapp.tasks.home_tasks.refresh_all_user_tastes",
+        "schedule": crontab(hour=2, minute=0),  # 2am daily
+    },
+}
 
-# Mailgun api 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp-relay.brevo.com'
+SPOONACULAR_API_KEY = os.environ.get("SPOONACULAR_API_KEY")
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+NUTRITION_API_KEY = os.environ.get("NUTRITION_API_KEY")
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+# Mailgun api
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp-relay.brevo.com"
 EMAIL_PORT = 587
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = '"Yummy Recipes" <yummyrecipes@django.com>'
 
-ROOT_URLCONF = 'test_project.urls'
+ROOT_URLCONF = "test_project.urls"
 
-TAILWIND_APP_NAME = 'theme'
+TAILWIND_APP_NAME = "theme"
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -134,36 +182,35 @@ NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'testingapp.context_processors.theme',
-                'testingapp.context_processors.colortheme',
-                'testingapp.context_processors.defaulttheme',
-                'testingapp.context_processors.search_autocomplete_data',
-                'testingapp.context_processors.message_notifications',
-                'testingapp.context_processors.most_searched_recipes',
-                'testingapp.context_processors.todays_date',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "testingapp.context_processors.search_autocomplete_data",
+                "testingapp.context_processors.message_notifications",
+                "testingapp.context_processors.most_searched_recipes",
+                "testingapp.context_processors.todays_date",
+                "testingapp.context_processors.guest_user_context",
+                "testingapp.context_processors.recipes",
             ],
-
-            'libraries':{
-            'noti_date_filter': 'testingapp.templatetags.noti_date_filter',
-            'read_time_pluralize': 'testingapp.templatetags.read_time_pluralize',
-            }
+            "libraries": {
+                "noti_date_filter": "testingapp.templatetags.noti_date_filter",
+                "read_time_pluralize": "testingapp.templatetags.read_time_pluralize",
+                "dictionary_values": "testingapp.templatetags.dictionary_values",
+            },
         },
     },
 ]
 
-WSGI_APPLICATION = 'test_project.wsgi.application'
+WSGI_APPLICATION = "test_project.wsgi.application"
 
 CKEDITOR_UPLOAD_PATH = "uploads/"
-CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js'
+CKEDITOR_JQUERY_URL = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 
 
@@ -177,27 +224,25 @@ CKEDITOR_IMAGE_BACKEND = "pillow"
 #     }
 # }
 
-ENVIRONMENT = os.environ.get('ENVIRONMENT')
+ENVIRONMENT = os.environ.get("ENVIRONMENT")
 
-if 'DATABASE_URL' in os.environ:
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
-    }
+if "DATABASE_URL" in os.environ:
+    DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
 
 else:
     # PosgreSQL
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'recipes',
-            'USER': 'postgres',
-            'PASSWORD': 'postgresql',
-            'HOST': 'localhost', 
-            'PORT': '',           
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.environ.get("LOCAL_DB_NAME"),
+            "USER": os.environ.get("LOCAL_DB_USER"),
+            "PASSWORD": os.environ.get("LOCAL_DB_PASSWORD"),
+            "HOST": os.environ.get("LOCAL_DB_HOST"),
+            "PORT": "",
         }
     }
 
-# Using database for suggesting recipes based on weather 
+# Using database for suggesting recipes based on weather
 DB_HOST = os.environ.get("DB_HOST")
 DB_PORT = os.environ.get("DB_PORT", "5432")
 DB_NAME = os.environ.get("DB_NAME")
@@ -210,16 +255,16 @@ DB_SSLMODE = os.environ.get("DB_SSLMODE", "prefer")
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -227,18 +272,18 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
-    ('en', 'English'),
-    ('fr', 'French'),
-    ('es', 'Spanish'),
+    ("en", "English"),
+    ("fr", "French"),
+    ("es", "Spanish"),
     # Add more languages as needed
 ]
 
 USE_I18N = True  # Enable internationalization
 
-TIME_ZONE = 'Asia/Kolkata'
+TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
 
@@ -249,113 +294,134 @@ USE_TZ = False
 IMPORT_EXPORT_USE_TRANSACTIONS = True
 
 LOCALE_PATHS = [
-    os.path.join(BASE_DIR, 'locale'),
+    os.path.join(BASE_DIR, "locale"),
 ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
-if not 'DATABASE_URL' in os.environ:
-    MEDIA_URL = '/media/'
+if "DATABASE_URL" not in os.environ:
+    MEDIA_URL = "/media/"
 
 
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # STATICFILES_DIRS = (
 #     os.path.join(BASE_DIR, 'static'),
 # )
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, "static"),
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'testingapp', 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, "testingapp", "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage"
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
-    }
+    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 
+# Explicit S3 toggle (never rely on DATABASE_URL for storage)
+if "DATABASE_URL" in os.environ:
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-2")
 
-if 'DATABASE_URL' in os.environ:
+    if not AWS_STORAGE_BUCKET_NAME:
+        raise ValueError("AWS_STORAGE_BUCKET_NAME not set in environment variables")
 
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = 'us-east-2'
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
 
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "access_key": AWS_ACCESS_KEY_ID,
+                "secret_key": AWS_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "region_name": AWS_S3_REGION_NAME,
+            },
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {"bucket_name": AWS_STORAGE_BUCKET_NAME},
+        },
+    }
 
-    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/static/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/images/"
 
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/images/'
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+else:
+    # Local development
+    STATIC_URL = "/static/"
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
 
 
 TINYMCE_DEFAULT_CONFIG = {
     # 'height': 500,
     # 'width': 1000,
-    'cleanup_on_startup': True,
-    'custom_undo_redo_levels': 20,
-    'selector': 'textarea:not(#customClipboardModalText)',
-    'plugins': '''
+    "cleanup_on_startup": True,
+    "custom_undo_redo_levels": 20,
+    "selector": "textarea:not(#customClipboardModalText)",
+    "plugins": """
             textcolor save link image media preview codesample contextmenu
             table code lists insertdatetime  nonbreaking
             contextmenu directionality searchreplace wordcount visualblocks
             visualchars code autolink lists  charmap print  hr
             anchor pagebreak
-            ''',
-    'toolbar1': '''
+            """,
+    "toolbar1": """
             fullscreen preview bold italic underline | fontselect,
             fontsizeselect  | forecolor backcolor | alignleft alignright |
             aligncenter alignjustify | indent outdent | bullist numlist table |
             | link image media | codesample |
-            ''',
-    'toolbar2': '''
+            """,
+    "toolbar2": """
             visualblocks visualchars |
             charmap hr pagebreak nonbreaking anchor |  code |
-            ''',
-    'contextmenu': 'formats | link image',
-    'menubar': True,
-    'statusbar': True,
+            """,
+    "contextmenu": "formats | link image",
+    "menubar": True,
+    "statusbar": True,
 }
 
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-    'testingapp.backends.EmailBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+    "testingapp.backends.EmailBackend",
 )
 
 SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
         ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
+        "AUTH_PARAMS": {
+            "access_type": "online",
         },
-        'CLIENT_ID': os.environ.get('GOOGLE_CLIENT_ID'),
-        'SECRET': os.environ.get('GOOGLE_SECRET_KEY'),
+        "CLIENT_ID": os.environ.get("GOOGLE_CLIENT_ID"),
+        "SECRET": os.environ.get("GOOGLE_SECRET_KEY"),
     }
 }
 
-LOGIN_REDIRECT_URL = '/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "/"
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
-SOCIALACCOUNT_ADAPTER = 'testingapp.adapters.SocialAccountAdapter'
+SOCIALACCOUNT_ADAPTER = "testingapp.adapters.SocialAccountAdapter"

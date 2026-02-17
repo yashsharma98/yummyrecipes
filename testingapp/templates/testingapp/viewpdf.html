@@ -1,125 +1,171 @@
-{% load hitcount_tags %}
-
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href="{% static 'testingapp/pdf_recipe.css' %}">
-    <title>{{recipes.title}}  </title>
+    <title>{{ recipes.title }}</title>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+        h1, h3 {
+            margin-bottom: 10px;
+        }
+        .pdf-image img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .pdf-author-recipe-detail {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 8px;
+        }
+        .pdf-author-recipe-detail img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .pdf-recipe-dates {
+            font-size: 11px;
+            color: #555;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 6px;
+            text-align: center;
+        }
+        th {
+            font-size: 10px;
+            font-weight: bold;
+            background: #f2f2f2;
+        }
+        .pdf-recipe-details-header {
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .pdf-recipe-details-data {
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
-
 <body>
-
+    {% if pdf_recipe_image_url %}
     <div class="pdf-image">
-        <img src="{{ pdf_recipe_image_url }}" alt="Recipe Image">
+        <img loading="lazy" src="{{ pdf_recipe_image_url }}" alt="Recipe Image">
     </div>
+    {% endif %}
 
-    <h1>{{ recipes.title }} </h1>
+    <h1>{{ recipes.title }}</h1>
 
     <div class="pdf-author-recipe-detail">
-        <div>
-            <img src="{{ pdf_profile_image_url }}">
-            <span><b>{{ recipes.author.get_full_name }}</b></span>
-        </div>
-
-        <div class="pdf-recipe-dates">
-            <b>Uploaded</b> : {{ recipes.get_date }} &nbsp; &#11825; &nbsp; <b>Updated</b> : {{ recipes.get_modified_date }}
-        </div>
-    </div>
-
-    <div class="pdf-recipe-table">
-
-        <table class="table table-borderless recipe-table">
-            <thead>
-              <tr>
-                <th scope="col">Prep time</th>
-                <th scope="col">Servings</th>
-                <th scope="col">Type</th>
-                <th scope="col">Cuisine</th>
-                <th scope="col">Category</th>
-                <th scope="col">Difficulty</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{recipes.timing}} min</td>
-                <td>{{recipes.servings}}</td>
-                <td>{{recipes.type}}</td>
-                <td>{{recipes.cuisine}}</td>
-                <td>{{recipes.category}}</td>
-                <td>{{recipes.difficulty}}</td>
-              </tr>
-            </tbody>
-        </table>
-
-        {% if nutrition_info %}
-        <table class="table table-borderless recipe-table pdf-nutrition-info">
-            <thead>
-              <tr>
-                <th scope="col">Carbohydrates</th>
-                <th scope="col">Cholesterol</th>
-                <th scope="col">Saturated fat</th>
-                <th scope="col">Total fat</th>
-                <th scope="col">Fiber</th>
-                <th scope="col">Potassium</th>
-                <th scope="col">Sodium</th>
-                <th scope="col">Sugar</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{nutrition_info.0.carbohydrates_total_g}} g</td>
-                <td>{{nutrition_info.0.cholesterol_mg}} mg</td>
-                <td>{{nutrition_info.0.fat_saturated_g}} g</td>
-                <td>{{nutrition_info.0.fat_total_g}} g</td>
-                <td>{{nutrition_info.0.fiber_g}} g</td>
-                <td>{{nutrition_info.0.potassium_mg}} mg</td>
-                <td>{{nutrition_info.0.sodium_mg}} mg</td>
-                <td>{{nutrition_info.0.sugar_g}} g</td>
-              </tr>
-            </tbody>
-        </table>
-            <!-- <caption>Serving size per 100/grams</caption> -->
-      
-        {% else %}
-    
+        {% if pdf_profile_image_url %}
+        <img loading="lazy" src="{{ pdf_profile_image_url }}" alt="Author">
         {% endif %}
-
-    </div>
-
-    
-    <div class="pdf-recipe-details">
-        <div class="pdf-recipe-ingre">
-            <div class="pdf-recipe-details-header">
-                <h3>Ingredients</h3>
-            </div>
-
-            <div class="pdf-recipe-details-data">
-                <p>{{recipes.ingredients|safe}}</p>
-            </div>
-        </div>
-
-        <div class="pdf-recipe-content">
-            <div class="pdf-recipe-details-header">
-                <h3>Instructions</h3>
-            </div>
-
-            <div class="pdf-recipe-details-data pdf-recipe-details-content">
-                <p>{{recipes.content|safe}}</p>
-            </div>
+        <b>{{ recipes.author.get_full_name }}</b>
+        <div class="pdf-recipe-dates">
+            <b>Uploaded</b>: {{ recipes.get_date }} &nbsp; | &nbsp;
+            <b>Updated</b>: {{ recipes.get_modified_date }}
         </div>
     </div>
 
-    <div class="pdf-footer">
+    <!-- Recipe details -->
+    <table>
+        <thead>
+            <tr>
+                <th>Prep time</th>
+                <th>Cook time</th>
+                <th>Servings</th>
+                <th>Type</th>
+                <th>Cuisine</th>
+                <th>Category</th>
+                <th>Difficulty</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% if pred_time %}
+                    <td>
+                        {% if pred_time.prep > 1 %}
+                            {{pred_time.prep}} mins
+                        {% else %}
+                            {{pred_time.prep}} min
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if pred_time.cook > 1 %}
+                            {{pred_time.cook}} mins
+                        {% else %}
+                            {{pred_time.cook}} min
+                        {% endif %}
+                    </td>
+                {% endif %}
+                <td>{{ recipes.servings }}</td>
+                <td>{{ recipes.type }}</td>
+                <td>{{ recipes.cuisine }}</td>
+                <td>{{ recipes.category }}</td>
+                <td>{{ recipes.difficulty }}</td>
+            </tr>
+        </tbody>
+    </table>
 
+    {% if nutrition_info %}
+    <table>
+        <thead>
+            <tr>
+                <th>Carbohydrates</th>
+                <th>Cholesterol</th>
+                <th>Saturated fat</th>
+                <th>Total fat</th>
+                <th>Fiber</th>
+                <th>Potassium</th>
+                <th>Sodium</th>
+                <th>Sugar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ nutrition_info.0.carbohydrates_total_g }} g</td>
+                <td>{{ nutrition_info.0.cholesterol_mg }} mg</td>
+                <td>{{ nutrition_info.0.fat_saturated_g }} g</td>
+                <td>{{ nutrition_info.0.fat_total_g }} g</td>
+                <td>{{ nutrition_info.0.fiber_g }} g</td>
+                <td>{{ nutrition_info.0.potassium_mg }} mg</td>
+                <td>{{ nutrition_info.0.sodium_mg }} mg</td>
+                <td>{{ nutrition_info.0.sugar_g }} g</td>
+            </tr>
+        </tbody>
+    </table>
+    {% endif %}
+
+    <div class="pdf-recipe-ingre">
+        <div class="pdf-recipe-details-header">
+            <h3>Ingredients</h3>
+        </div>
+        <div class="pdf-recipe-details-data">
+            {{ recipes.ingredients|safe }}
+        </div>
     </div>
-    
+
+    <div class="pdf-recipe-content">
+        <div class="pdf-recipe-details-header">
+            <h3>Instructions</h3>
+        </div>
+        <div class="pdf-recipe-details-data">
+            {{ recipes.content|safe }}
+        </div>
+    </div>
+
 </body>
-
 </html>

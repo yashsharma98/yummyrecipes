@@ -88,13 +88,16 @@
 
                 {# Image preview #}
                 <div class="imgarea">
-                    <div class="new-container">
-                      
-                    </div>
 
                   <div class="gen-img" style="display: none;">
-                    <img class="preview-image" src="" alt="Image">
-                    <div class="preview_ai_img_title"></div>
+                    <div class="upload-image-container">
+                      <div class="preview-image-container">
+                      <div>
+                        <img class="preview-image" src="" alt="Image">
+                        <div class="selected-img-name"></div>
+                      </div>
+                      </div>
+                    </div>
                   </div>
                 
                 </div>  
@@ -120,7 +123,7 @@
       
                 <div class="row mx-0 gx-4 gy-2 select-options">
 
-                  <div class="col-md-4">
+                  <div class="col-md-6">
                     {% if form.type.value %}
                       <select class="form-select" id="specificSizeSelect" name="type" required title="Type of the recipe">
                         <option value="{{form.type.value}}">{{form.type.value}}</option>
@@ -140,7 +143,7 @@
                     {% endif %}
                   </div>
 
-                  <div class="col-md-4">
+                  <div class="col-md-5 select-option-filters">
                     {% if form.cuisine.value %}
                       <select class="form-select" id="specificSizeSelect" name="cuisine" required title="Cuisine">
                         <option value="{{form.cuisine.value}}">{{form.cuisine.value}}</option>
@@ -158,13 +161,13 @@
                     {% endif %}
                   </div>
                   
-                  <div class="col-md-3">
+                  <!-- <div class="col-md-3">
                     {% if form.timing.value %}
                       <input type="number" class="form-control" name="timing" value="{{form.timing.value}}" id="inputTime" min="1" placeholder="Time (in min)" required="required" title="Preparation time">
                     {% else %}
                       <input type="number" class="form-control" name="timing" id="inputTime" min="1" placeholder="Time (in min)" required="required" title="Preparation time">
                     {% endif %}
-                  </div>
+                  </div> -->
 
                 </div>
                 
@@ -240,7 +243,11 @@
                     {% endif %}
                   </div>
 
-                <div class="recipe-instruction-text mt-2">Enter recipe instructions in a numeric list format <b>(e.g. 1. Preheat the oven...)</b></div>
+                  <div div class="recipe-instruction-text mt-2">
+                    <small class="text-muted">
+                      Enter recipe instructions in a numeric list format <b>(e.g. 1. Preheat the oven...)</b>
+                    </small>
+                  </div>
 
                 </div> 
 
@@ -248,7 +255,6 @@
                   <div class="form-btns">
                     <button type="submit" class="btn btn-transparent" id="postButton" onclick="validatebefore()"><span>Post</span></button>
                     <button type="reset" class="btn btn-transparent" onclick="removeimg()"><span>Clear</span></button>
-                    
                   </div>
                 </div>
                 
@@ -269,9 +275,9 @@
           <div class="sidebar-recipes">
 
             {# Image preview #}
-            <div class="preview-container">
+            <div class="preview-container preview-image-container">
               <img class="preview-image" src="" alt="Image" style="display: none;">
-              <div class="recipe-title preview_ai_img_title"></div>
+              <div class="selected-img-name"></div>
             </div>
                
           </div>
@@ -389,19 +395,17 @@
     });
 </script>
 
-{# Error toast for image generation error #}
+{# Error toast for image generation & API error #}
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-  <div id="imgErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+  <div id="ErrorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex"> 
-          <div class="toast-body">
-              Can't generate image at this moment 
+          <div class="toast-body" id="errorMessage">
           </div>
-          <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
   </div>
 </div>
 
-{# Sending & getting response of image using openai api #}
+{# Generating images using api #}
 <script>
   $(document).ready(function() {
     $('#generateImageButton').on('click', function(e) {
@@ -449,39 +453,41 @@
 
                     $('.gen-img').css('display', 'block');
 
-                    $('.gen-img .preview-image').attr('src', response.image_url);
+                    // $('.gen-img .preview-image').attr('src', response.image_url);
+                    showGeneratedImage(response.image_url);
 
-                    $('.gen-img .preview_ai_img_title').text(title);
-
-                    sideBar.classList.add('show-sidebar');
+                    // sideBar.classList.add('show-sidebar');
 
                     $('#generateImageButton').text('Regenerate');
-
-                    $('#generateImageButton').removeClass('loading');
                 }
 
-                else if (response.error){
-                  var successToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
-                  successToast.show();
+                else if (response.error) {
+                  $('#errorMessage').text(response.error);
+                  var errorToast = new bootstrap.Toast(document.getElementById('ErrorToast'));
+                  errorToast.show();
                   $('#generateImageButton').removeClass('loading').text('Generate');
                 }
 
-                else if (response.form_error){
-                  var successToast = new bootstrap.Toast(document.getElementById('testsToast'));
+                else if (response.form_error) {
+                  var successToast = new bootstrap.Toast(document.getElementById('formErrorToast'));
                   successToast.show();
                 }
-                
-            },
-            error: function(error) {
-                console.error('Error:', error);
 
-                $('#generateImageButton').removeClass('loading').text('Generate Image');
+                $('#generateImageButton').removeClass('loading');
+            },
+            error: function(xhr, status, error) {
+              var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? 
+              xhr.responseJSON.error : 'An unexpected error occurred';
+
+              $('#errorMessage').text(errorMessage);
+              var errorToast = new bootstrap.Toast(document.getElementById('ErrorToast'));
+              errorToast.show();
+              $('#generateImageButton').removeClass('loading').text('Generate');
             }
         });
     });
   });
 </script>
-
 
 {# Getting title from Imagegenerationform into myForm (main recipe forms) #}
 <!-- <script>
@@ -495,7 +501,6 @@
   });
 </script> -->
 
-  
 <script>
   function validatebefore() {
     const form = document.getElementById('myForm');
@@ -538,135 +543,139 @@
 
 {# image preview with name of the file #}
 <script>
-const previewContainers = document.querySelector('.new-container');
-const imagesInput = document.getElementById('images');
-const previewContainer = document.querySelector('.preview-container');
-const imgcounter = document.getElementById('counter');
-const sideBar = document.getElementById('show-sidebar');
-let counterValue = 0;
+  const imagesInput = document.getElementById('images');
+  const sidebar = document.getElementById('show-sidebar');
+  const sidebarPreviewContainer = document.querySelector('.sidebar-recipes .preview-container');
+  const genImgContainer = document.querySelector('.gen-img');
+  const genImgPreviewContainer = genImgContainer.querySelector('.preview-image-container');
+  const ttpreviewCounter = document.querySelector('.preview-counter');
 
-const ttpreviewContainer = document.querySelector('.preview-counter');
+  let selectedFiles = [];
 
-imagesInput.addEventListener('change', () => {
-  previewContainer.innerHTML = '';
-  previewContainers.innerHTML = '';
+  function updateCounter() {
+    const num = selectedFiles.length;
+    if (num === 1) {
+      ttpreviewCounter.textContent = '1 file selected';
+    } else if (num > 1) {
+      ttpreviewCounter.textContent = `${num} files selected`;
+    } else {
+      ttpreviewCounter.textContent = 'Select images';
+      sidebar.classList.remove('show-sidebar');
+      genImgContainer.style.display = 'none';
+    }
+  }
 
-  for (const file of imagesInput.files) {
-    const reader = new FileReader();
+  imagesInput.addEventListener('change', () => {
+    const files = Array.from(imagesInput.files);
 
-    reader.addEventListener('load', () => {
-      const image = document.createElement('img');
-      image.classList.add('preview-image');
-      image.src = reader.result;
+    selectedFiles = files;
+    sidebarPreviewContainer.innerHTML = '';
+    genImgPreviewContainer.innerHTML = '';
 
-  
-      sideBar.classList.add('show-sidebar');
+    files.forEach(file => {
+      const reader = new FileReader();
 
-      const name = document.createElement('div');
-      name.classList.add('preview-name');
-      name.textContent = file.name;
+      reader.onload = () => {
+        const sideWrapper = document.createElement('div');
+        sideWrapper.classList.add('preview-image-container');
 
-      const removeButtonNew = document.createElement('button');
-      removeButtonNew.textContent = 'x';    
-      removeButtonNew.classList.add('img-remove-button');
+        const img = document.createElement('img');
+        img.classList.add('preview-image');
+        img.src = reader.result;
 
-      const removeButtonPreview = document.createElement('button');
-      removeButtonPreview.textContent = 'x';   
-      removeButtonPreview.classList.add('img-remove-button');
+        const name = document.createElement('div');
+        name.classList.add('selected-img-name');
+        name.textContent = file.name;
 
-      const preview1 = document.createElement('div');
-      preview1.classList.add('new-container');
-      preview1.appendChild(copyElementWithChildren(image));
-      preview1.appendChild(copyElementWithChildren(name));
-      preview1.appendChild(removeButtonNew);
+        const removeBtn = document.createElement('button');
+        removeBtn.classList.add('img-remove-button');
+        removeBtn.textContent = 'x';
 
-      const preview = document.createElement('div');
-      preview.classList.add('preview-container');
-      preview.appendChild(image);
-      preview.appendChild(name);
-      preview.appendChild(removeButtonPreview);
+        const inner = document.createElement('div');
+        inner.appendChild(img);
+        inner.appendChild(name);
 
-      previewContainers.appendChild(preview1);
-      previewContainer.appendChild(preview);
+        sideWrapper.appendChild(inner);
+        sideWrapper.appendChild(removeBtn);
+        sidebarPreviewContainer.appendChild(sideWrapper);
 
-      removeButtonNew.addEventListener('click', () => {
-        preview1.remove();
-        preview.remove();
+        // === Gen-img preview ===
+        const genWrapper = document.createElement('div');
+        genWrapper.classList.add('preview-image-container');
 
-  updateCounter();
+        const genInner = document.createElement('div');
+        const genImg = img.cloneNode();
+        const genName = name.cloneNode(true);
 
-    updateFileList(file);
-      });
+        genInner.appendChild(genImg);
+        genInner.appendChild(genName);
+        genWrapper.appendChild(genInner);
 
-      removeButtonPreview.addEventListener('click', () => {
-        preview1.remove();
-        preview.remove();
+        const removeGen = document.createElement('button');
+        removeGen.classList.add('img-remove-button');
+        removeGen.textContent = 'x';
 
-  updateCounter();
+        genWrapper.appendChild(removeGen);
+        genImgPreviewContainer.appendChild(genWrapper);
 
-    updateFileList(file);
-      });
+        const removeHandler = () => {
+          genWrapper.remove();
+          sideWrapper.remove();
+          selectedFiles = selectedFiles.filter(f => f.name !== file.name);
+          updateCounter();
+        };
+
+        removeBtn.addEventListener('click', removeHandler);
+        removeGen.addEventListener('click', removeHandler);
+
+        updateCounter();
+        sidebar.classList.add('show-sidebar');
+        genImgContainer.style.display = 'block';
+      };
+
+      reader.readAsDataURL(file);
     });
 
-    reader.readAsDataURL(file);
-  }
-  sideBar.classList.add('show-sidebar');
-});
+    // imagesInput.value = '';
+  });
 
-function copyElementWithChildren(element) {
-  const htmlContent = element.outerHTML;
-  const newElement = document.createElement('div');
-  newElement.innerHTML = htmlContent;
-  return newElement.firstChild;
-}
+    function showGeneratedImage(url) {
+      selectedFiles = [];
+      // imagesInput.value = '';
+      ttpreviewCounter.textContent = 'Select images';
 
-function updateCounter() {
-  const numFiles = imagesInput.files.length;
+      sidebarPreviewContainer.innerHTML = '';
+      genImgPreviewContainer.innerHTML = '';
+      sidebar.classList.add('show-sidebar');
 
-  if (numFiles === 1) {
-    const counter = document.createElement('span');
-    counter.classList.add('preview-counter');
-    counter.textContent = `${numFiles} file selected`;
+      const genImg = document.createElement('img');
+      genImg.classList.add('preview-image');
+      genImg.src = url;
 
-    ttpreviewContainer.innerHTML = '';
-    ttpreviewContainer.appendChild(counter);
-  } else if (numFiles > 1) {
-    const counter = document.createElement('span');
-    counter.classList.add('preview-counter');
-    counter.textContent = `${numFiles} files selected`;
+      const genWrapper = document.createElement('div');
+      genWrapper.classList.add('preview-image-container');
 
-    ttpreviewContainer.innerHTML = '';
-    ttpreviewContainer.appendChild(counter);
-  } else {
-    
-    ttpreviewContainer.innerHTML = 'Select images';
-    sideBar.classList.remove('show-sidebar');
-  }
-}
+      const genInner = document.createElement('div');
+      genInner.appendChild(genImg);
+      genWrapper.appendChild(genInner);
+      genImgPreviewContainer.appendChild(genWrapper);
+      genImgContainer.style.display = 'block';
 
-imagesInput.addEventListener('change', () => {
+      const sideImg = document.createElement('img');
+      sideImg.classList.add('preview-image');
+      sideImg.src = url;
+
+      const sideWrapper = document.createElement('div');
+      sideWrapper.classList.add('preview-image-container');
+
+      const sideInner = document.createElement('div');
+      sideInner.appendChild(sideImg);
+
+      sideWrapper.appendChild(sideInner);
+      sidebarPreviewContainer.appendChild(sideWrapper);
+    }
+
   updateCounter();
-});
-
-document.addEventListener('click', (event) => {
-  const target = event.target;
-  if (target.classList.contains('img-remove-button')) {
-    updateCounter();
-  }
-});
-
-
-updateCounter();
-
-function updateFileList(fileToRemove) {
-  const files = Array.from(imagesInput.files);
-  const updatedFiles = files.filter(file => file !== fileToRemove);
-
-  const newFileList = new DataTransfer();
-  updatedFiles.forEach(file => newFileList.items.add(file));
-
-  imagesInput.files = newFileList.files;
-}
 </script>
 
 {% endblock %}

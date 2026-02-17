@@ -39,10 +39,19 @@
               Favourites
             </h1>
 
-            <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
+            <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary favourites-card-container">
+
+              {% if new %}
 
                 {% include 'testingapp/update_recipe_card.html' %}
-
+              
+              {% else %}
+              
+                <div class="unavailable-message">
+                  <p>No favourite recipe yet!</p>
+                </div>
+              
+              {% endif %}
             </div> 
         
           </div>

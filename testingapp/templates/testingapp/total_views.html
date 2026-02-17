@@ -49,16 +49,17 @@
                     <div class="tab-container">
                         <ul class="nav" id="myTab" role="tablist">
                             {% for year in distinct_years %}
-                                <li class="nav-item">
-                                    <a class="nav-link {% if forloop.first %}active{% endif %}" id="year{{ year|date:'Y' }}-tab" 
-                                        data-toggle="tab" href="#year{{ year|date:'Y' }}" role="tab" aria-controls="year{{ year|date:'Y' }}" 
-                                        aria-selected="{{ forloop.first }}">
-                                        <button class="tablinks history-delete-all-btn">
-                                            {{ year|date:'Y' }}
-
-                                        </button>
-                                    </a>
-                                </li>
+                                <button 
+                                    class="tablinks {% if forloop.first %}active{% endif %}" 
+                                    id="year{{ year|date:'Y' }}-tab" 
+                                    data-bs-toggle="tab" 
+                                    data-bs-target="#year{{ year|date:'Y' }}" 
+                                    type="button" 
+                                    role="tab" 
+                                    aria-controls="year{{ year|date:'Y' }}" 
+                                    aria-selected="{{ forloop.first|yesno:'true,false' }}">
+                                    <span class="tab-btns-label">{{ year|date:'Y' }}</span>
+                                </button>
                             {% endfor %}
                         </ul>
                     </div>
@@ -153,10 +154,10 @@
                                         <div class="d-flex history-list-body">
                                             {% for i in recipe.photo_set.all %}
                                                 {% if forloop.counter0 == 0 %}
-                                                    <img src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img" style="width: 140px;height: 90px;border-radius: 10px;" alt="recipe-image">
+                                                    <img loading="lazy" src="{{ i.image.url }}" class="flex-shrink-0 me-3 recipe-img" style="width: 140px;height: 90px;border-radius: 10px;" alt="recipe-image">
                                                 {% endif %}
                                                 {% empty %}
-                                                    <img src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" style="width: 140px;height: 90px;border-radius: 10px;" alt="recipe-image">
+                                                    <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="flex-shrink-0 me-3 recipe-img" style="width: 140px;height: 90px;border-radius: 10px;" alt="recipe-image">
                                             {% endfor %}
                                             <div class="list-content-body">
 

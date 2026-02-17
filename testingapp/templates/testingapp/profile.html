@@ -43,15 +43,24 @@
 
                                     <div class="article-recent-main top-profile-data">
                                         <div class="">
-                                            <h2 class="article-title">{{ user.first_name}} {{ user.last_name}} </h2>
-                                            <p>{{user.email}}</p>
-                                            <p>{{user.profile.bio}}</p>
+                                            {% if not is_guest %}
+                                                <h2 class="article-title">{{ user.first_name}} {{ user.last_name}} </h2>
+                                                <p>{{user.email}}</p>
+                                                <p>{{user.profile.bio}}</p>
+                                            {% else %}
+                                                <h2 class="article-title">{{ guest_user.name }} (Guest) </h2>
+                                                <p>{{guest_user.email}}</p>
+                                            {% endif %}
                                         </div>
                                     </div>
 
                                     <div class="article-recent-secondary user-profile-img">
                                         <div>
-                                            <img src="{{ user.profile.profile_img.url }}" alt="profile_image">
+                                            {% if not is_guest %}
+                                                <img loading="lazy" src="{{ user.profile.profile_img.url }}" alt="profile_image">
+                                            {% else %}
+                                                <img loading="lazy" src="{% static 'testingapp/media/avatar.jpg' %}" alt="profile_image">
+                                            {% endif %}
                                         </div>
                                     </div>
                                     
@@ -60,73 +69,75 @@
 
                         </div>
                         
-                        <div class="user-detail-heading">
+                        <!-- <div class="user-detail-heading">
                             <h2>Personal details </h2>
-                        </div>
+                        </div> -->
 
-                        <div class="dynamic-card-container">
-                            
-                            <div class="user-detail-container">
+                        {% if not is_guest %}
+                            <div class="dynamic-card-container">
                                 
-                                <div class="user-details">
+                                <div class="user-detail-container user-detail-container-primary">
+                                    
+                                    <div class="user-details">
 
-                                    <div class="user-detail-table">
+                                        <div class="user-detail-table">
 
-                                        <table class="table">
-                                            
-                                            <tbody>
-                                            <tr>
-                                                <th scope="row" colspan="2">Dob</th>
+                                            <table class="table">
                                                 
-                                                <td>
-                                                    {% if user.profile.dob == None %} 
-                                                    <a href="{% url 'updateprofile' %}">Update dob</a>
-                                                    {% else %}
-                                                    {{ user.profile.dob|date:"D, M j, Y"}}
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" colspan="2">Gender</th>
-                                                
-                                                <td>
-                                                    {% if user.profile.gender == None %} 
-                                                    <a href="{% url 'updateprofile' %}">Select gender</a>
-                                                    {% else %}
-                                                    {{ user.profile.gender}}
-                                                    {% endif %}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" colspan="2">Last login</th>
-                                                
-                                                <td>{{user.last_login|date:"D, M j, Y h:i a"}}</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row" colspan="2">Joined on</th>
-                                                
-                                                <td>{{ user.date_joined|date:"D, M j, Y h:i a"}}</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                                <tbody>
+                                                <tr>
+                                                    <th scope="row" colspan="2">Dob</th>
+                                                    
+                                                    <td>
+                                                        {% if user.profile.dob == None %} 
+                                                        <a href="{% url 'updateprofile' %}">Update dob</a>
+                                                        {% else %}
+                                                        {{ user.profile.dob|date:"D, M j, Y"}}
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row" colspan="2">Gender</th>
+                                                    
+                                                    <td>
+                                                        {% if user.profile.gender == None %} 
+                                                        <a href="{% url 'updateprofile' %}">Select gender</a>
+                                                        {% else %}
+                                                        {{ user.profile.gender}}
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row" colspan="2">Last login</th>
+                                                    
+                                                    <td>{{user.last_login|date:"D, M j, Y h:i a"}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row" colspan="2">Joined on</th>
+                                                    
+                                                    <td>{{ user.date_joined|date:"D, M j, Y h:i a"}}</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
                                     </div>
-
+                                    
                                 </div>
                                 
                             </div>
-                            
-                        </div>
 
-                        <div class="bottom-links">
-                            <div class="link-child-1 edit-links first-link">
-                                <a href="{% url 'updateprofile' %}"><span class="link-child-name">Update profile</span></a>
+                            <div class="bottom-links">
+                                <div class="link-child-1 edit-links first-link">
+                                    <a href="{% url 'updateprofile' %}"><span class="link-child-name">Update profile</span></a>
+                                </div>
+                                
+                                <div class="link-child-2 edit-links">
+                                    <a href="{% url 'updatepassword' %}"><span class="link-child-name">Change password</span></a>
+                                </div>
                             </div>
-                            
-                            <div class="link-child-2 edit-links">
-                                <a href="{% url 'updatepassword' %}"><span class="link-child-name">Change password</span></a>
-                            </div>
-                        </div>
-
+                        {% endif %}
+                        
 
                         <div class="user-detail-heading">
                             <h2>General</h2>

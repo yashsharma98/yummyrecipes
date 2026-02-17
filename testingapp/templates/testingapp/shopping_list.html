@@ -1,66 +1,43 @@
-{% load hitcount_tags %}
+{% load hitcount_tags %} {% load static %}
 
-{% load static %}
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Shopping list - {{recipe_object.title}} </title>
-</head>
+    <link
+      rel="stylesheet"
+      href="'https://fonts.googleapis.com/css2?family=Comfortaa:wght@500&display=swap">
 
-<style>
+    <title>Ingredients list for {{recipe_object.title}}</title>
+  </head>
 
-    .recipe-ingre{
-        background: whitesmoke;
+  <style>
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 0;
+      padding-top: 15px;
     }
 
-    .pdf-image{
-        text-align: center;
-        height: fit-content;
-        width: fit-content;
+    h3 {
+      font-size: 1.5em;
+      margin-bottom: 20px;
     }
 
-    .rec-title h2{
-        font-size: 2.2em;
+    .recipe-data {
+      font-size: 1.45em;
     }
+  </style>
 
-    .recipe-data{
-        font-size: 1.45em;
-    }
+  <body>
+    <h1>{{ recipe_object.title }}</h1>
 
-</style>
-
-<body>
-    <h1 style="text-align:center;font-size:3em;margin-bottom: 0;padding-top: 15px;">{{ recipe_object.title }}</h1>
-
-    <div class="pdf-image">
-        {% for image in recipe_object.photo_set.all %}
-            <img src="{{ image.image.path }}" alt="Recipe Image">
-        {% endfor %}
-    </div>
-
-    <br><br>
-
-    <h2 style="font-size: 2em;">Shopping list</h2>
+    <h3>Ingredients required</h3>
 
     <div class="recipe-data">
-
-        <ul>
-            {% for ingredient in cleaned_ingredients %}
-                <li>{{ ingredient.item }}</li>
-            {% endfor %}
-        </ul>
-
+      <p>{{recipe_ingredients|safe}}</p>
     </div>
-    
-
-
-
-
-    
-</body>
+  </body>
 </html>

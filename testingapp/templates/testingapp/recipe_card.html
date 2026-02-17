@@ -1,0 +1,70 @@
+{% load static %}
+{% load hitcount_tags %}
+{% load read_time_pluralize %}
+
+<div class="recipe-cards {{ extra_css_class }}" 
+     data-post-id="{{ post.id }}" 
+     data-bgcolor="{{ post.color_1 }}" 
+     data-hovercolor="{{ post.color_5 }}">
+
+    <a href="{% url 'viewpost' post.pk %}">
+        <div class="img-container {% if post.pk in historys_pk %}in-history{% endif %}">
+            {% for i in post.photo_set.all %}
+                {% if forloop.first %}
+                    <img loading="lazy" src="{{ i.image.url }}" class="recipe-img" alt="{{ post.title }}">
+                {% endif %}
+            {% empty %}
+                <img loading="lazy" src="{% static 'testingapp/media/empty4.jpg' %}" class="recipe-img">
+            {% endfor %}
+
+            <div class="readtime-container">
+                <p>{{ post.read_time|pluralize_min }}</p>
+            </div>
+        </div>
+
+        <div class="recipe-info" data-color="{{ post.color_7 }}">
+            <h4 class="card-title highlight">{{ post.title }}</h4>
+            <ul>
+                <li><img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="Image"></li>
+                <li>
+                    <div class="text-truncate">{{ post.author.first_name }} {{ post.author.last_name }}</div>
+                    {{ post.whenpublished }} &#11825; {% get_hit_count for post %} views
+                </li>
+            </ul>
+        </div>
+    </a>
+
+    <div class="quick-view slide-out" 
+         data-qvcolor="{{ post.color_2 }}" 
+         data-hovercolor="{{ post.color_5 }}">
+        <button class="btn btn-transparent quick-view-btn" type="button" 
+                data-bs-toggle="offcanvas" data-bs-target="#quickviewModal{{ post.pk }}" 
+                aria-controls="quickviewModal">
+            <span class="material-symbols-rounded recipe-read-more-icon">view_headline</span>
+        </button>
+    </div>
+
+    {% if is_guest or user.is_authenticated %}
+        <div class="favourites">
+            {% if post in user.favourite.all %}
+                <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                   data-bs-custom-class="bs-custom-tooltip"
+                   data-bs-original-title="Remove from favourites">
+                    <span class="material-symbols-rounded favourite-icon favourite-added">favorite</span>
+                </a>
+            {% else %}
+                <a class="favourite-link" data-post-id="{{ post.id }}" data-favcolor="{{ post.color_2 }}"
+                   data-bs-toggle="tooltip" data-bs-placement="bottom" 
+                   data-bs-custom-class="bs-custom-tooltip"
+                   data-bs-original-title="Add to favourites">
+                    <span class="material-symbols-rounded favourite-icon">favorite</span>
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if post.pk in historys_pk %}
+        <div class="cards-footer"></div>
+    {% endif %}
+</div>

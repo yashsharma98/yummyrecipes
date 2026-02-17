@@ -23,7 +23,7 @@
 
 <body>
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated or is_guest %}
 
   <div class="primary-wrapper">
 
@@ -33,64 +33,56 @@
 
         <main role="main" class="container-main">
 
-          <div class="dynamic-recipes dynamic-header tertiary-wrapper">
+          <div class="dynamic-recipes dynamic-header tertiary-wrapper generated-recipe-container">
                    
-            <h1><button class="btn btn-light back-btn" onclick="history.back()"><span class="material-symbols-rounded back-btn-icon">arrow_back</span></button> 
-                KitchenAI
-            </h1>
+            <div class="recipe-form-container generate-recipe ai-appearance-theme-input">
 
-            <p class="sub-heading">Elevate Your Kitchen with AI Recipes</p>
+              <div class="generated-recipe-content-body">
+                {# Image preview #}
+                <div class="imgarea generated-recipe-image-KitchenAI">
+                  <div class="gen-img" style="display: none;">
+                    <div class="preview-image-container">
+                     <div>
+                      <img class="preview-image" src="" alt="Image">
+                     </div>
+                    </div>
+                  </div>
+                </div> 
+              
+                <div class="col generated-recipe-content">
+                  <div class="generate-recipe-placeholder-container">
+                    <h2 class="generate-recipe-default-placeholder">Let's cook something great today!</h2>
+                    <h4 class="generate-recipe-secondary-placeholder" style="display: none;"></h4>
+                  </div>  
 
-            <div class="col-11 recipe-form-container main-recipe-form generate-recipe ai-appearance-theme-input">
-
-              <form id="AiImageGenerationForm" class="row m-1 g-4 create-recipe-form" action="{% url 'generate_recipe' %}">
-                {% csrf_token %}
-                
-                <input type="hidden" name="img_type" value="recipeimage">
-
-                <div class="col-12 ai-theme-form-content generate-recipe-form">
-                    <input type="text" name="title" class="form-control" id="id_title" required="required" placeholder="Enter a meal, cuisine, or flavour to get a recipe" autocomplete="off">
-                    <button id="generateRecipeImage" class="btn btn-transparent form-submit generate_ai_img_btn ai-theme-btn"><i class="fa-solid fa-wand-sparkles" style="font-size: 0.8em;margin-right: 10px;"></i> Generate</button>
+                  <div id="generated-recipe"></div>
                 </div>
 
-              </form> 
+                <div class="mt-5 text-secondary ai-recipe-check-response generated-recipe-check-response" style="display: none;">
+                  <small><p class="fst-italic px-2 opacity-85">May generate inaccurate response.</p></small>
+                </div>
 
-              {# Image preview #}
-              <div class="imgarea">
-                  <div class="gen-img" style="display: none">
-                      <img class="preview-image" src="" alt="Image">
-                      <div class="preview_ai_img_title"></div>
+              </div>
+
+              <div class="generate-recipe-form-container">
+                <form id="AiImageGenerationForm" class="create-recipe-form" action="{% url 'generate_recipe' %}" method="POST">
+                  {% csrf_token %}
+                  
+                  <input type="hidden" name="img_type" value="recipeimage">
+
+                  <div class="generate-recipe-form">
+                      <textarea name="title" class="form-control" id="id_title" required="required" placeholder="Enter a meal, cuisine, or flavour to get a recipe" autocomplete="off"></textarea>
+                      <button id="generateRecipeImage" class="generate_recipe_form_btn"><span class="material-symbols-rounded generate-btn-icon">north</span></button>
+                      <button id="gnerate-recipe-loader-container" style="display: none;"><div class="gen-recipe-loader-animation"></div></button>
                   </div>
-              </div> 
-            
-              <div class="col-12 generated-recipe-content">
-                  <p id="generated-recipe">
-                  </p>
+                </form> 
               </div>
-
-              <div class="mt-3 text-secondary ai-recipe-check-response" style="display: none;">
-                <small><p class="fst-italic px-2">May generate inaccurate response.</p></small>
-              </div>
-                
+              
             </div>
-            
-            
+
           </div>
 
         </main>
-
-        <aside class="sidebar sidebar-dashboard recipe-img-preview-sidebar" id="show-sidebar">
-                    
-          <div class="sidebar-recipes">
-
-              <div class="preview-container">
-                <img class="preview-image" src="" alt="Image" style="display: none;">
-                <div class="recipe-title preview_ai_img_title"></div>
-              </div>
-               
-          </div>
-
-        </aside>
 
       </div>
 
@@ -123,98 +115,120 @@
     </div>
 </div>
 
-{# Sending & getting response of image using openai api #}
+{# Sending & getting response of image using Openai or Gemini API based on what's available #}
 <script>
   $(document).ready(function() {
-    $('#generateRecipeImage').on('click', function(e) {
-      e.preventDefault(); 
+    let lastGeneratedTitle = "";
 
-      var emptytitle = $('#id_title').val();
-      if (!emptytitle.trim()) {
-          return;
-      }
+    // Function to handle recipe generation
+    function generateRecipe(title) {
+      if (!title) return; // Prevent generation with empty title
 
-      $(this).addClass('loading').text('Generating...');
+      var lowerCaseTitle = title.toLowerCase();
+
+      $('.generate-recipe-default-placeholder').hide();
+      $('.generate-recipe-secondary-placeholder').text('Generating...').show();
+      $('#generated-recipe').html('');
+      $('.ai-recipe-check-response').css('display', 'none').fadeOut();
+
+      $('#gnerate-recipe-loader-container').show();
+      $('#generateRecipeImage').hide();
 
       var imgType = $('#AiImageGenerationForm [name="img_type"]').val();
-      var title = $('#id_title').val();
       var csrfToken = $('[name=csrfmiddlewaretoken]').val();
 
       var formData = {
-          img_type: imgType,
-          title: title, 
+        img_type: imgType,
+        title: title,
+        regenerate: '1'
       };
 
       $.ajax({
-        url: '{% url "generate_recipe" %}', 
+        url: '{% url "generate_recipe" %}',
         method: 'POST',
         data: formData,
-        headers: {
-            'X-CSRFToken': csrfToken  
-        },
+        headers: { 'X-CSRFToken': csrfToken },
         success: function(response) {
-            if (response.recipe_image_url) {
-                $('#imageURLField').val(response.recipe_image_url);
-                var previewImage = $('.preview-image');
-                previewImage.attr('src', response.recipe_image_url);
-                previewImage.css('display', 'block'); 
+          $('#gnerate-recipe-loader-container').hide();
+          $('.generate-btn-icon').show();
 
-                $('#post_button').css('display', 'block');
+          if (response.recipe_image_url) {
+            $('#imageURLField').val(response.recipe_image_url);
+            $('.preview-image').attr('src', response.recipe_image_url).show();
+            $('#post_button').show();
+            $('.recipe-title').text(title);
+            $('.gen-img').show().find('.preview-image').attr('src', response.recipe_image_url);
+            $('.ai-recipe-check-response').css('display', 'block').fadeIn();
+          }
 
-                var title = $('#id_title').val();
-                var recipeTitleElement = $('.recipe-title');
-                recipeTitleElement.text(title);
+          if (response.generated_recipe) {
+            $('.generated-recipe-content').addClass('ai-content-styles');
+            $('.generate-recipe-secondary-placeholder').text('');
+            $('#generateRecipeImage').show();
+            $('.generate_recipe_form_btn').addClass('active');
 
-                $('.gen-img').css('display', 'block');
-                $('.gen-img .preview-image').attr('src', response.recipe_image_url);
-                $('.gen-img .preview_ai_img_title').text(title);
+            $('.generate-btn-icon').text('cached');
 
-                $('.ai-recipe-check-response').css('display', 'block').fadeIn();
+            const lines = response.generated_recipe.split('<br>');
+            $('#generated-recipe').html(lines[0]);
 
-                // Display sidebar
-                sideBar.classList.add('show-sidebar');
-                $('#generateRecipeImage').text('Regenerate');
-                $('#generateRecipeImage').removeClass('loading');
-            } else {
-                $('#generateRecipeImage').removeClass('loading').text('Regenerate');
-                $('.ai-recipe-check-response').css('display', 'none');
-            }
+            let index = 1;
+            const typingInterval = setInterval(function () {
+              if (index < lines.length) {
+                $('#generated-recipe').append('<br>' + lines[index]);
+                index++;
+              } else {
+                clearInterval(typingInterval);
+                $('.generated-recipe-content').fadeIn();
+                $('.ai-recipe-check-response').fadeIn();
+              }
+            }, 300);
 
-            if (response.generated_recipe) {
-                const lines = response.generated_recipe.split('<br>');
-
-                $('.generated-recipe-content').addClass('ai-content-styles');
-               
-                $('#generated-recipe').html(lines[0]);
-
-                let index = 1;
-                const typingInterval = setInterval(function () {
-                    if (index < lines.length) {
-                        $('#generated-recipe').append('<br>' + lines[index]);
-                        
-                        index++;
-                    } else {
-                        clearInterval(typingInterval);
-                        $('.generated-recipe-content').fadeIn();
-                        $('.ai-recipe-check-response').fadeIn();
-                    }
-                }, 300);
-            }
-
-            else if (response.error) {
-                var errorToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
-                errorToast.show();
-            } else if (response.form_error) {
-                var formErrorToast = new bootstrap.Toast(document.getElementById('testsToast'));
-                formErrorToast.show();
-            }
+            lastGeneratedTitle = lowerCaseTitle;
+          } else {
+            $('.ai-recipe-check-response').css('display', 'none').fadeOut();
+          }
         },
         error: function(error) {
-              console.error('Error:', error);
-              $('#generateRecipeImage').removeClass('loading').text('Generate Image');
-          }
+          $('#gnerate-recipe-loader-container').hide();
+          $('#generateRecipeImage').show();
+          $('.generate-recipe-secondary-placeholder').text('Error generating recipe. Please try again.').show();
+        }
       });
+    }
+
+    // Manual submission on button click
+    $('#generateRecipeImage').on('click', function(e) {
+      e.preventDefault();
+      var title = $('#id_title').val().trim();
+      generateRecipe(title);
     });
+
+    // Detect text change and update the icon
+    $('#id_title').on('input', function() {
+      var currentTitle = $(this).val().trim().toLowerCase();
+
+      if (currentTitle === "") {
+        $('#generateRecipeImage').removeClass('active');
+        $('.generate-btn-icon').show();
+        $('.generate_recipe_form_btn').removeClass('active');
+      } 
+      else if (currentTitle === lastGeneratedTitle) {
+        $('.generate-btn-icon').text('cached');
+        $('#generateRecipeImage').addClass('active').show();
+      } 
+      else {
+        $('#generateRecipeImage').show().removeClass('active');
+        $('.generate_recipe_form_btn').addClass('active');
+        $('.generate-btn-icon').text('north');
+      }
+    });
+
+    var initialQuery = "{{ initial_query|escapejs }}";
+    if (initialQuery && initialQuery.trim()) {
+      $('#id_title').val(initialQuery);
+      generateRecipe(initialQuery);
+    }
   });
 </script>
 
@@ -231,144 +245,32 @@ function validateForm() {
 }
 </script>
 
+{# Preventing enter key to change line & submitting form instead #}
 <script>
-   const previewContainers = document.querySelector('.new-container');
-   const imagesInput = document.getElementById('images');
-   const previewContainer = document.querySelector('.preview-container');
-   const imgcounter = document.getElementById('counter');
-   const sideBar = document.getElementById('show-sidebar');
-
-   let counterValue = 0;
-   
-   const ttpreviewContainer = document.querySelector('.preview-counter');
-   
-   imagesInput.addEventListener('change', () => {
-     previewContainer.innerHTML = '';
-     previewContainers.innerHTML = '';
-   
-     for (const file of imagesInput.files) {
-       const reader = new FileReader();
-   
-       reader.addEventListener('load', () => {
-         const image = document.createElement('img');
-         image.classList.add('preview-image');
-         image.src = reader.result;
-   
-     
-         sideBar.classList.add('show-sidebar');
-   
-         const name = document.createElement('div');
-         name.classList.add('preview-name');
-         name.textContent = file.name;
-   
-         const removeButtonNew = document.createElement('button');
-         removeButtonNew.textContent = 'x';   
-         removeButtonNew.classList.add('img-remove-button');
-   
-         // Create remove buttons for preview-container
-         const removeButtonPreview = document.createElement('button');
-         removeButtonPreview.textContent = 'x';   
-         removeButtonPreview.classList.add('img-remove-button');
-   
-         const preview1 = document.createElement('div');
-         preview1.classList.add('new-container');
-         preview1.appendChild(copyElementWithChildren(image));
-         preview1.appendChild(copyElementWithChildren(name));
-         preview1.appendChild(removeButtonNew);
-   
-         const preview = document.createElement('div');
-         preview.classList.add('preview-container');
-         preview.appendChild(image);
-         preview.appendChild(name);
-         preview.appendChild(removeButtonPreview);
-   
-         previewContainers.appendChild(preview1);
-         previewContainer.appendChild(preview);
-   
-         removeButtonNew.addEventListener('click', () => {
-           preview1.remove();
-           preview.remove();
-   
-     updateCounter();
-   
-       updateFileList(file);
-         });
-   
-         removeButtonPreview.addEventListener('click', () => {
-           preview1.remove();
-           preview.remove();
-   
-     updateCounter();
-   
-       updateFileList(file);
-         });
-       });
-   
-       reader.readAsDataURL(file);
-     }
-     sideBar.classList.add('show-sidebar');
-   });
-   
-   function copyElementWithChildren(element) {
-     const htmlContent = element.outerHTML;
-     const newElement = document.createElement('div');
-     newElement.innerHTML = htmlContent;
-     return newElement.firstChild;
-   }
-   
-   function updateCounter() {
-     const numFiles = imagesInput.files.length;
-   
-     if (numFiles === 1) {
-       const counter = document.createElement('span');
-       counter.classList.add('preview-counter');
-       counter.textContent = `${numFiles} file selected`;
-   
-       ttpreviewContainer.innerHTML = '';
-       ttpreviewContainer.appendChild(counter);
-     } 
-     else if (numFiles > 1) {
-       const counter = document.createElement('span');
-       counter.classList.add('preview-counter');
-       counter.textContent = `${numFiles} files selected`;
-   
-       ttpreviewContainer.innerHTML = '';
-       ttpreviewContainer.appendChild(counter);
-     } 
-     else {
-       
-       ttpreviewContainer.innerHTML = 'Select images';
-       sideBar.classList.remove('show-sidebar');
-     }
-   }
-   
-   imagesInput.addEventListener('change', () => {
-     updateCounter();
-   });
-   
-   document.addEventListener('click', (event) => {
-     const target = event.target;
-     if (target.classList.contains('img-remove-button')) {
-       updateCounter();
-     }
-   });
-   
-   
-   updateCounter();
-   
-   function updateFileList(fileToRemove) {
-     const files = Array.from(imagesInput.files);
-     const updatedFiles = files.filter(file => file !== fileToRemove);
-   
-     const newFileList = new DataTransfer();
-     updatedFiles.forEach(file => newFileList.items.add(file));
-   
-     imagesInput.files = newFileList.files;
-   }
-   
-   
-     
+  $(document).ready(function() {
+    $('#id_title').keypress(function(event) {
+      if (event.which === 13 && !event.shiftKey) {
+        event.preventDefault();
+        $('#generateRecipeImage').click();
+      }
+    });
+  });
 </script>
 
+{# Change button color upon textarea input #}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      const textarea = document.getElementById('id_title');
+      const button = document.querySelector('.generate_recipe_form_btn');
+
+      textarea.addEventListener('input', function () {
+          if (textarea.value.trim() !== '') {
+              button.classList.add('active');
+          } else {
+              button.classList.remove('active');
+          }
+      });
+  });
+</script>
 
 {% endblock %}

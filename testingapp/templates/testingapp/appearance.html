@@ -35,10 +35,9 @@
 
 <body>
 
-{% if user.is_authenticated %}
+{% if user.is_authenticated or is_guest %}
 
-
-<div class="primary-wrapper" id="primary-wrapper">
+  <div class="primary-wrapper" id="primary-wrapper">
     <div class="secondary-wrapper">
 
       <div class="container container-flex container-flex-2">
@@ -53,45 +52,47 @@
 
             <p class="sub-heading no-subheading-animation" id="subheading">Create your personalized theme</p>
 
-              <nav class="appearance-theme-nav">
-                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                  <div class="tabs">
-                    <button class="nav-link tab nav_link_btn no-animation" id="nav-light-theme" data-bs-toggle="tab" data-bs-target="#light_theme"
-                      type="button" role="tab" aria-controls="nav-profile" aria-selected="false">
-                      <div class="d-block">
-                        <div>
-                        <span class="material-symbols-rounded nav-theme-icons">wb_sunny</span>
+            <nav class="appearance-theme-nav">
+              <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <div class="tabs">
+                  <button class="tab nav_link_btn no-animation" id="nav-light-theme" data-bs-toggle="tab" data-bs-target="#light_theme"
+                    type="button" role="tab" aria-controls="nav-profile" aria-selected="false">
+                    <div class="d-block">
+                      <div>
+                      <span class="material-symbols-rounded nav-theme-icons">wb_sunny</span>
 
-                        </div>
-                        <div>Day</div>
                       </div>
-                    </button>
-                   
-                    <button class="nav-link tab nav_link_btn no-animation" id="dark_theme_tab_btn" 
-                      data-bs-toggle="tab" data-bs-target="#dark_theme_tab" type="button" 
-                      role="tab" aria-controls="nav-contact" aria-selected="false">
-                      <div class="d-block">
-                        <div>
-                        <span class="material-symbols-rounded nav-theme-icons">moon_stars</span>
+                      <div>Day</div>
+                    </div>
+                  </button>
+                  
+                  <button class="tab nav_link_btn no-animation" id="dark_theme_tab_btn" 
+                    data-bs-toggle="tab" data-bs-target="#dark_theme_tab" type="button" 
+                    role="tab" aria-controls="nav-contact" aria-selected="false">
+                    <div class="d-block">
+                      <div>
+                      <span class="material-symbols-rounded nav-theme-icons">moon_stars</span>
 
-                        </div>
-                        <div>Night</div>
                       </div>
-                    </button>
-                   
-                    <button class="nav-link tab nav_link_btn no-animation" id="nav-create-theme" 
-                      data-bs-toggle="tab" data-bs-target="#custom_theme" type="button" role="tab" 
-                      aria-controls="nav-home" aria-selected="true">
-                      <div class="d-block">
-                        <div>
-                        <span class="material-symbols-rounded nav-theme-icons">colors</span>
+                      <div>Night</div>
+                    </div>
+                  </button>
+                  
+                  <button class="tab nav_link_btn no-animation" id="nav-create-theme" 
+                    data-bs-toggle="tab" data-bs-target="#custom_theme" type="button" role="tab" 
+                    aria-controls="nav-home" aria-selected="true">
+                    <div class="d-block">
+                      <div>
+                      <!-- <span class="material-symbols-rounded nav-theme-icons">colors</span> -->
+                        <span><i class="fa-solid fa-fill-drip rounded nav-theme-icons"></i></span>
 
-                        </div>
-                        <div>Custom</div>
-                      </div> 
-                    </button>
-                    
-                    <button class="nav-link tab nav_link_btn no-animation" id="nav-generate-theme" 
+                      </div>
+                      <div>Custom</div>
+                    </div> 
+                  </button>
+                  
+                  {% if not is_guest %}
+                    <button class="tab nav_link_btn no-animation" id="nav-generate-theme" 
                       data-bs-toggle="tab" data-bs-target="#generate_colors" type="button" role="tab" 
                       aria-controls="nav-contact" aria-selected="false">
                       <div class="d-block">
@@ -103,128 +104,177 @@
                         <div>Generate theme</div>
                       </div>
                     </button>
-                  </div>
+
+                    <button class="tab nav_link_btn no-animation" id="nav-transparent-theme" 
+                      data-bs-toggle="tab" data-bs-target="#transparent_theme" type="button" role="tab" 
+                      aria-controls="nav-transparent" aria-selected="false">
+                      <div class="d-block">
+                        <div>
+                        <span class="material-symbols-rounded nav-theme-icons">blur_on</span>
+
+                        </div>
+                        <div>Transparent</div>
+                      </div> 
+                    </button>
+
+                  {% else %}
+                    <button class="tab no-animation" data-bs-toggle="modal" data-bs-target="#guestUserModal">
+                      <div class="d-block">
+                        <div>
+                        <span><i class="fa-solid fa-wand-magic-sparkles rounded nav-theme-icons"></i></span>
+
+                        </div>
+                        <div>Generate theme</div>
+                      </div>
+                    </button>
+
+                    <button class="tab no-animation" data-bs-toggle="modal" data-bs-target="#guestUserModal">
+                      <div class="d-block">
+                        <div>
+                        <span class="material-symbols-rounded nav-theme-icons">blur_on</span>
+
+                        </div>
+                        <div>Transparent</div>
+                      </div>
+                    </button>
+                  {% endif %}
                 </div>
-              </nav>  
-
-              <div class="color-form-container" style="display: none;">
-                <!-- Default/reset form -->
-                <form id="default_theme_form" class="form-animation" action="{% url 'reset_colors' %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Default color">
-                    <div class="circle">
-                    
-                      <input type="hidden" name="default_form_type" value="defaultform">
-
-                      <input type="hidden" name="default_theme" value="default_theme">
-
-                      <div class="col color1">
-                        <input type="hidden" id="default_primary_color" name="default_primary_color" value="#DBCBBD" readonly>
-                      </div>
-
-                      <div class="col color2">
-                        <input type="hidden" id="default_secondary_color" name="default_secondary_color" value="#F0ECE3" readonly>
-                      </div>
-
-                      <div class="col color3">
-                        <input type="hidden" id="default_tertiary_color" name="default_tertiary_color" value="#221e20" readonly>
-                      </div>
-
-                      <div class="col color4">
-                        <input type="hidden" id="default_activelink_color" name="default_activelink_color" value="#9F8772" readonly>
-                      </div>
-
-                      <div class="col color5">
-                        <input type="hidden" id="default_hover_color" name="default_hover_color" value="#9C938B" readonly>
-                      </div>
-
-                      <div class="col color6">
-                        <input type="hidden" id="default_neutral_primary" name="default_neutral_primary" value="#DFBB9D" readonly style="display: none;">  
-                      </div>
-
-                      <div class="col color7">
-                        <input type="hidden" id="default_neutral_secondary" name="default_neutral_secondary" value="#DBD7CB" readonly style="display: none;">  
-                      </div>
-                      
-                      <div class="top-half"></div>
-                      <div class="bottom-left-quadrant"></div>
-                      <div class="bottom-right-quadrant"></div>
-
-                    </div>
-
-                    <div class="check-icon" id="check-icon_default" style="display: none;">
-                      <span class="material-symbols-rounded check-circle">
-                        check_circle
-                      </span>
-                    </div>
-
-                  </button>
-                </form>
               </div>
+            </nav>  
 
-              <div class="color-form-container" style="display: none;">
-                <form id="default_dark_theme_form" class="dark-theme-form-animation" action="{% url 'reset_dark' %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns dark_button_bgcolor" id="dark_buttons">
-                    <div class="dark_theme_circle1">
+            <div class="color-form-container" style="display: none;">
+              <!-- Default/reset form -->
+              <form id="default_theme_form" class="form-animation" action="{% url 'reset_colors' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Default color">
+                  <div class="circle">
+                  
+                    <input type="hidden" name="default_form_type" value="defaultform">
+
+                    <input type="hidden" name="default_theme" value="default_theme">
+
+                    <div class="col color1">
+                      <input type="hidden" id="default_primary_color" name="default_primary_color" value="#DBCBBD" readonly>
+                    </div>
+
+                    <div class="col color2">
+                      <input type="hidden" id="default_secondary_color" name="default_secondary_color" value="#F0ECE3" readonly>
+                    </div>
+
+                    <div class="col color3">
+                      <input type="hidden" id="default_tertiary_color" name="default_tertiary_color" value="#221e20" readonly>
+                    </div>
+
+                    <div class="col color4">
+                      <input type="hidden" id="default_activelink_color" name="default_activelink_color" value="#9F8772" readonly>
+                    </div>
+
+                    <div class="col color5">
+                      <input type="hidden" id="default_hover_color" name="default_hover_color" value="#9C938B" readonly>
+                    </div>
+
+                    <div class="col color6">
+                      <input type="hidden" id="default_neutral_primary" name="default_neutral_primary" value="#DFBB9D" readonly style="display: none;">  
+                    </div>
+
+                    <div class="col color7">
+                      <input type="hidden" id="default_neutral_secondary" name="default_neutral_secondary" value="#DBD7CB" readonly style="display: none;">  
+                    </div>
                     
-                      <input type="hidden" name="default_dark_form_type" value="defaultdarkform">
+                    <div class="top-half"></div>
+                    <div class="bottom-left-quadrant"></div>
+                    <div class="bottom-right-quadrant"></div>
 
-                      <input type="hidden" name="default_dark_theme" value="default_dark_theme">
+                  </div>
 
-                      <div class="col color1">
-                        <input type="hidden" id="def_dark_primary_color" name="def_dark_primary_color" value="#414141" readonly>
-                      </div>
+                  <div class="check-icon" id="check-icon_default" style="display: none;">
+                    <span class="material-symbols-rounded check-circle">
+                      check_circle
+                    </span>
+                  </div>
 
-                      <div class="col color2">
-                        <input type="hidden" id="def_dark_secondary_color" name="def_dark_secondary_color" value="#4e4e4e" readonly>
-                      </div>
+                </button>
+              </form>
+            </div>
 
-                      <div class="col color3">
-                        <input type="hidden" id="def_dark_tertiary_color" name="def_dark_tertiary_color" value="#D9D9D9" readonly>
-                      </div>
+            <div class="color-form-container" style="display: none;">
 
-                      <div class="col color4">
-                        <input type="hidden" id="def_dark_activelink_color" name="def_dark_activelink_color" value="#1A5F7A" readonly>
-                      </div>
+              <form id="transparent_theme_form" class="form-animation" action="{% url 'dynamic_css' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns light_button_bgcolor" id="dcp_buttons" title="transparent theme">
 
-                      <div class="col color5">
-                        <input type="hidden" id="def_dark_hover_color" name="def_dark_hover_color" value="#526D82" readonly>
-                      </div>
+                  <input type="hidden" name="transparent_form" value="blurform">
 
-                      <div class="col color6">
-                        <input type="hidden" id="def_dark_neutral_primary" name="def_dark_neutral_primary" value="#4a5eab" readonly style="display: none;">  
-                      </div>
+                  <input type="hidden" name="transparent_theme" value="transparent_theme">
+              
+                </button>
+              </form>
+            </div>
 
-                      <div class="col color7">
-                        <input type="hidden" id="def_dark_neutral_secondary" name="def_dark_neutral_secondary" value="#689ec8" readonly style="display: none;">  
-                      </div>
-                      
-                      <div class="dark_theme_top-half1"></div>
-                      <div class="dark_theme_bottom-left-quadrant1"></div>
-                      <div class="dark_theme_bottom-right-quadrant1"></div>
+            <div class="color-form-container" style="display: none;">
+              <form id="default_dark_theme_form" class="dark-theme-form-animation" action="{% url 'reset_dark' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-light themetext theme-form1-btn theme_form_btns dark_button_bgcolor" id="dark_buttons">
+                  <div class="dark_theme_circle1">
+                  
+                    <input type="hidden" name="default_dark_form_type" value="defaultdarkform">
 
+                    <input type="hidden" name="default_dark_theme" value="default_dark_theme">
+
+                    <div class="col color1">
+                      <input type="hidden" id="def_dark_primary_color" name="def_dark_primary_color" value="#39393a" readonly>
                     </div>
 
-                    <div class="check-icon" id="check-icon_default_dark" style="display: none;">
-                      <span class="material-symbols-rounded check-circle">
-                        check_circle
-                      </span>
+                    <div class="col color2">
+                      <input type="hidden" id="def_dark_secondary_color" name="def_dark_secondary_color" value="#252422" readonly>
                     </div>
 
-                  </button>
-                </form> 
-              </div>
-                
+                    <div class="col color3">
+                      <input type="hidden" id="def_dark_tertiary_color" name="def_dark_tertiary_color" value="#f5f5dc" readonly>
+                    </div>
+
+                    <div class="col color4">
+                      <input type="hidden" id="def_dark_activelink_color" name="def_dark_activelink_color" value="#829cbc" readonly>
+                    </div>
+
+                    <div class="col color5">
+                      <input type="hidden" id="def_dark_hover_color" name="def_dark_hover_color" value="#6d6a75" readonly>
+                    </div>
+
+                    <div class="col color6">
+                      <input type="hidden" id="def_dark_neutral_primary" name="def_dark_neutral_primary" value="#0077b6" readonly style="display: none;">  
+                    </div>
+
+                    <div class="col color7">
+                      <input type="hidden" id="def_dark_neutral_secondary" name="def_dark_neutral_secondary" value="#5c6b73" readonly style="display: none;">  
+                    </div>
+                    
+                    <div class="dark_theme_top-half1"></div>
+                    <div class="dark_theme_bottom-left-quadrant1"></div>
+                    <div class="dark_theme_bottom-right-quadrant1"></div>
+
+                  </div>
+
+                  <div class="check-icon" id="check-icon_default_dark" style="display: none;">
+                    <span class="material-symbols-rounded check-circle">
+                      check_circle
+                    </span>
+                  </div>
+
+                </button>
+              </form> 
+            </div>
+              
+            <div class="appearance-tab-content-wrap">
               <div class="tab-content appearance-tab-content" id="nav-tabContent">
 
                 <div class="tab-pane fade" id="custom_theme" role="tabpanel" aria-labelledby="nav-create-theme" tabindex="0">
                   
                   <div class="theme-builder-forms light-mode">
                     <h4>Primary color</h4>
-                    <div class="recipe-form-container mb-3 theme-container" id="color-preview-form1">
+                    <div class="recipe-form-container mb-4 theme-container" id="color-preview-form1">
                       <div class="theme-form-wrapper">
-                        <form class="row m-1" id="color-form" class="form1" action="{% url 'appearance' %}" method="POST">
+                        <form class="row" id="color-form" class="form1" action="{% url 'appearance' %}" method="POST">
                           {% csrf_token %}
         
                           <input type="hidden" name="form_type" value="colorform">
@@ -244,19 +294,18 @@
                           </div>
 
                           <p id="primaryColor"></p>
-    
-                          <div class="form-submit-btns">
-                            <button type="submit" class="btn btn-light" id="primary_color_btn">Save primary_color</button>
-                          </div>
-        
                         </form>
+                      </div>
+
+                      <div class="form-submit-btns">
+                        <button type="submit" form="color-form" class="btn btn-light" id="primary_color_btn">Apply</button>
                       </div>
                     </div>
     
                     <h4>Secondary color</h4>
-                    <div class="recipe-form-container mb-3 theme-container" id="color-preview-form2">
+                    <div class="recipe-form-container mb-4 theme-container" id="color-preview-form2">
                       <div class="theme-form-wrapper">
-                        <form class="row m-1" id="color-form2" action="{% url 'appearance' %}" method="POST">
+                        <form class="row" id="color-form2" action="{% url 'appearance' %}" method="POST">
                           {% csrf_token %}
         
                           <input type="hidden" name="form_type" value="colorform2">
@@ -276,19 +325,18 @@
                           </div>
                           
                           <p id="secondaryColor"></p>
-                          
-                          <div class="form-submit-btns">
-                            <button type="submit" name="form2_submit" class="btn btn-light" id="secondary_color_btn">Save secondary_color</button>
-                          </div>
-                          
                         </form>
+                      </div>
+
+                      <div class="form-submit-btns">
+                        <button type="submit" form="color-form2" name="form2_submit" class="btn btn-light" id="secondary_color_btn">Apply</button>
                       </div>
                     </div>
     
                     <h4>Tertiary color</h4>
-                    <div class="recipe-form-container mb-3 theme-container" id="color-preview-form3">
+                    <div class="recipe-form-container mb-2 theme-container" id="color-preview-form3">
                       <div class="theme-form-wrapper" >
-                        <form class="row m-1" id="color-form3" action="{% url 'appearance' %}" method="POST">
+                        <form class="row" id="color-form3" action="{% url 'appearance' %}" method="POST">
                           {% csrf_token %}
         
                           <input type="hidden" name="form_type" value="colorform3">
@@ -300,12 +348,11 @@
                           </div>
         
                           <p id="tertiaryColor"></p>
-                          
-                          <div class="form-submit-btns">
-                            <button type="submit" name="form2_submit" class="btn btn-light" id="tertiary_color_btn">Save tertiary_color</button>
-                          </div>
-                          
                         </form>
+                      </div>
+
+                      <div class="form-submit-btns">
+                        <button type="submit" form="color-form3" name="form2_submit" class="btn btn-light" id="tertiary_color_btn">Apply</button>
                       </div>
                     </div>
                   </div>
@@ -314,8 +361,8 @@
 
                 <div class="tab-pane fade" id="generate_colors" role="tabpanel" aria-labelledby="nav-generate-theme" tabindex="0">
                   
-                  <div class="recipe-form- main-recipe-form generate-recipe ai-appearance-theme-input">
-                    <form id="AiImageGenerationForm" class="row m-1 create-recipe-form" action="{% url 'generate_recipe' %}">
+                  <div class="main-recipe-form ai-appearance-theme-input">
+                    <form id="AiImageGenerationForm" class="row creat-recipe-form" action="{% url 'generate_recipe' %}">
                       {% csrf_token %}
                       
                       <input type="hidden" name="color_description" value="colorcode">
@@ -332,65 +379,65 @@
                     </form> 
                   </div>
 
-                  <div class="color-form-container mb-1" style="display: flex;">
-           
-                    <div class="color-form-container" id="ai_generated_theme_form" style="display: flex;">
+                  <div class="color-form-container-primary" style="display: flex;">
+                    
+                    {% if 'ai_theme' in user.userprofile.theme or 'saved_ai_scheme' in user.userprofile.theme %}
+                      <div class="color-form-container" id="ai_generated_theme_form" style="display: flex;">
                       
-                      {% if 'ai_theme' in user.userprofile.theme or 'saved_ai_scheme' in user.userprofile.theme %}
-                      <form id="default_ai_theme_form" class="" action="{% url 'dcp_1' %}" method="POST">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-light themetext theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Caroon">
-                          <div class="circle1">
-                          
-                            <input type="hidden" name="ai_color_palette" value="saved_ai_form">
-
-                            <input type="hidden" name="ai_color_scheme" value="saved_ai_scheme">
-
-                            <div class="col color1">
-                              <input type="hidden" id="ai_primary_color" name="ai_primary_color" value="{{user.userprofile.primary_color}}" readonly>
-                            </div>
-
-                            <div class="col color2">
-                              <input type="hidden" id="ai_secondary_color" name="ai_secondary_color" value="{{user.userprofile.secondary_color}}" readonly>
-                            </div>
-
-                            <div class="col color3">
-                              <input type="hidden" id="ai_tertiary_color" name="ai_tertiary_color" value="{{user.userprofile.tertiary_color}}" readonly>
-                            </div>
-
-                            <div class="col color4">
-                              <input type="hidden" id="ai_activelink_color" name="ai_activelink_color" value="{{user.userprofile.active_link_color}}" readonly>
-                            </div>
-
-                            <div class="col color5">
-                              <input type="hidden" id="ai_hover_color" name="ai_hover_color" value="{{user.userprofile.hover_color}}" readonly>
-                            </div>
-
-                            <div class="col color6">
-                              <input type="hidden" id="ai_neutral_primary" name="ai_neutral_primary" value="{{user.userprofile.neutral_primary}}" readonly style="display: none;">  
-                            </div>
-
-                            <div class="col color7">
-                              <input type="hidden" id="ai_neutral_secondary" name="ai_neutral_secondary" value="{{user.userprofile.neutral_secondary}}" readonly style="display: none;">  
-                            </div>
+                        <form id="default_ai_theme_form" class="" action="{% url 'dcp_1' %}" method="POST">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-light themetext theme_form_btns light_button_bgcolor" id="dcp_buttons" title="Caroon">
+                            <div class="circle1">
                             
-                            <div class="top-half1 ai-tophalf"></div>
-                            <div class="bottom-left-quadrant1 ai-bottom-left-quad"></div>
-                            <div class="bottom-right-quadrant1 ai-bottom-right-quad"></div>
+                              <input type="hidden" name="ai_color_palette" value="saved_ai_form">
 
-                          </div>
+                              <input type="hidden" name="ai_color_scheme" value="saved_ai_scheme">
 
-                          <div class="check-icon" id="check-icon_ai_form" style="display: none;">
-                            <span class="material-symbols-rounded check-circle">
-                              check_circle
-                            </span>
-                          </div>
+                              <div class="col color1">
+                                <input type="hidden" id="ai_primary_color" name="ai_primary_color" value="{{user.userprofile.primary_color}}" readonly>
+                              </div>
 
-                        </button>
-                      </form>
-                      {% endif %}
-                      
-                    </div>
+                              <div class="col color2">
+                                <input type="hidden" id="ai_secondary_color" name="ai_secondary_color" value="{{user.userprofile.secondary_color}}" readonly>
+                              </div>
+
+                              <div class="col color3">
+                                <input type="hidden" id="ai_tertiary_color" name="ai_tertiary_color" value="{{user.userprofile.tertiary_color}}" readonly>
+                              </div>
+
+                              <div class="col color4">
+                                <input type="hidden" id="ai_activelink_color" name="ai_activelink_color" value="{{user.userprofile.active_link_color}}" readonly>
+                              </div>
+
+                              <div class="col color5">
+                                <input type="hidden" id="ai_hover_color" name="ai_hover_color" value="{{user.userprofile.hover_color}}" readonly>
+                              </div>
+
+                              <div class="col color6">
+                                <input type="hidden" id="ai_neutral_primary" name="ai_neutral_primary" value="{{user.userprofile.neutral_primary}}" readonly style="display: none;">  
+                              </div>
+
+                              <div class="col color7">
+                                <input type="hidden" id="ai_neutral_secondary" name="ai_neutral_secondary" value="{{user.userprofile.neutral_secondary}}" readonly style="display: none;">  
+                              </div>
+                              
+                              <div class="top-half1 ai-tophalf"></div>
+                              <div class="bottom-left-quadrant1 ai-bottom-left-quad"></div>
+                              <div class="bottom-right-quadrant1 ai-bottom-right-quad"></div>
+
+                            </div>
+
+                            <div class="check-icon" id="check-icon_ai_form" style="display: none;">
+                              <span class="material-symbols-rounded check-circle">
+                                check_circle
+                              </span>
+                            </div>
+
+                          </button>
+                        </form>
+                        
+                      </div>
+                    {% endif %}
 
                     <div class="color-form-container" id="colorPreviewContainer" style="display: flex;">
                     
@@ -398,13 +445,14 @@
                   
                   </div>
                   
-                  <div class="mt-3 text-secondary ai-recipe-check-response" style="display: none;">
-                    <small><p class="fst-italic px-3">May generate inaccurate themes.</p></small>
+                  <div class="mt-3 ai-recipe-check-response" style="display: none;">
+                    <small><p class="fst-italic px-3 opacity-85">May generate inaccurate themes.</p></small>
                   </div>
 
                   <script>
                     $(document).ready(function() {
-                        const userId = "{{ user.id }}";
+                        const isGuest = '{{ is_guest|yesno:"true,false" }}';
+                        const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
 
                         if (localStorage.getItem(`AIform_${userId}`) === 'default_ai_theme_form') {
                           $(".check-icon").show();
@@ -452,282 +500,283 @@
                 </div>
               
               </div>
+            </div>
 
-              {# Generating forms with input prompt using ai #}
-              {# Enable script for generating color palettes using OpenAI API #}
-              <!-- <script>
-                $(document).ready(function() {
-                  $('#generateRecipeImage').on('click', function(e) {
-                      e.preventDefault(); 
-              
+            {# Generating forms with input prompt using ai #}
+            {# Enable script for generating color palettes using OpenAI API #}
+            <!-- <script>
+              $(document).ready(function() {
+                $('#generateRecipeImage').on('click', function(e) {
+                    e.preventDefault(); 
+            
+                    var emptytitle = $('#id_title').val();
+                    if (!emptytitle.trim()) {
+                        return;
+                    }
+            
+                    $(this).addClass('loading').text('Generating...');
+            
+                    var imgType = $('#AiImageGenerationForm [name="color_description"]').val();
+                    var title = $('#id_title').val();
+                    var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+            
+                    var formData = {
+                        color_description: imgType,
+                        title: title, 
+                    };
+            
+                    $.ajax({
+                        url: '{% url "appearance" %}', 
+                        method: 'POST',
+                        data: formData,
+                        headers: {
+                            'X-CSRFToken': csrfToken  
+                        },
+                        success: function(response) {
+                            if (response.generated_colors) {
+                              
+                              var palettes = response.generated_colors.split('\n\n');
+                              $('#colorPreviewContainer').empty();
+
+                              for (var i = 0; i < palettes.length; i++) {
+                                  var paletteContainer = $('<div>').addClass('palette');
+                                  // var paletteNameElement = $('<h4>').text('Palette ' + (i + 1));
+                                  // paletteContainer.append(paletteNameElement);
+
+                                  var colorCodesArray = palettes[i].match(/#[a-fA-F0-9]{6}/g);
+
+                                  var form = $('<form>').addClass('form-animation').attr({
+                                      action: '{% url "dcp_1" %}',
+                                      method: 'POST',
+                                      title: 'Palette ' + (i + 1),
+                                      id: 'aiform' + (i + 1)
+                                  });
+
+                                  form.append('{% csrf_token %}');
+
+                                  var button = $('<button>').addClass('btn btn-light themetext theme_form_btns light_button_bgcolor').attr({
+                                      type: 'button',
+                                      id: 'dcp_buttons',
+                                      onclick: 'submitForm(' + (i + 1) + ')' 
+                                  });
+
+                                  var aiColorCircle = $('<div>').addClass('ai_color_circle');
+
+                                  aiColorCircle.append('<input type="hidden" name="ai_color_palette" value="aiform' + (i + 1) + '">');
+                                  aiColorCircle.append('<input type="hidden" name="ai_theme" value="ai_theme' + (i + 1) + '">');
+
+                                  for (var j = 0; j < colorCodesArray.length; j++) {
+                                      aiColorCircle.append('<div class="col color' + (j + 1) + '">' +
+                                                              '<input type="hidden" name="ai_color' + (j + 1) + '" value="' + colorCodesArray[j] + '" readonly>' +
+                                                            '</div>');
+
+                                      if (j === 0) {
+                                          aiColorCircle.css('background-color', colorCodesArray[j]);
+                                      }
+
+                                      if (j >= 3) {
+                                          var aiquadrants = $('<div>').addClass('aiquadrants' + (j - 2));
+                                          var colorIndex = j - 3;
+                                          aiquadrants.css('background-color', colorCodesArray[colorIndex]);
+                                          aiColorCircle.append(aiquadrants);
+                                      }    
+                                  }
+
+                                  var checkIcon = $('<div>').addClass('check-icon').attr({
+                                    id: 'check-icon_aiform' + (i + 1),
+                                    style: 'display: none;'
+                                  });
+                                  checkIcon.append('<span class="material-symbols-rounded check-circle" style="display:block;z-index:9999;">check_circle</span>');
+                                  button.append(checkIcon);
+
+                                  button.append(aiColorCircle);
+
+                                  form.append(button);
+
+                                  paletteContainer.append(form);
+
+                                  $('#colorPreviewContainer').append(paletteContainer);
+                              }
+
+                              $('#colorPreviewContainer').show();
+
+                              $('#generateRecipeImage').text('Regenerate');
+                                            
+                              $('#generateRecipeImage').removeClass('loading');
+
+                            }
+            
+            
+                            else if (response.error){
+                              var successToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
+                              successToast.show();
+                              $('#generateRecipeImage').removeClass('loading').text('Generate');
+                            }
+            
+                            else if (response.form_error){
+                              var successToast = new bootstrap.Toast(document.getElementById('testsToast'));
+                              successToast.show();
+                            }
+                            
+                        },
+                        error: function(error) {
+                            $('#generateRecipeImage').removeClass('loading').text('Generate Image');
+                        }
+                    });
+                });
+              });
+            </script> -->
+
+            {# Enable this script for generating color palettes using Gemini API #}
+            <script>
+              $(document).ready(function () {
+                  $('#generateRecipeImage').on('click', function (e) {
+                      e.preventDefault();
+          
                       var emptytitle = $('#id_title').val();
                       if (!emptytitle.trim()) {
                           return;
                       }
-              
+          
                       $(this).addClass('loading').text('Generating...');
-              
+          
                       var imgType = $('#AiImageGenerationForm [name="color_description"]').val();
                       var title = $('#id_title').val();
                       var csrfToken = $('[name=csrfmiddlewaretoken]').val();
-              
+          
                       var formData = {
                           color_description: imgType,
-                          title: title, 
+                          title: title,
                       };
-              
+          
                       $.ajax({
-                          url: '{% url "appearance" %}', 
+                          url: '{% url "appearance" %}',
                           method: 'POST',
                           data: formData,
                           headers: {
-                              'X-CSRFToken': csrfToken  
+                              'X-CSRFToken': csrfToken
                           },
-                          success: function(response) {
+                          success: function (response) {
                               if (response.generated_colors) {
-                                
-                                var palettes = response.generated_colors.split('\n\n');
-                                $('#colorPreviewContainer').empty();
+                                  var hexCodes = response.generated_colors.match(/#[a-fA-F0-9]{6}/g);
+                                  $('#colorPreviewContainer').empty();
+          
+                                  if (!hexCodes || hexCodes.length === 0) {
+                                      alert('No valid response found!');
+                                      $('#generateRecipeImage').removeClass('loading').text('Generate');
+                                      return;
+                                  }
+          
+                                  var colorGroups = [];
+                                  for (let i = 0; i < hexCodes.length; i += 7) {
+                                      colorGroups.push(hexCodes.slice(i, i + 7));
+                                  }
+          
+                                  for (var i = 0; i < colorGroups.length; i++) {
+                                      var group = colorGroups[i];
+          
+                                      var paletteContainer = $('<div>').addClass('palette');
+          
+                                      var form = $('<form>').addClass('form-animation').attr({
+                                          action: '{% url "dcp_1" %}',
+                                          method: 'POST',
+                                          title: 'Palette ' + (i + 1),
+                                          id: 'aiform' + (i + 1)
+                                      });
+          
+                                      form.append('{% csrf_token %}');
+          
+                                      var button = $('<button>').addClass('btn btn-light themetext theme_form_btns light_button_bgcolor').attr({
+                                          type: 'button',
+                                          id: 'dcp_buttons',
+                                          onclick: 'submitForm(' + (i + 1) + ')'
+                                      });
+          
+                                      var aiColorCircle = $('<div>').addClass('ai_color_circle');
+          
+                                      aiColorCircle.append('<input type="hidden" name="ai_color_palette" value="aiform' + (i + 1) + '">');
+                                      aiColorCircle.append('<input type="hidden" name="ai_theme" value="ai_theme' + (i + 1) + '">');
+          
+                                      for (var j = 0; j < group.length; j++) {
+                                          aiColorCircle.append('<div class="col color' + (j + 1) + '">' +
+                                              '<input type="hidden" name="ai_color' + (j + 1) + '" value="' + group[j] + '" readonly>' +
+                                              '</div>');
+          
+                                          if (j === 0) {
+                                              aiColorCircle.css('background-color', group[j]);
+                                          }
+          
+                                          if (j >= 3) {
+                                              var aiquadrants = $('<div>').addClass('aiquadrants' + (j - 2));
+                                              var colorIndex = j - 3;
+                                              aiquadrants.css('background-color', group[colorIndex]);
+                                              aiColorCircle.append(aiquadrants);
+                                          }
+                                      }
+          
+                                      var checkIcon = $('<div>').addClass('check-icon').attr({
+                                          id: 'check-icon_aiform' + (i + 1),
+                                          style: 'display: none;'
+                                      });
+                                      checkIcon.append('<span class="material-symbols-rounded check-circle" style="display:block;z-index:9999;">check_circle</span>');
+                                      button.append(checkIcon);
+          
+                                      button.append(aiColorCircle);
+          
+                                      form.append(button);
+          
+                                      paletteContainer.append(form);
+          
+                                      $('#colorPreviewContainer').append(paletteContainer);
+                                  }
+          
+                                  $('#colorPreviewContainer').show();
+          
+                                  $('#generateRecipeImage').text('Regenerate');
+          
+                                  $('#generateRecipeImage').removeClass('loading');
 
-                                for (var i = 0; i < palettes.length; i++) {
-                                    var paletteContainer = $('<div>').addClass('palette');
-                                    // var paletteNameElement = $('<h4>').text('Palette ' + (i + 1));
-                                    // paletteContainer.append(paletteNameElement);
+                                  $('.ai-recipe-check-response').fadeIn();
 
-                                    var colorCodesArray = palettes[i].match(/#[a-fA-F0-9]{6}/g);
-
-                                    var form = $('<form>').addClass('form-animation').attr({
-                                        action: '{% url "dcp_1" %}',
-                                        method: 'POST',
-                                        title: 'Palette ' + (i + 1),
-                                        id: 'aiform' + (i + 1)
-                                    });
-
-                                    form.append('{% csrf_token %}');
-
-                                    var button = $('<button>').addClass('btn btn-light themetext theme_form_btns light_button_bgcolor').attr({
-                                        type: 'button',
-                                        id: 'dcp_buttons',
-                                        onclick: 'submitForm(' + (i + 1) + ')' 
-                                    });
-
-                                    var aiColorCircle = $('<div>').addClass('ai_color_circle');
-
-                                    aiColorCircle.append('<input type="hidden" name="ai_color_palette" value="aiform' + (i + 1) + '">');
-                                    aiColorCircle.append('<input type="hidden" name="ai_theme" value="ai_theme' + (i + 1) + '">');
-
-                                    for (var j = 0; j < colorCodesArray.length; j++) {
-                                        aiColorCircle.append('<div class="col color' + (j + 1) + '">' +
-                                                                '<input type="hidden" name="ai_color' + (j + 1) + '" value="' + colorCodesArray[j] + '" readonly>' +
-                                                              '</div>');
-
-                                        if (j === 0) {
-                                            aiColorCircle.css('background-color', colorCodesArray[j]);
-                                        }
-
-                                        if (j >= 3) {
-                                            var aiquadrants = $('<div>').addClass('aiquadrants' + (j - 2));
-                                            var colorIndex = j - 3;
-                                            aiquadrants.css('background-color', colorCodesArray[colorIndex]);
-                                            aiColorCircle.append(aiquadrants);
-                                        }    
-                                    }
-
-                                    var checkIcon = $('<div>').addClass('check-icon').attr({
-                                      id: 'check-icon_aiform' + (i + 1),
-                                      style: 'display: none;'
-                                    });
-                                    checkIcon.append('<span class="material-symbols-rounded check-circle" style="display:block;z-index:9999;">check_circle</span>');
-                                    button.append(checkIcon);
-
-                                    button.append(aiColorCircle);
-
-                                    form.append(button);
-
-                                    paletteContainer.append(form);
-
-                                    $('#colorPreviewContainer').append(paletteContainer);
-                                }
-
-                                $('#colorPreviewContainer').show();
-
-                                $('#generateRecipeImage').text('Regenerate');
-                                              
-                                $('#generateRecipeImage').removeClass('loading');
-
+                              } else if (response.error) {
+                                  var successToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
+                                  successToast.show();
+                                  $('#generateRecipeImage').removeClass('loading').text('Generate');
+                              } else if (response.form_error) {
+                                  var successToast = new bootstrap.Toast(document.getElementById('testsToast'));
+                                  successToast.show();
                               }
-              
-              
-                              else if (response.error){
-                                var successToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
-                                successToast.show();
-                                $('#generateRecipeImage').removeClass('loading').text('Generate');
-                              }
-              
-                              else if (response.form_error){
-                                var successToast = new bootstrap.Toast(document.getElementById('testsToast'));
-                                successToast.show();
-                              }
-                              
                           },
-                          error: function(error) {
+                          error: function (error) {
                               $('#generateRecipeImage').removeClass('loading').text('Generate Image');
                           }
                       });
                   });
+              });
+            </script>
+
+            {# Showing check icon for ai forms #}
+            <script>
+              function submitForm(formNumber) {
+                var formData = $('#aiform' + formNumber).serialize();
+
+                $.ajax({
+                    url: '{% url "dcp_1" %}',
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                      $(".check-icon").hide();
+
+                      $('#check-icon_aiform' + formNumber).show();
+      
+                      applyColorsFromForm(formNumber);
+                    },
+                    error: function (error) {
+                    }
                 });
-              </script> -->
-
-              {# Enable this script for generating color palettes using Gemini API #}
-              <script>
-                $(document).ready(function () {
-                    $('#generateRecipeImage').on('click', function (e) {
-                        e.preventDefault();
-            
-                        var emptytitle = $('#id_title').val();
-                        if (!emptytitle.trim()) {
-                            return;
-                        }
-            
-                        $(this).addClass('loading').text('Generating...');
-            
-                        var imgType = $('#AiImageGenerationForm [name="color_description"]').val();
-                        var title = $('#id_title').val();
-                        var csrfToken = $('[name=csrfmiddlewaretoken]').val();
-            
-                        var formData = {
-                            color_description: imgType,
-                            title: title,
-                        };
-            
-                        $.ajax({
-                            url: '{% url "appearance" %}',
-                            method: 'POST',
-                            data: formData,
-                            headers: {
-                                'X-CSRFToken': csrfToken
-                            },
-                            success: function (response) {
-                                if (response.generated_colors) {
-                                    var hexCodes = response.generated_colors.match(/#[a-fA-F0-9]{6}/g);
-                                    $('#colorPreviewContainer').empty();
-            
-                                    if (!hexCodes || hexCodes.length === 0) {
-                                        alert('No valid response found!');
-                                        $('#generateRecipeImage').removeClass('loading').text('Generate');
-                                        return;
-                                    }
-            
-                                    var colorGroups = [];
-                                    for (let i = 0; i < hexCodes.length; i += 7) {
-                                        colorGroups.push(hexCodes.slice(i, i + 7));
-                                    }
-            
-                                    for (var i = 0; i < colorGroups.length; i++) {
-                                        var group = colorGroups[i];
-            
-                                        var paletteContainer = $('<div>').addClass('palette');
-            
-                                        var form = $('<form>').addClass('form-animation').attr({
-                                            action: '{% url "dcp_1" %}',
-                                            method: 'POST',
-                                            title: 'Palette ' + (i + 1),
-                                            id: 'aiform' + (i + 1)
-                                        });
-            
-                                        form.append('{% csrf_token %}');
-            
-                                        var button = $('<button>').addClass('btn btn-light themetext theme_form_btns light_button_bgcolor').attr({
-                                            type: 'button',
-                                            id: 'dcp_buttons',
-                                            onclick: 'submitForm(' + (i + 1) + ')'
-                                        });
-            
-                                        var aiColorCircle = $('<div>').addClass('ai_color_circle');
-            
-                                        aiColorCircle.append('<input type="hidden" name="ai_color_palette" value="aiform' + (i + 1) + '">');
-                                        aiColorCircle.append('<input type="hidden" name="ai_theme" value="ai_theme' + (i + 1) + '">');
-            
-                                        for (var j = 0; j < group.length; j++) {
-                                            aiColorCircle.append('<div class="col color' + (j + 1) + '">' +
-                                                '<input type="hidden" name="ai_color' + (j + 1) + '" value="' + group[j] + '" readonly>' +
-                                                '</div>');
-            
-                                            if (j === 0) {
-                                                aiColorCircle.css('background-color', group[j]);
-                                            }
-            
-                                            if (j >= 3) {
-                                                var aiquadrants = $('<div>').addClass('aiquadrants' + (j - 2));
-                                                var colorIndex = j - 3;
-                                                aiquadrants.css('background-color', group[colorIndex]);
-                                                aiColorCircle.append(aiquadrants);
-                                            }
-                                        }
-            
-                                        var checkIcon = $('<div>').addClass('check-icon').attr({
-                                            id: 'check-icon_aiform' + (i + 1),
-                                            style: 'display: none;'
-                                        });
-                                        checkIcon.append('<span class="material-symbols-rounded check-circle" style="display:block;z-index:9999;">check_circle</span>');
-                                        button.append(checkIcon);
-            
-                                        button.append(aiColorCircle);
-            
-                                        form.append(button);
-            
-                                        paletteContainer.append(form);
-            
-                                        $('#colorPreviewContainer').append(paletteContainer);
-                                    }
-            
-                                    $('#colorPreviewContainer').show();
-            
-                                    $('#generateRecipeImage').text('Regenerate');
-            
-                                    $('#generateRecipeImage').removeClass('loading');
-
-                                    $('.ai-recipe-check-response').fadeIn();
-
-                                } else if (response.error) {
-                                    var successToast = new bootstrap.Toast(document.getElementById('imgErrorToast'));
-                                    successToast.show();
-                                    $('#generateRecipeImage').removeClass('loading').text('Generate');
-                                } else if (response.form_error) {
-                                    var successToast = new bootstrap.Toast(document.getElementById('testsToast'));
-                                    successToast.show();
-                                }
-                            },
-                            error: function (error) {
-                                $('#generateRecipeImage').removeClass('loading').text('Generate Image');
-                            }
-                        });
-                    });
-                });
-              </script>
-
-              {# Showing check icon for ai forms #}
-              <script>
-                function submitForm(formNumber) {
-                  var formData = $('#aiform' + formNumber).serialize();
-
-                  $.ajax({
-                      url: '{% url "dcp_1" %}',
-                      method: 'POST',
-                      data: formData,
-                      success: function (response) {
-                        $(".check-icon").hide();
-
-                        $('#check-icon_aiform' + formNumber).show();
-        
-                        applyColorsFromForm(formNumber);
-                      },
-                      error: function (error) {
-                      }
-                  });
-                }
-                
-              </script>
+              }
+              
+            </script>
 
           </div>
 
@@ -789,7 +838,16 @@
       <div class="toast-body">
         Night mode
       </div>
-      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3">
+  <div id="transparentToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="2000">
+    <div class="d-flex">
+      <div class="toast-body">
+        Transparency effects
+      </div>
     </div>
   </div>
 </div>
@@ -804,11 +862,17 @@
     const defaulttoast = document.getElementById('defualtToast');
     const darkThemeToast = document.getElementById('darkthemeToast');
     const darktoastTrigger = document.getElementById('dark_theme_tab_btn')
+    const transparentTheme = document.getElementById('nav-transparent-theme')
+    const transparenttoast = document.getElementById('transparentToast');
 
     // Light theme toast
     if (toastTrigger) {
       toastTrigger.addEventListener('click', () => {
-        const userId = "{{ user.id }}";
+        const isGuest = '{{ is_guest|yesno:"true,false" }}';
+        const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
+        // Checking if userId is of authenticated user or not if not then uuid is used for guest user handling custom_colors in localstorage
+        // If guest user then uuid is used inplace of userId
+
         const currentTab = localStorage.getItem(`lastSelectedTab_${userId}`);
 
         const customPrimaryColor = localStorage.getItem(`custom_primary_color_${userId}`);
@@ -875,7 +939,8 @@
     // Dark theme toast
     if (darktoastTrigger) {
       darktoastTrigger.addEventListener('click', () => {
-        const userId = "{{ user.id }}";
+        const isGuest = '{{ is_guest|yesno:"true,false" }}';
+        const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
         const currentTab = localStorage.getItem(`lastSelectedTab_${userId}`);
 
         const customPrimaryColor = localStorage.getItem(`custom_primary_color_${userId}`);
@@ -938,13 +1003,15 @@
 
       });
     }
+
   });
 </script>
 
 {# Manually setting background color of forms rounded rectangle based on light & dark theme #}
 <script>
   $(document).ready(function () {
-    const userId = "{{ user.id }}";
+        const isGuest = '{{ is_guest|yesno:"true,false" }}';
+        const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
     
     $('#dark_theme_tab_btn').on('click', function () {
       var lastSubmittedFormDark = localStorage.getItem(`lastSubmittedForm_Dark_${userId}`);
@@ -962,7 +1029,8 @@
 
   $(document).ready(function () {
     
-    const userId = "{{ user.id }}";
+    const isGuest = '{{ is_guest|yesno:"true,false" }}';
+    const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
     
     $('#nav-light-theme').on('click', function () {
       var lastSubmittedFormLight = localStorage.getItem(`lastSubmittedForm_Light_${userId}`);
@@ -974,6 +1042,106 @@
       }
     });
   });
+  
+</script>
+
+<script>
+  function refreshDynamicThemeStylesheet() {
+  const themeLink = document.getElementById('dynamic-theme-css');
+  if (themeLink) {
+    const href = themeLink.getAttribute('href').split('?')[0]; // remove old timestamp
+    themeLink.setAttribute('href', href + '?t=' + new Date().getTime()); // force reload
+  }
+}
+
+</script>
+
+<!-- <script>
+  $(document).ready(function () {
+    const isGuest = '{{ is_guest|yesno:"true,false" }}';
+    const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
+
+    $('#nav-transparent-theme').on('click', function () {
+        const form = $('#transparent_theme_form');
+        const csrfToken = form.find('[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: form.attr('action'),
+            data: form.serialize(),
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            success: function (response) {
+                // Store selected tab
+                localStorage.setItem(`lastSelectedTab_${userId}`, 'nav-transparent-theme');
+
+                // Show toast
+                const toast = new bootstrap.Toast(document.getElementById('transparentToast'));
+                toast.show();
+
+                // Optional: trigger dynamic style reload or force re-style
+                // location.reload(); // only if really needed
+
+                console.log("Transparent theme applied.");
+            },
+            error: function (xhr, status, error) {
+                console.error("Error applying transparent theme:", error);
+            }
+        });
+    });
+});
+
+</script> -->
+
+<script>
+$(document).ready(function () {
+  $('#nav-transparent-theme').on('click', function (e) {
+    const isGuest = '{{ is_guest|yesno:"true,false" }}';
+    const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
+    const currentTab = localStorage.getItem(`lastSelectedTab_${userId}`);
+
+    if (currentTab === 'nav-transparent-theme') {
+      e.preventDefault();
+      return;
+    }
+
+    const form = $('#transparent_theme_form');
+    const csrfToken = form.find('[name=csrfmiddlewaretoken]').val();
+
+    $.ajax({
+      type: 'POST',
+      url: form.attr('action'),
+      data: form.serialize(),
+      headers: {
+        'X-CSRFToken': csrfToken
+      },
+      success: function (response) {
+        if (response.status === 'ok' && response.theme === 'transparent_theme') {
+          applyFrostedTheme();
+
+          localStorage.setItem(`lastSelectedTab_${userId}`, 'nav-transparent-theme');
+
+          const lightToast = new bootstrap.Toast(document.getElementById('myToast'));
+          const darkToast = new bootstrap.Toast(document.getElementById('darkthemeToast'));
+          const defaultToast = new bootstrap.Toast(document.getElementById('defualtToast'));
+
+          lightToast.hide();
+          darkToast.hide();
+          defaultToast.hide();
+
+          setTimeout(() => {
+            const transparentToast = new bootstrap.Toast(document.getElementById('transparentToast'));
+            transparentToast.show();
+          }, 500);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error applying transparent theme:", error);
+      }
+    });
+  });
+});
 </script>
 
 {# Showing prev check icon to prev tab pane color forms & resetting custom theme color selector value #}
@@ -992,7 +1160,8 @@
       }
     }
 
-    const userId = "{{ user.id }}";  
+    const isGuest = '{{ is_guest|yesno:"true,false" }}';
+    const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}"; 
     checkAndShowIcon(userId, "default_dark_theme_form", "check-icon_default_dark");
     checkAndShowIcon(userId, "default_theme_form", "check-icon_default");
 
@@ -1267,6 +1436,7 @@
             $("#check-icon_default_dark").show();
             // Saving the last submitted form to local storage
             localStorage.setItem(`lastSubmittedForm_Dark_${userId}`, "default_dark_theme_form");
+            refreshDynamicThemeStylesheet();
           }
         }
       });
@@ -1285,6 +1455,7 @@
             $("#check-icon_default").show();
             // Saving the last submitted form to local storage
             localStorage.setItem(`lastSubmittedForm_Light_${userId}`, "default_theme_form");
+            refreshDynamicThemeStylesheet();
           } 
         }
       });
@@ -1368,18 +1539,48 @@
       return `#${Math.round(r * 255).toString(16).padStart(2, '0')}${Math.round(g * 255).toString(16).padStart(2, '0')}${Math.round(b * 255).toString(16).padStart(2, '0')}`;
     }
   
+    function getAdaptiveHoverLightnessAdjust(hex) {
+      hex = hex.replace(/^#/, '');
+
+      let r = parseInt(hex.substring(0, 2), 16) / 255;
+      let g = parseInt(hex.substring(2, 4), 16) / 255;
+      let b = parseInt(hex.substring(4, 6), 16) / 255;
+
+      let max = Math.max(r, g, b);
+      let min = Math.min(r, g, b);
+      let l = (max + min) / 2;
+
+      let targetLightness;
+
+      if (l <= 0.1) {
+        targetLightness = 0.3;
+      } else if (l <= 0.3) {
+        targetLightness = 0.5;
+      } else if (l <= 0.5) {
+        targetLightness = 0.6;
+      } else if (l <= 0.75) {
+        targetLightness = 0.75;
+      } else {
+        targetLightness = 0.7;
+      }
+
+      return Math.max(-1, Math.min(1, targetLightness - l));
+    }
 
     // Custom theme colors
     function customColors() {
-      const userId = "{{ user.id }}";
+      const isGuest = '{{ is_guest|yesno:"true,false" }}';
+      const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
       const custom_PrimaryColor = $('#primary_color').val();
       const custom_SecondaryColor = $('#secondary_color').val();
   
       // Convert the hover color to HSL
       const custom_primaryHSL = hexToHSLWithVariation(custom_PrimaryColor, -0.3, 0.4, -0.2); 
       const custom_secondaryHSL = hexToHSLWithVariation(custom_PrimaryColor, -0.2, 0.25, 0.15); 
-      const custom_link_colorHSL = hexToHSLWithVariation(custom_SecondaryColor, 0.3, 0.05, -0.2); 
-      const custom_hover_colorHSL = hexToHSLWithVariation(custom_SecondaryColor, 0.25, 0, -0.3);
+      const custom_link_colorHSL = hexToHSLWithVariation(custom_SecondaryColor, 0.3, 0.05, -0.2);
+       
+      const hoverLightnessAdjust = getAdaptiveHoverLightnessAdjust(custom_SecondaryColor);
+      const custom_hover_colorHSL = hexToHSLWithVariation(custom_SecondaryColor, 0, 0.2, hoverLightnessAdjust);
 
       // const custom_primaryHSL = hexToHSLWithVariation(custom_PrimaryColor, -0.1, 0.2, -0.3);
       // const custom_secondaryHSL = hexToHSLWithVariation(custom_PrimaryColor, 0.9, -0.04, 0.04);
@@ -1635,7 +1836,8 @@
 {# Restore default values to respective tab & forms if user deletes from localStorage #}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const userId = "{{ user.id }}";
+    const isGuest = '{{ is_guest|yesno:"true,false" }}';
+    const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}";
 
     function ensureStorageDefaults() {
         if (!localStorage.getItem(`lastSelectedTab_${userId}`)) {
@@ -1719,7 +1921,9 @@
 {# Show/hide appearance-tab-content based on button & show Applied text #}
 <script>
   $(document).ready(function () {
-    const userId = "{{ user.id }}";  
+    const isGuest = '{{ is_guest|yesno:"true,false" }}';
+    console.log(isGuest,'appearance page')
+    const userId = isGuest ? "{{ guest_user.uuid }}" : "{{ user.id }}"; 
     const userTheme = localStorage.getItem(`lastSelectedTab_${userId}`) || "nav-light-theme";
     const appearanceTabContent = $(".appearance-tab-content");
 
@@ -1749,7 +1953,7 @@
         }
 
 
-        if (tabButton.id === "nav-create-theme" || tabButton.id === "nav-generate-theme" || tabButton.id === "nav-light-theme" || tabButton.id === "dark_theme_tab_btn") {
+        if (tabButton.id === "nav-create-theme" || tabButton.id === "nav-generate-theme" || tabButton.id === "nav-light-theme" || tabButton.id === "dark_theme_tab_btn" || tabButton.id === "nav-transparent-theme") {
           tabButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
         }
     }
