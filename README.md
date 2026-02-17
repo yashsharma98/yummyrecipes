@@ -9,6 +9,15 @@ https://yummy-recipes-ht6h.onrender.com/
 
 <br>
 
+**Project Screenshot**
+
+  ![Screenshot (336)](https://github.com/user-attachments/assets/89290d89-a0ae-469a-8e5f-46aa36b9f121)
+
+  <img width="1919" height="1031" alt="image" src="https://github.com/user-attachments/assets/263b9623-6f9c-4521-9191-8ea4479397c1" />
+
+
+<br>  
+
 ## About The Project
 
 This project goes beyond a simple recipe management application, focusing not only on core features but also on improving search accuracy, integrating machine learning models, and handling deployment.
