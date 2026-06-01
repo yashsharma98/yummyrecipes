@@ -5,7 +5,7 @@ Yummy Recipes is a full-stack Django web application where users can upload, exp
 <br>
 
 **Live Link**  
-https://yummy-recipes-ht6h.onrender.com/
+https://yummy-recipes-jfvg.onrender.com/
 
 <br>
 
@@ -76,6 +76,7 @@ The application is deployed on **Render**, uses **PostgreSQL** as the database, 
 ### Recipe Summarization & AI Generation
 - Generate recipes using Gemini API
 - Recipe summarization & translation
+- Image generation through Cloudflare worker API
 
 <br>
 
