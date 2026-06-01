@@ -46,28 +46,6 @@ def send_welcome_email_signal(request, user, **kwargs):
         send_welcome_email(request, user.email, user.first_name)
 
 
-embedding_model = None
-embedding_lock = None
-
-
-def embeddings():
-    global embedding_model, embedding_lock
-
-    if embedding_model is None:
-        if embedding_lock is None:
-            import threading
-
-            embedding_lock = threading.Lock()
-
-        with embedding_lock:
-            if embedding_model is None:
-                from sentence_transformers import SentenceTransformer
-
-                embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-
-    return embedding_model
-
-
 @receiver(post_save, sender=post)
 def generate_embedding(sender, instance, created, **kwargs):
     if created and not instance.embedding:
@@ -80,12 +58,20 @@ def generate_embedding(sender, instance, created, **kwargs):
             f"{instance.difficulty or ''}"
         )
 
-        # loads on the first call
-        model = embeddings()
-        instance.embedding = model.encode(text).tolist()
-        instance.save(update_fields=["embedding"])
+        from testingapp.search.text_embeddings import recipe_embedding
+
+        try:
+            vector_list = recipe_embedding(text)
+            instance.embedding = vector_list
+
+            # Save the embedding to database
+            instance.save(update_fields=["embedding"])
+
+        except Exception as e:
+            print(f"Failed to generate embedding for recipe {instance.id}: {e}")
 
 
+# trigger update on like and views (hitcounts) handled by celery in settings
 @receiver(m2m_changed, sender=post.likes.through)
 @receiver(post_save, sender=post)
 def update_trending_cache(sender, **kwargs):

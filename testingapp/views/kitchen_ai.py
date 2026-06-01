@@ -1,7 +1,9 @@
 import base64
+import json
+import re
 from io import BytesIO
 
-import openai
+import requests
 from django.conf import settings
 from django.core.cache import cache
 from django.http import (
@@ -9,12 +11,31 @@ from django.http import (
 )
 from django.shortcuts import render
 from google import genai
-from google.genai import types
 from PIL import Image
 
 from ..forms import (
     AIRecipeGenerationForm,
 )
+
+
+def cloudflare_image_generation(prompt):
+    url = f"https://api.cloudflare.com/client/v4/accounts/{settings.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/leonardo/phoenix-1.0"
+    response = requests.post(
+        url,
+        headers={
+            "Authorization": f"Bearer {settings.CLOUDFLARE_API_TOKEN}",
+            "Content-Type": "application/json",
+        },
+        json={
+            "prompt": prompt,
+            "width": 512,
+            "height": 512,
+        },
+        timeout=120,
+    )
+    response.raise_for_status()
+
+    return Image.open(BytesIO(response.content))
 
 
 def generate_recipe_with_ai_image(request):
@@ -34,158 +55,156 @@ def generate_recipe_with_ai_image(request):
             image_generation_form = AIRecipeGenerationForm(request.POST)
 
             if image_generation_form.is_valid():
-                # Get the title from the image generation form
                 title = image_generation_form.cleaned_data["title"]
 
                 cache_key = f"generated_recipe_{title.lower().strip()}"
-                cached_data = cache.get(cache_key)
 
-                # Return cached data and handling regeneration of recipe
                 if not regenerate:
                     cached_data = cache.get(cache_key)
+
                     if cached_data:
                         return JsonResponse(cached_data)
 
-                # if OpenAI API is available then generate both recipe and its image
-                if openai.api_key:
-                    openai.api_key = settings.OPENAI_API_KEY
+                # STEP 1
+                # Generate recipe JSON
+                generated_recipe = generate_recipe_content(title)
 
-                    # Generate an image based on the user's input
-                    response = openai.Image.create(prompt=title, n=1, size="256x256")
+                # STEP 2
+                # Extract image description
+                image_description = generated_recipe.get(
+                    "image_description",
+                    title,
+                )
 
-                    try:
-                        # Download the generated image
-                        recipe_image_url = response.data[0].url
-                    except (AttributeError, KeyError):
-                        # Handle the case where the response structure doesn't provide a direct URL
-                        recipe_image_url = None
+                # STEP 3
+                # Generate image prompt
+                prompt = f"""
+                    Generate a professional food photography.
 
-                    # Call the second function to generate the recipe
-                    generated_recipe = generate_recipe_content(title)
+                    {image_description}
 
-                    formatted_generated_recipe = generated_recipe.replace("\n", "<br>")
+                    Authentic regional preparation.
+                    Traditional serving style.
+                    Real cooked food.
+                    Natural lighting.
+                    Visible ingredients.
+                    Accurate colors and textures.
+                    Food magazine quality.
 
-                    set_cache = {
-                        "recipe_image_url": recipe_image_url,
-                        "generated_recipe": formatted_generated_recipe,
-                    }
+                    No illustration.
+                    No cartoon.
+                    No painting.
+                    No CGI.
+                    No 3D render.
+                    No text.
+                    No watermark.
+                """
 
-                    cache.set(cache_key, set_cache, timeout=7200)
-                    return JsonResponse(set_cache)
+                image_url = None
 
-                    # if recipe_image_url:
-                    #     return JsonResponse({"recipe_image_url": recipe_image_url,"generated_recipe": formatted_generated_recipe})
+                try:
+                    image = cloudflare_image_generation(prompt)
 
-                # Else use Gemini API to generate both recipe and its image
-                else:
+                    buffer = BytesIO()
+
+                    image.convert("RGB").save(
+                        buffer,
+                        format="JPEG",
+                        quality=70,
+                        optimize=True,
+                    )
+
+                    base64_image = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+                    image_url = f"data:image/jpeg;base64,{base64_image}"
+
+                except Exception:
                     image_url = None
 
-                    try:
-                        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                set_cache = {
+                    "recipe_image_url": image_url,
+                    "generated_recipe": generated_recipe,
+                    "image_description": image_description,
+                }
 
-                        response = client.models.generate_content(
-                            model="gemini-2.5-flash-image",
-                            contents=[f"Generate an image for {title}"],
-                            config=types.GenerateContentConfig(
-                                response_modalities=["Image"],
-                            ),
-                        )
+                cache.set(
+                    cache_key,
+                    set_cache,
+                    timeout=7200,
+                )
 
-                        for part in response.candidates[0].content.parts:
-                            if part.inline_data is not None:
-                                # Convert binary data to base64 string for URL response
-                                image_data = part.inline_data.data
-                                image = Image.open(BytesIO(image_data))
-
-                                # Save to a temporary buffer
-                                buffered = BytesIO()
-                                image.save(buffered, format="PNG")
-
-                                # Convert image to base64 string
-                                base64_image = base64.b64encode(buffered.getvalue()).decode("utf-8")
-                                image_url = f"data:image/png;base64,{base64_image}"
-                                break
-
-                    except Exception:
-                        image_url = None
-
-                    # Generate recipe
-                    generated_recipe = generate_recipe_content(title)
-                    formatted_generated_recipe = generated_recipe.replace("\n", "")
-
-                    set_cache = {
-                        "recipe_image_url": image_url,
-                        "generated_recipe": formatted_generated_recipe,
-                    }
-
-                    cache.set(cache_key, set_cache, timeout=7200)
-                    return JsonResponse(set_cache)
-
-                    # return JsonResponse({"recipe_image_url": image_url,"generated_recipe": formatted_generated_recipe})
-
-                    # generated_recipe = generate_recipe(title)
-
-                    # formatted_generated_recipe = generated_recipe.replace('\n', '')
-                    # return JsonResponse({"recipe_image_url": None,"generated_recipe": formatted_generated_recipe})
+                return JsonResponse(set_cache)
 
         except Exception as e:
-            error = str(e)
-            return JsonResponse({"error": error})
+            return JsonResponse({"error": str(e)})
 
-    form = AIRecipeGenerationForm()
-    return render(
-        request,
-        "testingapp/generate_recipe.html",
-        {"form": form, "initial_query": initial_query},
-    )
+    return render(request, "testingapp/generate_recipe.html",{"form": form, "initial_query": initial_query})
 
 
 def generate_recipe_content(title):
-    try:
-        # Generate recipe using OpenAI API
-        # recipe_prompt = f"Generate a recipe for {title}."
-        # recipe_response = openai.Completion.create(
-        #     engine="gpt-3.5-turbo-instruct",
-        #     prompt=recipe_prompt,
-        #     max_tokens=50,
-        #     temperature=0.7,
-        #     n=1,
-        # )
+    client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-        # generated_recipe = recipe_response.choices[0].text.strip()
+    response = client.models.generate_content(
+        model="gemini-2.5-flash-lite",
+        contents=[
+            f"""
+                Generate a realistic recipe for "{title}".
 
-        # return generated_recipe
+                Return ONLY valid JSON.
 
-        # Generating recipe using Gemini API
-        client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                Schema:
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
-            contents=[
-                f"""Generate a recipe for {title} with detailed nutritional information in grams only, not for ingredients. 
-                    Start with the recipe title '{title}' in an <h1> tag at the top. Below the title, wrap two tables
-                    in a <div> with class 'generated-recipe-table-container'. The first table is for nutritional information limited to the most 
-                    important nutrients: Calories, Protein, Fat, Carbohydrates, Fiber, Sugar, and Sodium, with no inline styling 
-                    attributes like border or other styles; use only <table>, <tr>, <th>, and <td> tags. The second table is for 
-                    the following details: Prep Time, Cook Time, Servings, Category (veg or non-veg), Difficulty, Cuisine, and 
-                    Best Time to Consume (use one or two words); use only <table>, <tr>, <th>, and <td> tags with no inline styling 
-                    attributes. Below the tables, include an <h3> tag for 'Ingredients' followed by numbered bullet points with 
-                    <ol> and <li> tags for the ingredient list. Then, include an <h3> tag for 'Instructions' followed by numbered 
-                    bullet points with <ol> and <li> tags for the instruction list. Use only periods (.) in the bullet points and 
-                    avoid any special characters. Provide the output as pure HTML without code block markers like ``` or ''' or 
-                    the word 'html'. At the end, add an appropriate cooking-related closing message with an emoji relevant to the 
-                    recipe, separated by some vertical space using single <br> tag.
+                {{
+                    "title": "",
+                    "image_description": "",
+                    "nutrition": {{
+                        "calories": "",
+                        "protein": "",
+                        "fat": "",
+                        "carbohydrates": "",
+                        "fiber": "",
+                        "sugar": "",
+                        "sodium": ""
+                    }},
+                    "details": {{
+                        "prep_time": "",
+                        "cook_time": "",
+                        "servings": "",
+                        "category": "",
+                        "difficulty": "",
+                        "cuisine": "",
+                        "best_time": ""
+                    }},
+                    "ingredients": [],
+                    "instructions": []
+                }}
+
+                Rules:
+
+                - image_description should visually describe the final cooked dish.
+                - Mention visible ingredients.
+                - Mention plating.
+                - Mention garnish.
+                - Mention colors.
+                - Mention texture.
+                - Mention serving vessel.
+                - Mention camera angle.
+                - Use realistic values.
+                - Return JSON only.
+                - Do not use markdown.
+                - Do not use ```json.
+                - Do not include explanations.
                 """
-            ],
-        )
+        ],
+    )
 
-        generated_recipe = response.text
-        if "```" in generated_recipe:
-            generated_recipe = generated_recipe.replace("```html", "").replace("```", "").strip()
+    generated_recipe = response.text.strip()
 
-        # generated_recipe = response.text
-        return generated_recipe
+    generated_recipe = re.sub(
+        r"^```json|^```|```$",
+        "",
+        generated_recipe,
+        flags=re.MULTILINE,
+    ).strip()
 
-    except Exception as e:
-        error = str(e)
-        return JsonResponse({"error": error})
+    return json.loads(generated_recipe)

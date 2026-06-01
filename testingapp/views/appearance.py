@@ -198,32 +198,6 @@ def appearance(request):
                         # Get the title from the image generation form
                         title = image_generation_form.cleaned_data["title"]
 
-                        # Generating colors paletts using OpenAI API
-
-                        # openai.api_key = settings.OPENAI_API_KEY
-
-                        # color_prompt = f"Convert the following verbal description of a color palette into a set of 2 different palettes
-                        # with list of 4 hexadecimal color code starting with primary color for cards (this color should be light) ,
-                        # secondary color for background (should be lighter), tertiary color for text (this color should be extremely dark),
-                        # active link color (this color should be different), additionally generate 3 more color's with first fpr hovering the links
-                        # (this color should be light), while others should be contrasty first being primary neutral (should be medium light),
-                        # second being neutral secondary (should be moderately light) : {title}."
-
-                        # # Generate an image based on the user's input
-                        # response = openai.Completion.create(
-                        #     engine="gpt-3.5-turbo-instruct",
-                        #     prompt=color_prompt,
-                        #     max_tokens=400,
-                        #     temperature=0.7,
-                        # )
-
-                        # generated_colors = response.choices[0].text.strip()
-
-                        # if hex_codes:
-                        #     return JsonResponse({"generated_colors": hex_codes})
-
-                        """----------------------------------------------------------------"""
-
                         # Generating colors paletts using Gemini API
                         client = genai.Client(api_key=settings.GEMINI_API_KEY)
 

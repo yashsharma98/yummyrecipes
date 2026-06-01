@@ -1,13 +1,10 @@
 import openai
-from django.conf import settings
 from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from symspellpy import SymSpell
 
 from .models import BlogHistory, post
-
-openai.api_key = settings.OPENAI_API_KEY
 
 
 def summarize_text(text):

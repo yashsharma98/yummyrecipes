@@ -15,17 +15,17 @@ like = 1, favourit = 1.2, view = 0.4, dislike = -1, search = 0.6
 
 # when user has no taste profile
 def default_recommendations(user, limit):
-    qs = (
+    recipes = (
         post.objects.filter(embedding__isnull=False)
         .select_related("author", "author__profile")
         .annotate(hit_count_value=F("hit_count_generic__hits"))
         .order_by("-date_post")[:limit]
     )
 
-    return list(qs)
+    return list(recipes)
 
 
-def _log_recommendations(user, recipes):
+def recommendations(user, recipes):
     """
     Logs which recipes were shown to the user.
     Avoids duplicates per session window.
@@ -57,8 +57,8 @@ def personalized_recommendations(user, limit=20):
 
     user_profile = profile.objects.get(user=user)
 
-    # qs = post.objects.filter(embedding__isnull=False).select_related("author", "author__profile").prefetch_related("likes", "dislikes")
-    qs = (
+    # recipes = post.objects.filter(embedding__isnull=False).select_related("author", "author__profile").prefetch_related("likes", "dislikes")
+    recipes = (
         post.objects.filter(embedding__isnull=False)
         .select_related("author", "author__profile")
         .prefetch_related("photo_set", "likes", "dislikes")
@@ -69,18 +69,18 @@ def personalized_recommendations(user, limit=20):
     )
 
     if user_profile.preference_category and user_profile.preference_category != "Select":
-        qs = qs.filter(category__icontains=user_profile.preference_category)
+        recipes = recipes.filter(category__icontains=user_profile.preference_category)
 
     if user_profile.preference_cuisine and user_profile.preference_cuisine != "Select":
-        qs = qs.filter(cuisine__icontains=user_profile.preference_cuisine)
+        recipes = recipes.filter(cuisine__icontains=user_profile.preference_cuisine)
 
     if user_profile.preference_type and user_profile.preference_type != "Select":
-        qs = qs.filter(type__icontains=user_profile.preference_type)
+        recipes = recipes.filter(type__icontains=user_profile.preference_type)
 
-    qs = qs.order_by("score")[:limit]
+    recipes = recipes.order_by("score")[:limit]
 
-    recipes = list(qs)
+    recipes = list(recipes)
 
-    _log_recommendations(user, recipes)
+    recommendations(user, recipes)
 
     return recipes

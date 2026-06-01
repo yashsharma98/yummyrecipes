@@ -1,5 +1,6 @@
 from io import BytesIO
 
+import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
@@ -17,8 +18,6 @@ from django.utils.html import strip_tags
 from django.views.generic import (
     DeleteView,
 )
-from google import genai
-from google.genai import types
 from notifications.signals import notify
 from PIL import Image
 
@@ -275,36 +274,98 @@ def post_post_view(request):
             try:
                 title = request.POST.get("title")
 
-                if not settings.GEMINI_API_KEY:
-                    return JsonResponse({"error": "API key missing"})
+                # if not settings.GEMINI_API_KEY:
+                #     return JsonResponse({"error": "API key missing"})
 
-                client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                # client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash-image",
-                    contents=[f"Generate a realistic food image of: {title}"],
-                    config=types.GenerateContentConfig(response_modalities=["Image"]),
+                # response = client.models.generate_content(
+                #     model="gemini-2.5-flash-image",
+                #     contents=[f"Generate a realistic food image of: {title}"],
+                #     config=types.GenerateContentConfig(response_modalities=["Image"]),
+                # )
+
+                # for part in response.candidates[0].content.parts:
+                #     if part.inline_data is not None:
+                #         image_data = part.inline_data.data
+
+                #         image = Image.open(BytesIO(image_data)).convert("RGB")
+                #         buffer = BytesIO()
+                #         image.save(buffer, format="JPEG", quality=70, optimize=True)
+
+                #         filename = f"generated/{title.replace(' ', '_')}.jpg"
+                #         saved_path = default_storage.save(filename, ContentFile(buffer.getvalue()))
+
+                #         image_url = default_storage.url(saved_path)
+
+                #         return JsonResponse({"image_url": image_url, "saved_path": saved_path})
+
+                # return JsonResponse({"error": "Image generation failed"})
+
+                prompt = f"""
+                Authentic {title}, real cooked food, traditional serving style, served on a plate or bowl as commonly prepared,
+                natural food photography, real ingredients visible, accurate colors and texture, top quality food image,
+                not illustration,
+                not cartoon,
+                not painting,
+                not CGI,
+                not 3D render
+                """
+
+                url = f"https://api.cloudflare.com/client/v4/accounts/{settings.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/leonardo/phoenix-1.0"
+
+                response = requests.post(
+                    url,
+                    headers={
+                        "Authorization": f"Bearer {settings.CLOUDFLARE_API_TOKEN}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "prompt": prompt,
+                        "width": 512,
+                        "height": 512,
+                    },
+                    timeout=120,
                 )
 
-                for part in response.candidates[0].content.parts:
-                    if part.inline_data is not None:
-                        image_data = part.inline_data.data
+                response.raise_for_status()
 
-                        image = Image.open(BytesIO(image_data)).convert("RGB")
-                        buffer = BytesIO()
-                        image.save(buffer, format="JPEG", quality=70, optimize=True)
+                # If image response is json (from other text to image models)
+                # data = response.json()
 
-                        filename = f"generated/{title.replace(' ', '_')}.jpg"
-                        saved_path = default_storage.save(filename, ContentFile(buffer.getvalue()))
+                # image_b64 = data["result"]["image"]
 
-                        image_url = default_storage.url(saved_path)
+                # image_bytes = base64.b64decode(image_b64)
 
-                        return JsonResponse({"image_url": image_url, "saved_path": saved_path})
+                # image = Image.open(BytesIO(image_bytes))
 
-                return JsonResponse({"error": "Image generation failed"})
+                # Disable if response is json (from other text to image models)
+                image = Image.open(BytesIO(response.content))
 
-            except Exception as e:
-                return JsonResponse({"error": str(e)})
+                buffer = BytesIO()
+
+                image.convert("RGB").save(
+                    buffer,
+                    format="JPEG",
+                    quality=70,
+                    optimize=True,
+                )
+
+                filename = f"generated/{title.replace(' ', '_')}.jpg"
+
+                saved_path = default_storage.save(filename, ContentFile(buffer.getvalue()))
+
+                image_url = default_storage.url(saved_path)
+
+                return JsonResponse(
+                    {
+                        "image_url": image_url,
+                        "saved_path": saved_path,
+                    }
+                )
+
+            except Exception:
+                return JsonResponse({"error": "Unable to complete the request at the moment"})
 
         form = post_form(request.POST)
         uploaded_files = request.FILES.getlist("image")
@@ -314,7 +375,7 @@ def post_post_view(request):
             return render(
                 request,
                 "testingapp/createpost.html",
-                {"form": form, "newrecipe_error_message": "Choose either generated image OR upload image."},
+                {"form": form, "newrecipe_error_message": "Either generate an image OR upload a image."},
             )
 
         if not uploaded_files and not generated_path:
@@ -329,9 +390,12 @@ def post_post_view(request):
 
             # duplicate recipe title for same user
             if post.objects.filter(author=request.user, title__iexact=title).exists():
-                return render(request,"testingapp/createpost.html",
-                    {"form": form, "newrecipe_error_message": "You have already have a recipe with this title!"})
-            
+                return render(
+                    request,
+                    "testingapp/createpost.html",
+                    {"form": form, "newrecipe_error_message": "You have already have a recipe with this title!"},
+                )
+
             post_instance = form.save(commit=False)
             post_instance.author = request.user
             post_instance.save()
@@ -411,4 +475,5 @@ def Updaterecipeview(request, title, pk, *args, **kwargs):
             "form": form,
             "recipes": recipes,
             "image_count": recipes.photo_set.count(),
-        })
+        },
+    )

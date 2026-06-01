@@ -1,3 +1,51 @@
-docs/
-locale/
+yummyrecipes/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
+venv/
+env/
+.venv/
+
+# Django
 db.sqlite3
+media/
+staticfiles/
+static/
+
+# Celery
+celerybeat-schedule*
+celerybeat.pid
+
+# Caches
+.ruff_cache/
+.pytest_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Env files
+.env
+
+# Backup files
+*.bak
+
+# Node (if any frontend)
+node_modules/
+dist/
+build/
+
+test_project/__pycache__/
+
+docs/

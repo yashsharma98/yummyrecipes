@@ -92,7 +92,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "hitcount",
-    "django_browser_reload",
     "rest_framework",
     "django.contrib.humanize",
     "wkhtmltopdf",
@@ -118,13 +117,16 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "allauth.account.middleware.AccountMiddleware",
     "testingapp.middleware.CheckPasswordMiddleware",
     "testingapp.middleware.ClearExistingUserFirstnameMiddleware",
     "testingapp.middleware.GuestMiddleware",
 ]
+
+if DEBUG:
+    INSTALLED_APPS.append("django_browser_reload")
+    MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
 
 # X_FRAME_OPTIONS = 'SAMEORIGIN'
 
@@ -133,33 +135,36 @@ OPENWEATHERMAP_API_KEY = os.environ.get("OPENWEATHERMAP_API_KEY")
 
 SPOONACULAR_API_KEY = os.environ.get("SPOONACULAR_API_KEY")
 
-# Fetch and auto update weather every 2 hours (fetching location from db)
-
-# CELERY_BEAT_SCHEDULE = {
-#     "refresh-weather-every-2-hours-for-active-users": {
-#         "task": "testingapp.tasks.refresh_recent_user_weather",
-#         "schedule": crontab(minute=0, hour="*/2"),
-#     }
-# }
-
 CELERY_BEAT_SCHEDULE = {
-    "backfill-recipe-embeddings": {
-        "task": "testingapp.tasks.text_embeddings_tasks.generate_recipe_embeddings",
-        "schedule": 300.0,
-    },
-    "refresh-user-tastes-nightly": {
+    "refresh-user-tastes-at-night": {
         "task": "testingapp.tasks.home_tasks.refresh_all_user_tastes",
         "schedule": crontab(hour=2, minute=0),  # 2am daily
+    },
+    "refresh-weather-every-2-hours-for-active-users": {
+        "task": "testingapp.tasks.refresh_recent_user_weather",
+        "schedule": crontab(minute=0, hour="*/2"),  # every 2hrs
+    },
+    "update-trending-posts-hourly": {
+        "task": "testingapp.tasks.trending_post_tasks.update_trending_posts",
+        "schedule": crontab(minute=0),  # every hour
+    },
+    "fill-missing-embeddings": {
+        "task": "testingapp.tasks.text_embeddings_tasks.generate_recipe_embeddings",
+        "schedule": crontab(hour=3, minute=0),  # every night at 3am
     },
 }
 
 SPOONACULAR_API_KEY = os.environ.get("SPOONACULAR_API_KEY")
 
+# Openai api
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 NUTRITION_API_KEY = os.environ.get("NUTRITION_API_KEY")
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN")
 
 # Mailgun api
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -227,7 +232,11 @@ CKEDITOR_IMAGE_BACKEND = "pillow"
 ENVIRONMENT = os.environ.get("ENVIRONMENT")
 
 if "DATABASE_URL" in os.environ:
-    DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
+    # for neon db or render built in db
+    # DATABASES = {"default": dj_database_url.parse(os.environ.get("DATABASE_URL"))}
+
+    # just for supabase
+    DATABASES = {"default": dj_database_url.config(default=os.environ.get("DATABASE_URL"), conn_max_age=600, ssl_require=True)}
 
 else:
     # PosgreSQL

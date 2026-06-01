@@ -262,7 +262,7 @@
                         {% endif %}                    
 
                         {# popular recipe card #}
-                        <div class="dynamic-recipes u--slideLeft">
+                        <div class="dynamic-recipes">
                             
                             <div class="dynamic-card-container popular-card-container">
 
@@ -361,7 +361,7 @@
                                         <div class="static-card-container">
                                             <div class="d-flex align-items-start flex-column card-info">
                                                 <div class="mb-auto p-2 card-header">
-                                                    <span class="material-symbols-rounded header-icon veg-icon">radio_button_unchecked  </span>
+                                                    <span class="material-symbols-rounded header-icon veg-icon">eco</span>
                                                 </div>
                                                 <div class="p-2 card-text">Veg recipes</div>
                                             </div>
@@ -374,7 +374,7 @@
                                         <div class="static-card-container">
                                             <div class="d-flex align-items-start flex-column card-info">
                                                 <div class="mb-auto p-2 card-header">
-                                                    <span class="material-symbols-rounded header-icon nonveg-icon">radio_button_unchecked</span>
+                                                    <span class="material-symbols-rounded header-icon nonveg-icon">square_dot</span>
                                                 </div>
                                                 <div class="p-2 card-text">Non-veg recipes</div>
                                             </div>
@@ -441,7 +441,7 @@
 
                             {% endif %}
 
-                            <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
+                            <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary all-recipes-card-container-tertiary">
 
                                 {% if recommended_recipes %}
 
@@ -522,7 +522,7 @@
                             <div class="dynamic-recipes dynamic-all-recipes-card">
                                 <h1>From people you follow</h1>
 
-                                <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary">
+                                <div class="dynamic-card-container all-recipes-card-container all-recipes-card-container-secondary all-recipes-card-container-tertiary">
                                     {% for user, posts in following_user_posts.items %}
 
                                         {% for post in posts %}

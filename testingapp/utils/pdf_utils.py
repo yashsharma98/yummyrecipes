@@ -12,7 +12,6 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
 
-from ..ml.predictor import predict_recipe_time
 from ..models import (
     photo,
     post,
@@ -96,6 +95,8 @@ def customer_render_pdf_view(request, feed, pk, *args, **kwargs):
     recipe_title = recipes.title or "recipe"
     safe_filename = recipe_title.replace(" ", "_")
     filename = f"{safe_filename}.pdf"
+
+    from ..ml.predictor import predict_recipe_time
 
     # using ml model to pred the recipe timings
     pred_time = predict_recipe_time(recipes)

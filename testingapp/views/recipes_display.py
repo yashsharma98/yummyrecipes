@@ -14,7 +14,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.files.storage import default_storage
-from django.db.models import Q
+from django.db.models import Count, F, Q
+from django.db.models.functions import Coalesce
 from django.http import (
     HttpResponseRedirect,
     JsonResponse,
@@ -33,7 +34,6 @@ from requests.exceptions import RequestException
 from ..forms import (
     comment_form,
 )
-from ..ml.predictor import predict_recipe_time
 from ..models import BlogHistory, CreditSpentHistory, Follow, RecipeRecommendationHistory, comments, post, profile
 from ..utils.history_helpers import get_historys_pk
 from ..utils.recipes_helper import clean_ingredients, get_recommendations
@@ -261,6 +261,8 @@ class postDetailView(HitCountDetailView):
 
         postrecipe = self.get_object()
 
+        from ..ml.predictor import predict_recipe_time
+
         # using ml model to pred the recipe timings
         pred_time = predict_recipe_time(postrecipe)
         context["pred_time"] = pred_time
@@ -306,42 +308,7 @@ class postDetailView(HitCountDetailView):
         # gtts library for audio
         audio_file_path = f"{self.get_object().title}.mp3"
 
-        # if the audio file is not downloaded
-        # if not default_storage.exists(audio_file_path):
-        #     text_to_speak = post_content
-        #     tts = gTTS(text=text_to_speak, lang='en',tld='co.in')
-        #     file_path = os.path.join(settings.MEDIA_ROOT, audio_file_path)
-        #     tts.save(file_path)
-
         context["audio_file_new"] = default_storage.url(audio_file_path)
-
-        # openai.api_key = settings.OPENAI_API_KEY
-
-        # Get the audio data from the OpenAI API
-        # response = openai.audio.speech.create(
-        #     model="tts-1",
-        #     voice="alloy",
-        #     input=post_content,
-        # )
-
-        # # Save the audio data to a file
-        # file_name = f'recipe_title_{self.get_object().id}.mp3'
-        # file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-        # with open(file_path, "wb") as f:
-        #     f.write(response.content)
-
-        # # Save the file to Django's default storage
-        # with open(file_path, 'rb') as f:
-        #     default_storage.save(file_name, f)
-
-        # # Set context['audio_file_name'] to the URL of the audio file
-        # context['audio_file_name'] = default_storage.url(file_name)
-
-        # original_content = strip_tags(self.get_object().content)
-        # summarized_content = summarize_text(original_content)
-
-        # context['original_content'] = original_content
-        # context['summarized_content'] = summarized_content
 
         post_author = context["post"]
         author_name = post_author.author.username
@@ -550,7 +517,14 @@ class trendingRecipesView(HitCountMixin, ListView):
             return sorted(qs, key=lambda x: ids.index(x.id))
 
         # Fallback (if cache is empty)
-        return post.objects.select_related("author").order_by("-hit_count_generic__hits", "-date_post")[:20]
+        return (
+            post.objects.select_related("author")
+            .annotate(
+                total_hits=Coalesce(F("hit_count_generic__hits"), 0),
+                total_likes=Count("likes", distinct=True),
+            )
+            .order_by("-total_hits", "-total_likes", "-date_post")[:20]
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

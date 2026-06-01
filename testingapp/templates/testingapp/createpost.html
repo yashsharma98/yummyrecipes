@@ -103,7 +103,9 @@
                 </div>  
                 
                 {# Hidden input field for image URL #}
-                <input type="hidden" name="image_url" id="imageURLField">
+                <!-- <input type="hidden" name="image_url" id="imageURLField"> -->
+
+                <input type="hidden" name="image_path" id="imageURLField">
 
                 <input type="hidden" name="api_image_title" id="imageTitle">
 
@@ -436,7 +438,9 @@
             },
             success: function(response) {
                 if (response.image_url) {
-                    $('#imageURLField').val(response.image_url);
+                    // $('#imageURLField').val(response.image_url);
+
+                    $('#imageURLField').val(response.saved_path);
                     $('#imageTitle').val(response.title);
 
 

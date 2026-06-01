@@ -162,29 +162,141 @@
           }
 
           if (response.generated_recipe) {
-            $('.generated-recipe-content').addClass('ai-content-styles');
-            $('.generate-recipe-secondary-placeholder').text('');
-            $('#generateRecipeImage').show();
-            $('.generate_recipe_form_btn').addClass('active');
 
-            $('.generate-btn-icon').text('cached');
+              const recipe = response.generated_recipe || {};
+              console.log(recipe);
 
-            const lines = response.generated_recipe.split('<br>');
-            $('#generated-recipe').html(lines[0]);
+              recipe.nutrition = recipe.nutrition || {};
+              recipe.details = recipe.details || {};
+              recipe.ingredients = recipe.ingredients || [];
+              recipe.instructions = recipe.instructions || [];
 
-            let index = 1;
-            const typingInterval = setInterval(function () {
-              if (index < lines.length) {
-                $('#generated-recipe').append('<br>' + lines[index]);
-                index++;
-              } else {
-                clearInterval(typingInterval);
-                $('.generated-recipe-content').fadeIn();
-                $('.ai-recipe-check-response').fadeIn();
-              }
-            }, 300);
+              $('.generated-recipe-content').addClass('ai-content-styles');
 
-            lastGeneratedTitle = lowerCaseTitle;
+              $('.generate-recipe-secondary-placeholder').text('');
+
+              $('#generateRecipeImage').show();
+
+              $('.generate_recipe_form_btn').addClass('active');
+
+              $('.generate-btn-icon').text('cached');
+
+              let html = `
+                  <h1>${recipe.title}</h1>
+
+                  <div class="generated-recipe-table-container">
+
+                      <table>
+                          <tr>
+                              <th>Calories</th>
+                              <td>${recipe.nutrition.calories}</td>
+                          </tr>
+                          <tr>
+                              <th>Protein</th>
+                              <td>${recipe.nutrition.protein}</td>
+                          </tr>
+                          <tr>
+                              <th>Fat</th>
+                              <td>${recipe.nutrition.fat}</td>
+                          </tr>
+                          <tr>
+                              <th>Carbohydrates</th>
+                              <td>${recipe.nutrition.carbohydrates}</td>
+                          </tr>
+                          <tr>
+                              <th>Fiber</th>
+                              <td>${recipe.nutrition.fiber}</td>
+                          </tr>
+                          <tr>
+                              <th>Sugar</th>
+                              <td>${recipe.nutrition.sugar}</td>
+                          </tr>
+                          <tr>
+                              <th>Sodium</th>
+                              <td>${recipe.nutrition.sodium}</td>
+                          </tr>
+                      </table>
+
+                      <table>
+                          <tr>
+                              <th>Prep Time</th>
+                              <td>${recipe.details.prep_time}</td>
+                          </tr>
+                          <tr>
+                              <th>Cook Time</th>
+                              <td>${recipe.details.cook_time}</td>
+                          </tr>
+                          <tr>
+                              <th>Servings</th>
+                              <td>${recipe.details.servings}</td>
+                          </tr>
+                          <tr>
+                              <th>Category</th>
+                              <td>${recipe.details.category}</td>
+                          </tr>
+                          <tr>
+                              <th>Difficulty</th>
+                              <td>${recipe.details.difficulty}</td>
+                          </tr>
+                          <tr>
+                              <th>Cuisine</th>
+                              <td>${recipe.details.cuisine}</td>
+                          </tr>
+                          <tr>
+                              <th>Best Time</th>
+                              <td>${recipe.details.best_time}</td>
+                          </tr>
+                      </table>
+
+                  </div>
+
+                  <h3>Ingredients</h3>
+                  <ol>
+              `;
+
+              recipe.ingredients.forEach(function(item) {
+
+                  if (typeof item === "object") {
+
+                      html += `
+                          <li>
+                              ${item.quantity || ""}
+                              ${item.item || ""}
+                              ${item.notes ? `(${item.notes})` : ""}
+                          </li>
+                      `;
+
+                  } else {
+
+                      html += `<li>${item}</li>`;
+
+                  }
+
+              });
+
+              html += `
+                  </ol>
+
+                  <h3>Instructions</h3>
+
+                  <ol>
+              `;
+
+              recipe.instructions.forEach(function(item) {
+                  html += `<li>${item}</li>`;
+              });
+
+              html += `
+                  </ol>
+              `;
+
+              $('#generated-recipe').html(html);
+
+              $('.generated-recipe-content').fadeIn();
+
+              $('.ai-recipe-check-response').fadeIn();
+
+              lastGeneratedTitle = lowerCaseTitle;
           } else {
             $('.ai-recipe-check-response').css('display', 'none').fadeOut();
           }

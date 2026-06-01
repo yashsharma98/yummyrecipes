@@ -1,20 +1,13 @@
-import openai
 import requests
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.http import (
-    JsonResponse,
-)
+from django.http import JsonResponse
 from django.utils.html import strip_tags
 from django.views.decorators.csrf import csrf_protect
 from google import genai
 from requests.exceptions import RequestException
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
-from ..models import (
-    post,
-)
+from ..models import post
 
 API_KEY = settings.SPOONACULAR_API_KEY
 
@@ -46,6 +39,9 @@ def get_recipe_nutrition_widget(ingredients):
 
 
 def get_recommendations(recipe_id, num_recommendations=50):
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+
     recipe = post.objects.get(id=recipe_id)
 
     recipes = list(post.objects.all())
@@ -76,23 +72,7 @@ def translate_content(request):
         post_content = request.POST.get("post_content", "")
         stripped_content = strip_tags(post_content)
 
-        # If OpenAI API is available
-        if settings.OPENAI_API_KEY:
-            try:
-                openai.api_key = settings.OPENAI_API_KEY
-                response = openai.Completion.create(
-                    engine="gpt-3.5-turbo-instruct",
-                    prompt=f"Translate the following instruction Hindi: '{stripped_content}'",
-                    max_tokens=300,
-                )
-                translated_text = response.choices[0].text.strip()
-                return JsonResponse({"translated_text": translated_text})
-
-            except Exception as e:
-                return JsonResponse({"error": f"An unexpected error occurred: {str(e)}"}, status=500)
-
-        # Else use Gemini API
-        elif settings.GEMINI_API_KEY:
+        if settings.GEMINI_API_KEY:
             try:
                 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 

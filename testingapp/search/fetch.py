@@ -95,7 +95,22 @@ def fetch_recipes_filtered(filters, timing=None, servings=None, difficulty=None)
 
 
 def fetch_users(query):
-    return User.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query))
+    query = query.strip()
+
+    if not query:
+        return User.objects.none()
+
+    words = query.split()
+
+    exact_users = Q(username__iexact=query) | Q(username__istartswith=query)
+
+    matched_users = Q()
+    for word in words:
+        matched_users &= Q(first_name__icontains=word) | Q(last_name__icontains=word) | Q(username__icontains=word)
+
+    result = exact_users | matched_users
+
+    return User.objects.filter(result).distinct().order_by("username")[:10]
 
 
 def fetch_history(user, query):

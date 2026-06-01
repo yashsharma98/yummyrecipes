@@ -1908,7 +1908,9 @@ html *{
 }
 
 .logout-container{
-    background: inherit;
+    /* background: inherit; */
+    background: transparent;
+    backdrop-filter: blur(40px);
     position: absolute;
     bottom: 0;
     margin-left: -10px;

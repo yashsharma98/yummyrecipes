@@ -106,11 +106,18 @@ html *::selection{
     background-color: var(--neutral_primary_rgba_2);
 }
 
-.dynamic-recipes h1:not(.recipe-body h1),
-.dynamic-header h1 {
+.dynamic-recipes h1:not(.recipe-body h1){
     position: -webkit-sticky;
     position: sticky;
     top: -15px;
+}
+
+@media (max-width: 800px){
+    .dynamic-recipes h1 {
+        position: -webkit-sticky;
+        position: sticky;
+        top: -25px;
+    }
 }
 
 #color-preview-form1,.color-preview-navrail,.reset-color-btn button,
