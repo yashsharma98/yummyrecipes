@@ -1,0 +1,381 @@
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+<div class="space-y-4 z-[999px]">
+
+    <div class="mb-5">
+
+        <div class="flex items-center justify-between ml-5 md:ml-0 mb-5">
+            <div>
+                <h2 class="text-lg md:text-xl font-medium">Top Performing Recipes</h2>
+                <p class="text-sm opacity-60 mt-0.5">Your most viewed and liked recipes</p>
+            </div>
+        </div>
+
+        <div class="dashboard-info-grid grid lg:grid-cols-2 gap-4 mb-5">
+
+            {% for post in top_performing_recipes|slice:":2" %}
+
+            <a href="{{ post.get_absolute_url }}"
+                class="card hover:border-primary hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+
+                <div class="card-body p-4">
+
+                    <div class="flex gap-4">
+
+                        <div class="shrink-0">
+                            {% for i in post.photo_set.all %}
+                                {% if forloop.counter0 == 0 %}
+                                    <img loading="lazy"
+                                        src="{{ i.image.url }}"
+                                        alt="{{ post.title }}"
+                                        class="w-30 h-30 rounded-2xl object-cover">
+                                {% endif %}
+                            {% empty %}
+                                <img loading="lazy"
+                                    src="{% static 'yummyrecipes/media/empty4.jpg' %}"
+                                    alt="{{ post.title }}"
+                                    class="w-30 h-30 rounded-2xl object-cover">
+                            {% endfor %}
+                        </div>
+
+                        <div class="flex flex-col flex-1 min-w-0">
+
+                            <div class="flex items-start justify-between">
+
+                                <div class="min-w-0">
+                                    <h3 class="font-medium capitalize text-xl truncate">{{ post.title }}</h3>
+
+                                    <p class="text-sm mt-0.5 mt-1">
+                                        {{ post.type }} • {{ post.category }}
+                                    </p>
+                                </div>
+
+                                {% if forloop.counter == 1 %}
+                                    <div class="dashboard-top-recipe-tag badge border-0 font-medium rounded-full gap-1 px-3 py-3">
+                                        <span class="material-symbols-rounded !text-[1.1rem]">trophy</span>
+                                        Top #1
+                                    </div>
+                                    {% else %}
+                                    <div class="badge custom-badge rounded-full gap-1 px-3 py-3">
+                                        <span class="material-symbols-rounded !text-[1.1rem]">military_tech</span>
+                                        Top #2
+                                    </div>
+                                {% endif %}
+
+                            </div>
+
+                            <div class="mt-auto pt-5 flex items-center justify-between">
+
+                                <div class="flex gap-6">
+
+                                    <!-- Likes -->
+                                    <div class="flex items-center gap-2">
+
+                                        <div class="dashboard-icon-container rounded-xl p-3 flex items-center justify-center">
+                                            <span class="material-symbols-rounded !text-[1.15rem]">
+                                                thumb_up
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h6 class="font-semibold leading-none">
+                                                {{ post.total_likes }}
+                                            </h6>
+                                            <span class="text-xs mt-0">
+                                                Likes
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Views -->
+                                    <div class="flex items-center gap-2">
+
+                                        <div class="dashboard-icon-container rounded-xl p-3 flex items-center justify-center">
+                                            <span class="material-symbols-rounded text-primary !text-[1.15rem]">
+                                                visibility
+                                            </span>
+                                        </div>
+
+                                        <div>
+                                            <h6 class="font-semibold leading-none">
+                                                {% get_hit_count for post %}
+                                            </h6>
+                                            <span class="text-xs mt-0.5">
+                                                Views
+                                            </span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+            {% empty %}
+
+            <div class="md:col-span-2 card rounded-3xl">
+
+                <div class="card-body py-14 items-center text-center">
+
+                    <i data-lucide="chef-hat"
+                    class="w-10 h-10 opacity-30 mb-3"></i>
+
+                    <h3 class="font-semibold">
+                        No recipes yet
+                    </h3>
+
+                    <p class="text-sm mt-0.5">
+                        Your best performing recipes will appear here.
+                    </p>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    <!-- My Recipes Header -->
+    <div class="mt-12">
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+            <div class="ml-5 md:ml-0">
+                <h2 class="text-lg md:text-xl font-medium">My Recipes</h2>
+                <p class="text-sm opacity-60 mt-0.5">Manage and organize your uploaded recipes</p>
+            </div>
+
+            <input type="hidden" id="current-filter" name="filter" value="all">
+            <input type="hidden" id="current-sort" name="sort" value="newest">
+            
+            <div class="flex flex-wrap items-center gap-2 ml-5 md:ml-0">
+
+                <!-- Filter -->
+                <div class="dashboard-recipe-dropdown dropdown dropdown-bottom sm:dropdown-end border-0 shadow-none focus:outline-none focus:ring-0 focus:border-0 focus-visible:outline-none focus-visible:ring-0">
+
+                    <div tabindex="0" role="button" class="trigger btn btn-outline font-medium bg-transparent rounded-full border-0 shadow-none">
+                        <span class="material-symbols-rounded !text-[1.15rem]">filter_list</span>
+                        <span id="filter-label">Filter</span>
+                    </div>
+
+                    <ul tabindex="0"
+                        class="drawer-dropdown-content dropdown-content menu rounded-box shadow-xl w-56 z-50 mt-1">
+
+                        <li>
+                            <a data-filter="all"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"filter":"all"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                All Recipes
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-filter="breakfast"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"filter":"breakfast"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Breakfast
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-filter="lunch"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"filter":"lunch"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Lunch
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-filter="dinner"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"filter":"dinner"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Dinner
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-filter="snack"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"filter":"snack"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Evening Snack
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-filter="veg"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"filter":"veg"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Veg
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-filter="nonveg"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"filter":"nonveg"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Non-Veg
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <!-- Sort -->
+                <div class="dashboard-recipe-dropdown dropdown dropdown-bottom sm:dropdown-end border-0 shadow-none focus:outline-none focus:ring-0 focus:border-0 focus-visible:outline-none focus-visible:ring-0">
+
+                    <div tabindex="0" role="button" class="trigger btn btn-outline font-medium bg-transparent rounded-full border-0 shadow-none">
+                        <span class="material-symbols-rounded !text-[1.15rem]">swap_vert</span>
+                        <span id="sort-label">Sort</span>
+                    </div>
+
+                    <ul tabindex="0" class="drawer-dropdown-content dropdown-content menu rounded-box shadow-xl w-56 z-50 mt-1">
+
+                        <li>
+                            <a data-sort="newest"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"sort":"newest"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Newest
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-sort="oldest"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"sort":"oldest"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Oldest
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-sort="updated"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"sort":"updated"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Recently Updated
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-sort="likes"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"sort":"likes"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Most Liked
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-sort="views"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"sort":"views"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Most Viewed
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-sort="title_asc"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"sort":"title_asc"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                A-Z
+                            </a>
+                        </li>
+
+                        <li>
+                            <a data-sort="title_desc"
+                            hx-get="{% url 'dashboard_recipe_list' %}"
+                            hx-include="#current-filter,#current-sort"
+                            hx-vals='{"sort":"title_desc"}'
+                            hx-target="#recipe-list"
+                            hx-swap="innerHTML">
+                                Z-A
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <!-- New Recipe -->
+                <!-- <a href="" class="btn btn-primary rounded-full">
+                    <span class="material-symbols-rounded">add</span>
+                    New Recipe
+                </a> -->
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Recipe List -->
+    <div>
+
+        <div id="recipe-list" class="card" hx-get="{% url 'dashboard_recipe_list' %}" hx-trigger="load"
+            hx-swap="innerHTML">
+
+            <div class="flex justify-center py-16">
+                <span class="loading loading-spinner loading-lg"></span>
+            </div>
+            
+            <!-- recipe_list_partial - always shows the first page on page load
+            recipe_cards_partial - displays actual row cards using loops
+            load_more_partial - displays load more button if has next set of recipes (pagination) on first page
+            recipe_cards_oob_partial - shows the cards + updated load more button on 2nd page (to show more recipes if it has) -->
+
+        </div>
+
+    </div>
+</div>

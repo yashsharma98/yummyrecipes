@@ -1,0 +1,94 @@
+{% load static %}
+{% load humanize %}
+{% load hitcount_tags %}
+
+<div class="space-y-4">
+
+    <header class="flex items-center justify-between">
+        <div class="ml-5 md:ml-0">
+            <h1 class="text-lg md:text-xl font-medium">Favoruites</h1>
+            <p class="mt-0.5 text-sm opacity-60">Saved recipes for later</p>
+        </div>
+
+        <div class="badge badge-primary badge-lg rounded-full px-5 py-5">{{ total_favourites }}</div>
+    </header>
+
+    {% if favourite_recipes %}
+
+        <div>
+            {% for recipe in favourite_recipes %}
+                <div class="py-1">
+                    <div class="flex gap-4 items-center">
+
+                        <!-- Image -->
+                        <div class="w-32 h-24 rounded-2xl overflow-hidden shrink-0">
+
+                            {% with recipe.photo_set.first as i %}
+
+                                {% if i %}
+                                    <img loading="lazy"
+                                        src="{{ i.image.url }}"
+                                        class="w-full h-full object-cover">
+                                {% else %}
+                                    <img loading="lazy"
+                                        src="{% static 'yummyrecipes/media/empty4.jpg' %}"
+                                        class="w-full h-full object-cover">
+                                {% endif %}
+
+                            {% endwith %}
+
+                        </div>
+
+                        <!-- Title -->
+                        <div class="flex-1 min-w-0">
+                            <h2 class="font-medium capitalize text-lg truncate">{{ recipe.title }}</h2>
+                            <p class="text-sm opacity-60 mt-1">
+                                {{ recipe.view_count|default:0|intcomma }} views
+                            </p>
+                        </div>
+
+                        <!-- Favourite -->
+                        <div class="flex items-center">
+
+                            <div
+                                class="recipe-action p-2.5 favourite-action bg-red-300 cursor-pointer flex items-center justify-center rounded-full
+                                tooltip tooltip-left
+                                {% if recipe in user.favourite.all %}active{% endif %}"
+
+                                data-tip="{% if recipe in user.favourite.all %}Remove{% else %}Favourite{% endif %}"
+
+                                data-post-id="{{ recipe.id }}">
+
+                                <span
+                                    class="material-symbols-rounded favourite-icon
+                                    {% if recipe in user.favourite.all %}favourite-added{% endif %}">
+
+                                    favorite
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                {% if not forloop.last %}
+                    <div class="divider my-0"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="hero py-24">
+            <div class="hero-content text-center">
+                <div>
+                    <span class="material-symbols-rounded text-7xl opacity-30">favorite</span>
+                    <h2 class="text-2xl font-medium mt-5">No favourite recipes</h2>
+                    <p class="opacity-60 mt-2">Save recipes to access them here.</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

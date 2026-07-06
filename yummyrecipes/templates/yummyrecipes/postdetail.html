@@ -1,0 +1,786 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load hitcount_tags %}
+{% load static %}
+{% load read_time_pluralize %}
+
+{% block title %}
+<title>{{ post.title }}</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div id="scrollableDiv" data-recipe-id="{{ post.pk }}" class="min-h-screen w-full pt-[80px] text-base-content">
+  <main class="w-full px-3 pb-16 sm:px-5 lg:px-7">
+
+    <section class="createpost-top-section grid w-full px-0 sm:px-8 grid-cols-1 gap-5 lg:grid-cols-[60fr_40fr] lg:gap-7">
+      <div class="overflow-hidden">
+        {% if post.photo_set.all.count > 1 %}
+          <div class="carousel w-full">
+            {% for image in post.photo_set.all %}
+              <div id="recipe-slide-{{ forloop.counter }}" class="carousel-item relative w-full">
+                <img
+                  loading="lazy"
+                  src="{{ image.image.url }}"
+                  alt="{{ post.title }}"
+                  class="h-[360px] w-full object-cover sm:h-[500px] lg:h-[650px]"
+                />
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="flex justify-center gap-2 bg-base-100 px-4 py-3">
+            {% for image in post.photo_set.all %}
+              <a href="#recipe-slide-{{ forloop.counter }}" class="btn btn-xs btn-circle">
+                {{ forloop.counter }}
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          {% for image in post.photo_set.all %}
+            <img
+              loading="lazy"
+              src="{{ image.image.url }}"
+              alt="{{ post.title }}"
+              class="h-[360px] w-full object-cover sm:h-[500px] lg:h-[650px]"
+            />
+          {% empty %}
+            <img
+              loading="lazy"
+              src="{% static 'yummyrecipes/media/empty4.jpg' %}"
+              alt="{{ post.title }}"
+              class="h-[360px] w-full object-cover sm:h-[500px] lg:h-[650px]"
+            />
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="flex min-h-full flex-col justify-center px-5 sm:px-8 lg:px-10">
+        <h1 class="text-5xl font-semibold capitalize leading-tight tracking-normal text-3xl md:text-4xl lg:text-5xl xl:text-7xl">
+          {{ post.title }}
+        </h1>
+
+        <div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <span>{% get_hit_count for post %} views</span>
+
+          {% if post.title in top_10_trend_recipes|join:"" %}
+            <span>#{{ check|join:"" }} on Trending</span>
+          {% endif %}
+
+          <span>{{ post.read_time }} min read</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-8 grid p-0 xl:px-7 w-full grid-cols-1 gap-15 xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div class="space-y-4 md:space-y-8 w-full max-w-5xl mx-auto xl:mx-0 xl:mr-auto xl:pl-8 2xl:pl-10">
+
+        <section class="postdetail-action-section flex items-center justify-between gap-3 flex-wrap">
+
+          <a href="{% url 'userchannelpage' first=post.author.first_name last=post.author.last_name pk=post.author.pk %}"
+            class="flex items-center gap-3 min-w-0 flex-1">
+
+            <div class="avatar shrink-0">
+              <div class="w-12 h-12 rounded-full">
+                <img loading="lazy" src="{{ post.author.profile.profile_img.url }}" alt="{{ post.author.first_name }}">
+              </div>
+            </div>
+
+            <div class="min-w-0">
+              <p class="font-medium truncate">
+                {{ post.author.first_name }} {{ post.author.last_name }}
+              </p>
+
+              <p class="text-xs opacity-60">
+                {{ followers }} Follower{{ followers|pluralize }}
+              </p>
+            </div>
+          </a>
+
+          {% if user.is_authenticated %}
+            <div class="flex items-center gap-2 md:gap-3 flex-wrap justify-end">
+
+              <form method="post" class="follow-unfollow-form">
+                {% csrf_token %}
+                  {% if post.author.id != request.user.id %}
+                      <button
+                          type="button"
+                          class="btn btn-xs md:btn-md md:btn-ghost border-0 font-medium shadow-none rounded-full follow-btn"
+                          data-username="{{ post.author.username }}">
+
+                          {% if is__following.0 %}
+                              Unfollow
+                          {% else %}
+                              Follow
+                          {% endif %}
+
+                      </button>
+                  {% endif %}
+              </form>
+
+              <form action="{% url 'like-view' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" data-post-id="{{ post.id }}"
+                class="btn btn-xs md:btn-md md:gap-2 p-2 md:p-4 md:px-2 border-0 shadow-none like-button">
+                  <span class="material-symbols-rounded !text-[1.25rem] {% if user.profile in post.likes.all %}like-added{% endif %}">thumb_up</span>
+
+                  <span class="total-likes" data-post-id="{{ post.id }}">
+                    {{ post.total_likes }}
+                  </span>
+                </button>
+              </form>
+              
+              <form action="{% url 'dislike-view' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" data-post-id="{{ post.id }}"
+                class="btn btn-xs md:btn-md md:gap-2 p-2 md:p-4 md:px-2 border-0 shadow-none dislike-button">
+                  <span class="material-symbols-rounded !text-[1.25rem] {% if user.profile in post.dislikes.all %}dislike-added{% endif %}">thumb_down</span>
+
+                  <span class="total-dislikes" data-post-id="{{ post.id }}">
+                    {{ post.total_dislikes }}
+                  </span>
+                </button>
+              </form>
+
+              <div class="dashboard-recipe-dropdown postdetail-action-dropdown dropdown dropdown-end border-0">
+
+                <button tabindex="0" class="btn-xs md:btn-md trigger btn btn-circle bg-transparent border-0 shadow-none">
+                  <span class="material-symbols-rounded !text-[1.3rem]">
+                    more_vert
+                  </span>
+                </button>
+
+                <ul tabindex="0" class="drawer-dropdown-content p-2.5 dropdown-content menu rounded-box shadow-xl z-20 mt-1 w-55">
+
+                  <li>
+                    <button onclick="shareRecipeModal.showModal()" class="border-0 shadow-none">
+                      <span class="material-symbols-rounded !text-[1.2rem]">share</span>
+                      Share
+                    </button>
+                  </li>
+
+                  <li>
+                      <a class="favourite-link cursor-pointer" data-post-id="{{ post.id }}">
+                          <span class="material-symbols-rounded favourite-detail-icon !text-[1.2rem] {% if post in user.favourite.all %}favourite-added{% endif %}">
+                              favorite
+                          </span>
+
+                          <span class="fav-text">
+                              {% if post in user.favourite.all %}
+                                  Remove
+                              {% else %}
+                                  Favourite
+                              {% endif %}
+                          </span>
+                      </a>
+                  </li>
+
+                  <li>
+                    <a href="{% url 'customerrender' feed=post.title pk=post.pk %}" target="_blank">
+                      <span class="material-symbols-rounded !text-[1.2rem]">file_download</span>
+                      Download
+                    </a>
+                  </li>
+
+                </ul>
+
+              </div>
+
+            </div>
+          {% endif %}
+
+        </section>
+
+        
+        <section class="postdetail-links-section overflow-x-auto py-2 scrollbar-hide">
+          <div class="flex w-max gap-3 pb-1">
+            <a href="#translatedContainer" class="btn btn-transparent bg-transparent border-0 font-normal shadow-none shrink-0" id="translateButton">
+              <span class="material-symbols-rounded !text-[1.2rem]">translate</span>
+              Translate in Hindi
+            </a>
+
+            <a href="{% url 'compare_recipes' post.pk %}" class="btn btn-transparent bg-transparent border-0 font-normal shadow-none shrink-0">
+              <span class="material-symbols-rounded !text-[1.2rem]">compare_arrows</span>
+              Compare
+            </a>
+
+            <button type="button" class="btn btn-transparent bg-transparent border-0 font-normal shadow-none shrink-0" onclick="shoppinglistModal.showModal()">
+              <span class="material-symbols-rounded !text-[1.2rem]">shopping_cart</span>
+              Shopping list
+            </button>
+
+            <button type="button" class="btn btn-transparent bg-transparent border-0 font-normal shadow-none shrink-0" onclick="simpleViewModal.showModal()">
+              <span class="material-symbols-rounded !text-[1.2rem]">visibility</span>
+              Simple view
+            </button>
+
+            <button type="button" class="btn btn-transparent bg-transparent border-0 font-normal shadow-none shrink-0" onclick="commentsModal.showModal()">
+              <span class="material-symbols-rounded !text-[1.2rem]">chat</span>
+              Comments
+              <span class="badge badge-sm custom-badge">{{ comments.count }}</span>
+            </button>
+          </div>
+        </section>
+
+
+        <section class="postdetail-table-section grid items-stretch gap-6 lg:grid-cols-2">
+
+          <div class="detail flex h-[500px] flex-col p-6">
+            <h2 class="mb-3 text-xl font-medium shrink-0">Details</h2>
+
+            <div class="flex-1 overflow-hidden">
+              <table class="dashboard-table postdetail-table table h-full">
+                <tbody>
+                  <tr><th class="font-semibold">Type</th><td>{{ post.type }}</td></tr>
+                  <tr><th class="font-semibold">Category</th><td>{{ post.category }}</td></tr>
+                  <tr><th class="font-semibold">Cuisine</th><td>{{ post.cuisine|cut:" cuisine" }}</td></tr>
+
+                  {% if pred_time %}
+                    <tr>
+                      <th class="font-semibold">Prep time</th>
+                      <td>{{ pred_time.prep }} {% if pred_time.prep > 1 %}mins{% else %}min{% endif %}</td>
+                    </tr>
+                    <tr>
+                      <th class="font-semibold">Cook time</th>
+                      <td>{{ pred_time.cook }} {% if pred_time.cook > 1 %}mins{% else %}min{% endif %}</td>
+                    </tr>
+                  {% endif %}
+
+                  <tr><th class="font-semibold">Servings</th><td>{{ post.servings }}</td></tr>
+                  <tr><th class="font-semibold">Difficulty</th><td>{{ post.difficulty }}</td></tr>
+                  <tr><th class="font-semibold">Posted</th><td>{{ post.get_date }}</td></tr>
+                  <tr>
+                    <th class="font-semibold">Updated</th>
+                    <td>
+                      {% if post.get_date == post.get_modified_date %}
+                        No change
+                      {% else %}
+                        {{ post.get_modified_date }}
+                      {% endif %}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {% if nutrition_widget|safe %}
+          <div class="nutri flex h-[500px] flex-col p-6">
+            <h2 class="mb-3 text-xl font-medium shrink-0">Nutrition</h2>
+
+            <div class="flex-1 overflow-y-auto pr-2">
+              {% if nutrition_error %}
+                <div class="alert alert-warning">
+                  Nutritional information is currently unavailable.
+                </div>
+              {% else %}
+                {{ nutrition_widget|safe }}
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+        </section>
+        
+        <article class="postdetail-main-content mt-12">
+          <h2 class="mb-4 text-2xl font-medium">Ingredients</h2>
+          <div class="prose max-w-none">{{ post.ingredients|safe }}</div>
+        </article>
+
+        <article class="postdetail-main-content mt-12">
+          <h2 class="mb-4 text-2xl font-medium">Instructions</h2>
+          <div class="prose max-w-none">{{ post.content|safe }}</div>
+        </article>
+
+        <section class="postdetail-main-content" id="translatedContainer">
+          <h2 id="translateTextHeading" class="mb-4 hidden text-2xl font-medium">Hindi Translation</h2>
+
+          <form id="translateForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value="{{ post.pk }}" />
+          </form>
+
+          <div id="translatedTextContainer" class="hidden">
+            <div id="translatedContent" class="prose max-w-none"></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="order-last">
+        <div class="lg:sticky lg:top-24">
+          <h2 class="mb-4 text-lg font-medium">Related recipes</h2>
+
+          <div class="space-y-3">
+            {% for recipe in related_recipes %}
+              <a href="{% url 'viewpost' recipe.pk %}"
+                class="group flex gap-3 p-3 transition hover:shadow-md">
+                <div class="h-20 w-24 shrink-0 overflow-hidden rounded-xl">
+                  {% for image in recipe.photo_set.all %}
+                    {% if forloop.first %}
+                      <img
+                        loading="lazy"
+                        src="{{ image.image.url }}"
+                        alt="{{ recipe.title }}"
+                        class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                    {% endif %}
+                  {% empty %}
+                    <img
+                      loading="lazy"
+                      src="{% static 'yummyrecipes/media/empty4.jpg' %}"
+                      alt="{{ recipe.title }}"
+                      class="h-full w-full object-cover"
+                    />
+                  {% endfor %}
+                </div>
+
+                <div class="min-w-0">
+                  <h3 class="line-clamp-2 text-sm font-medium capitalize leading-snug">
+                    {{ recipe.title }}
+                  </h3>
+                  <p class="mt-1 text-xs">
+                    {{ recipe.read_time }} min read
+                  </p>
+                </div>
+              </a>
+            {% empty %}
+              <p class="text-sm opacity-60">
+                No related recipes yet.
+              </p>
+            {% endfor %}
+          </div>
+        </div>
+      </aside>
+
+    </section>
+  </main>
+</div>
+
+{# Share modal #}
+<dialog id="shareRecipeModal" class="modal">
+  <div class="modal-box share-recipe-dialog w-lg">
+    <form method="dialog">
+      <button class="btn btn-sm btn-transparent bg-transparent border-0 btn-circle shadow-none drawer-dialog-close-btn absolute right-3 top-3">
+        <span class="material-symbols-rounded !text-[1.2rem]">close</span>
+      </button>
+    </form>
+
+    <h3 class="text-2xl font-medium">Share</h3>
+
+    <div class="mt-6 grid gap-2 grid-cols-6">
+      <a href="https://www.gmail.com/" target="_blank" class="btn btn-circle btn-transparent bg-transparent border-0 shadow-none p-5"><i class="fa-solid fa-envelope"></i></a>
+      <a href="https://www.facebook.com/" target="_blank" class="btn btn-circle btn-transparent bg-transparent border-0 shadow-none p-5"><i class="fa-brands fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/" target="_blank" class="btn btn-circle btn-transparent bg-transparent border-0 shadow-none p-5"><i class="fa-brands fa-instagram"></i></a>
+      <a href="https://telegram.org/" target="_blank" class="btn btn-circle btn-transparent bg-transparent border-0 shadow-none p-5"><i class="fa-brands fa-telegram"></i></a>
+      <a href="" id="whatsapp-share-button" class="btn btn-circle btn-transparent bg-transparent border-0 shadow-none p-5"><i class="fa-brands fa-whatsapp"></i></a>
+      <a href="https://x.com/?lang=en" target="_blank" class="btn btn-circle btn-transparent bg-transparent border-0 shadow-none p-5"><i class="fa-brands fa-x-twitter"></i></a>
+    </div>
+
+    <div class="mt-6 flex justify-center">
+      <img loading="lazy" src="data:image/png;base64,{{ img_data }}" alt="QR Code" class="rounded-xl border" />
+    </div>
+
+    <button class="btn btn-transparent bg-transparent border-0 shadow-none font-normal copy-link-btn mt-6 w-full" id="copylink" type="button">
+      <span class="material-symbols-rounded">content_copy</span>
+      <span class="button-text">Copy link</span>
+    </button>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>
+
+{# Shopping list modal #}
+<dialog id="shoppinglistModal" class="modal">
+  <div class="modal-box max-w-2xl">
+    <form method="dialog">
+      <button class="btn btn-sm btn-transparent bg-transparent border-0 btn-circle shadow-none drawer-dialog-close-btn absolute right-3 top-3">
+        <span class="material-symbols-rounded !text-[1.2rem]">close</span>
+      </button>
+    </form>
+
+    <h3 class="text-2xl font-medium">Ingredients lists</h3>
+    <div class="prose mt-4 max-h-[60vh] max-w-none overflow-y-auto">
+      {{ ingredients|safe }}
+    </div>
+
+    <div class="modal-action">
+      <a class="btn btn-transparent bg-transparent copy-link-btn border-0 shadow-none font-normal" href="{% url 'shopping_list' title=post.title pk=post.pk %}" target="_blank">
+        Download list
+      </a>
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button></button>
+  </form>
+</dialog>
+
+{# Simple view modal #}
+<dialog id="simpleViewModal" class="modal">
+  <div class="modal-box max-w-3xl">
+    <form method="dialog">
+      <button class="btn btn-sm btn-transparent bg-transparent border-0 btn-circle shadow-none drawer-dialog-close-btn absolute right-3 top-3">
+        <span class="material-symbols-rounded !text-[1.2rem]">close</span>
+      </button>
+    </form>
+
+    <h3 class="pr-10 text-xl font-medium">{{ post.title }}</h3>
+
+    {% for image in post.photo_set.all %}
+      {% if forloop.first %}
+        <img loading="lazy" src="{{ image.image.url }}" alt="{{ post.title }}" class="mt-5 h-64 w-full rounded-xl object-cover" />
+      {% endif %}
+    {% endfor %}
+
+    <div class="prose mt-6 max-w-none">
+      <div class="mt-4">
+        <h1 class="mb-1 font-medium text-2xl">Ingredients</h1>
+        {{ post.ingredients|safe }}
+      </div>
+
+      <div class="mt-4">
+        <h1 class="mb-1 font-medium text-2xl">Instructions</h1>
+        {{ post.content|safe }}
+      </div>
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button></button>
+  </form>
+</dialog>
+
+{# Comments modal #}
+<dialog id="commentsModal" class="modal">
+  <div class="modal-box comments-dialog max-w-2xl">
+    <form method="dialog">
+      <button class="btn btn-sm btn-transparent bg-transparent border-0 btn-circle shadow-none drawer-dialog-close-btn absolute right-3 top-3">
+        <span class="material-symbols-rounded !text-[1.2rem]">close</span>
+      </button>
+    </form>
+
+    <h3 class="text-2xl font-semibold">Comments</h3>
+
+    {% if user.is_authenticated %}
+      <div class="mt-5 flex gap-3">
+        <div class="avatar">
+          <div class="h-10 w-10 rounded-full">
+            <img loading="lazy" src="{{ user.profile.profile_img.url }}" alt="{{ user.first_name }}" />
+          </div>
+        </div>
+
+        <textarea id="inputComment" class="textarea min-h-12 flex-1 rounded-xl bg-transparent border-0 shadow-none" placeholder="Add a comment..."></textarea>
+
+        <button type="button" class="btn btn-transparent rounded-xl bg-transparent border-0 shadow-none copy-link-btn" id="commentbutton">
+          <span class="material-symbols-rounded">send</span>
+        </button>
+      </div>
+    {% endif %}
+
+    <div id="comments" class="mt-6 max-h-[55vh] space-y-5 overflow-y-auto">
+      {% if comments %}
+        {% for comment in comments.reverse %}
+          <div class="flex gap-3">
+            <div class="avatar">
+              <div class="h-10 w-10 rounded-full">
+                <img loading="lazy" src="{{ comment.comment_user.profile.profile_img.url }}" alt="{{ comment.comment_user.first_name }}" />
+              </div>
+            </div>
+
+            <div>
+              <h6 class="font-medium">
+                {{ comment.comment_user.first_name }} {{ comment.comment_user.last_name }}
+                <span class="text-sm font-normal text-base-content/50">{{ comment.get_date }}</span>
+              </h6>
+              <p class="text-sm text-base-content/80">{{ comment.comment }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="no-comment text-base-content/60">No comments</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="dialog" class="modal-backdrop">
+    <button></button>
+  </form>
+</dialog>
+
+{# spoonacular widget #}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const heading1 = document.querySelector('.spoonacular-caption.spoonacular-salmon');
+    const headingBlue = document.querySelector('.spoonacular-caption.spoonacular-blue');
+    const quickviewText = document.querySelector('.spoonacular-caption');
+
+    if (heading1 && headingBlue) {
+      heading1.textContent = '';
+      headingBlue.textContent = 'More details';
+    }
+
+    if (quickviewText) {
+      quickviewText.style.display = 'none';
+    }
+  });
+</script>
+
+{# like dislike script #}
+<script>
+  $(document).on("click", ".like-button", function (e) {
+    e.preventDefault();
+    const $button = $(this);
+    const postId = $button.data("post-id");
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'like-view' %}",
+        data: {
+            post_id: postId,
+            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').first().val(),
+        },
+
+        success: function (response) {
+            $button.find(".total-likes").text(response.total_likes);
+            $(".dislike-button[data-post-id='" + postId + "']")
+                .find(".total-dislikes")
+                .text(response.total_dislikes);
+            const $likeIcon = $button.find(".material-symbols-rounded");
+            if (response.action === "added") {
+                $likeIcon.addClass("like-added");
+            } else {
+                $likeIcon.removeClass("like-added");
+            }
+            if (response.removefromdislike) {
+                $(".dislike-button[data-post-id='" + postId + "']")
+                    .find(".material-symbols-rounded")
+                    .removeClass("dislike-added");
+            }
+        }
+
+    });
+
+});
+
+
+  $(document).on("click", ".dislike-button", function (e) {
+
+    e.preventDefault();
+
+    const $button = $(this);
+    const postId = $button.data("post-id");
+
+    $.ajax({
+        type: "POST",
+        url: "{% url 'dislike-view' %}",
+        data: {
+            post_id: postId,
+            csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').first().val(),
+        },
+
+        success: function (response) {
+
+            $button.find(".total-dislikes").text(response.total_dislikes);
+
+            $(".like-button[data-post-id='" + postId + "']")
+                .find(".total-likes")
+                .text(response.total_likes);
+
+            const $dislikeIcon = $button.find(".material-symbols-rounded");
+
+            if (response.action === "added") {
+                $dislikeIcon.addClass("dislike-added");
+            } else {
+                $dislikeIcon.removeClass("dislike-added");
+            }
+
+            if (response.removefromlike) {
+                $(".like-button[data-post-id='" + postId + "']")
+                    .find(".material-symbols-rounded")
+                    .removeClass("like-added");
+            }
+
+        }
+
+    });
+
+  });
+</script>
+
+{# follow unfollow #}
+<script>
+  $(document).on("click", ".follow-btn", function (e) {
+      e.preventDefault();
+
+      const $button = $(this);
+      const username = $button.data("username");
+      $.ajax({
+          type: "POST",
+          url: "/follow/" + username + "/",
+          data: {
+              csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').first().val(),
+          },
+
+          success: function (response) {
+              if (!response.success)
+                  return;
+              if (response.action === "follow") {
+                  $button.text("Unfollow");
+              } else {
+                  $button.text("Follow");
+              }
+              $(".followers-count").text(response.followers);
+              $(".following-count").text(response.following);
+          }
+      });
+  });
+</script>
+
+{# favourite #}
+<script>
+  $(document).on("click", ".favourite-link", function (e) {
+
+    e.preventDefault();
+
+    const $button = $(this);
+    const postId = $button.data("post-id");
+
+    const $icon = $button.find(".material-symbols-rounded");
+    const $text = $button.find(".fav-text");
+
+    const csrf = $('input[name="csrfmiddlewaretoken"]').val();
+
+    $.ajax({
+        type: "POST",
+        url: "/fav/" + postId + "/",
+        data: {
+            csrfmiddlewaretoken: csrf,
+        },
+        success: function (response) {
+
+            if (response.action === "add") {
+
+                $icon.addClass("favourite-added");
+                $text.text("Remove");
+
+            } else {
+
+                $icon.removeClass("favourite-added");
+                $text.text("Favourite");
+
+            }
+
+        }
+    });
+
+  });
+</script>
+
+{# translate recipe #}
+<script>
+  $(document).ready(function () {
+    $("#translateButton").click(function () {
+      $("#translateForm").submit();
+    });
+
+    $("#translateForm").submit(function (event) {
+      event.preventDefault();
+
+      var formData = new FormData(this);
+      var csrftoken = $("input[name='csrfmiddlewaretoken']").val();
+
+      $.ajax({
+        url: "{% url 'translate_content' %}",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: { "X-CSRFToken": csrftoken },
+        success: function (response) {
+          if (response.translated_text) {
+            $("#translatedContent").html(response.translated_text);
+            $("#translateTextHeading").removeClass("hidden");
+            $("#translatedTextContainer").removeClass("hidden");
+          }
+        },
+        error: function () {
+          alert("Translation is currently unavailable.");
+        }
+      });
+    });
+
+    $('#commentbutton').on('click', function () {
+      var comt = $('#inputComment').val().trim();
+      if (!comt) return;
+
+      $.ajax({
+        method: 'POST',
+        url: '',
+        data: {
+          comt: comt,
+          csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (response) {
+          $('#inputComment').val("");
+
+          if ($('.no-comment').length) {
+            $('.no-comment').remove();
+          }
+
+          var commentHTML = `
+            <div class="flex gap-3">
+              <div class="avatar">
+                <div class="h-10 w-10 rounded-full">
+                  <img loading="lazy" src="${response.profile_img}" alt="">
+                </div>
+              </div>
+
+              <div>
+                <h6 class="font-medium">
+                  ${response.first_name} ${response.last_name}
+                  <span class="text-sm font-normal text-base-content/50">${response.date}</span>
+                </h6>
+                <p class="text-sm text-base-content/80">${response.comment}</p>
+              </div>
+            </div>
+          `;
+
+          $('#comments').prepend(commentHTML);
+
+          var badge = $('.tot_recipe_badge');
+          if (badge.length) {
+            badge.text(parseInt(badge.text() || "0") + 1);
+          }
+        },
+        error: function () {
+          alert("Error posting comment");
+        }
+      });
+    });
+
+    $("#whatsapp-share-button").click(function (e) {
+      e.preventDefault();
+      var url = window.location.href;
+      window.location.href = "whatsapp://send?text=" + encodeURIComponent(url);
+    });
+
+    $('#copylink').click(function () {
+      var url = window.location.href;
+
+      navigator.clipboard.writeText(url);
+
+      var buttonText = $('#copylink .button-text');
+      buttonText.text('Link copied');
+
+      setTimeout(function () {
+        buttonText.text('Copy link');
+        if (window.shareRecipeModal) {
+          shareRecipeModal.close();
+        }
+      }, 900);
+    });
+  });
+</script>
+
+{% endblock %}

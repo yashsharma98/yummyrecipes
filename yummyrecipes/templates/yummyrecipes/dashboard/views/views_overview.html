@@ -1,0 +1,117 @@
+{% load humanize %}
+
+{% if year_data %}
+
+<div class="space-y-4">
+
+    {% for year in year_data %}
+
+    <div class="dashboard-views-collapse collapse collapse-arrow mt-2">
+
+        <input type="checkbox" {% if forloop.first %}checked{% endif %}>
+
+        <div class="collapse-title py-3 pl-4 pr-11">
+
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+
+                <div>
+                    <h2 class="text-2xl font-medium">{{ year.year }}</h2>
+                    <p class="text-sm opacity-60 mt-1">{{ year.recipe_count }} Recipe{{ year.recipe_count|pluralize }}</p>
+                </div>
+
+                <div class="ml-auto flex gap-2">
+
+                    <div class="card w-25">
+                        <div class="card-body py-4 px-5">
+                            <p class="text-xs opacity-60">Views</p>
+                            <h3 class="text-lg font-medium mt-1">{{ year.total_views|intcomma }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="card w-25">
+                        <div class="card-body py-4 px-5">
+                            <p class="text-xs opacity-60">Avg</p>
+                            <h3 class="text-lg font-medium mt-1">{{ year.average_views|floatformat:1 }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="card w-50">
+                        <div class="card-body py-4 px-5">
+                            <p class="text-xs opacity-60">Top</p>
+                            <h3 class="capitalize truncate text-md font-medium truncate mt-1">
+                                {{ year.top_recipe.title|default:"—" }}
+                            </h3>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="dashboard-views-collapse-content collapse-content">
+
+            <div class="overflow-x-auto">
+                <table class="dashboard-table table">
+                    <thead>
+                        <tr>
+                            <th>Recipe</th>
+                            <th>Published</th>
+                            <th class="text-center">Views</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for recipe in year.recipes %}
+                        <tr>
+                            <td>
+                                <div>
+                                    <a href="{% url 'viewpost' recipe.pk %}" class="hover hover:underline">
+                                        <div class="capitalize truncate line-clamp-2 font-medium">
+                                            {{ recipe.title }}
+                                        </div>
+                                    </a> 
+                                    <div class="text-xs opacity-60">
+                                        {{ recipe.category }} • {{ recipe.cuisine }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>{{ recipe.date_post|date:"d M Y" }}</td>
+
+                            <td class="text-center">{{ recipe.views|default:0|intcomma }}</td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-8 opacity-60">
+                                No recipes this year.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="hero">
+    <div class="hero-content py-20 text-center">
+        <div>
+            <span class="material-symbols-rounded text-6xl opacity-30">visibility</span>
+            <h2 class="text-2xl font-medium mt-5">No view history yet</h2>
+            <p class="opacity-60 mt-2">Publish recipes and start receiving visitors.</p>
+        </div>
+    </div>
+</div>
+
+{% endif %}

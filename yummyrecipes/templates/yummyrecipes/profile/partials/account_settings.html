@@ -1,0 +1,101 @@
+<div id="profile-page" data-active-nav="settings"></div>
+
+<div class="profile-partial-back-btn mb-4 grid grid-cols-[auto_1fr] gap-x-2 pl-2 md:pl-0">
+  <button class="btn btn-transparent bg-transparent border-0 -ml-2 shadow-none" hx-get="{% url 'profile_details_partial' %}" hx-target="#profile-content" hx-swap="innerHTML">
+    <span class="material-symbols-rounded text-lg">arrow_back</span>
+  </button>
+
+  <div>
+    <h2 class="text-xl font-medium">Account settings</h2>
+    <p class="opacity-70 text-sm mt-0.5">Manage your account preferences.</p>
+  </div>
+</div>
+
+
+<div class="profile-partials-container card mb-6">
+  <div class="card-body">
+    <div class="flex justify-between items-center">
+      <div>
+        <h3 class="card-title font-medium text-[1rem]">Email Notifications</h3>
+        <p class="opacity-70 text-[0.8rem]">Receive recipe related emails.</p>
+      </div>
+
+      <form method="POST" hx-post="{% url 'account_settings' %}" hx-target="#profile-content" hx-swap="innerHTML">
+        {% csrf_token %}
+        <input type="hidden" name="email_form" value="email_form">
+
+        <input type="checkbox" class="toggle toggle-primary" name="send_email" onchange="this.form.requestSubmit()" {% if user.profile.send_email %}checked{% endif %}>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="profile-partials-container card mb-6">
+  <div class="card-body">
+    <h3 class="card-title font-medium text-[1rem] mb-1">Recipe Goal</h3>
+
+    <p>Achieved : {{ recipes_uploaded }} · Goal : {{ goal_for_year }}</p>
+
+    <progress class="progress w-full" value="{{ progress_percentage }}" max="100"></progress>
+
+    <form class="acc-setting-form" method="POST" hx-post="{% url 'account_settings' %}" hx-target="#profile-content" hx-swap="innerHTML" class="mt-5">
+      {% csrf_token %}
+      <input type="hidden" name="recipes_goal" value="recipes_goal">
+
+      <div class="join">
+        <!-- {{ goal_form.goal }} -->
+        <input type="number" name="goal" value="1" required="" id="id_goal" class="p-3 rounded-xl">
+        <button class="btn btn-transparent bg-transparent border-0 font-medium shadow-none ml-4 py-6">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="profile-partials-container card mb-6">
+  <div class="card-body">
+    <h3 class="card-title font-medium text-[1rem]">Export Data</h3>
+    <p class="opacity-70 text-[0.8rem] -mt-2 mb-3">Download a copy of your account.</p>
+
+    <a href="{% url 'export_data' %}" class="btn btn-transparent bg-transparent border-0 font-medium shadow-none w-fit">
+      Download
+    </a>
+  </div>
+</div>
+
+<div class="profile-partials-container card border border-error">
+  <div class="card-body">
+    <h3 class="text-error card-title font-medium text-[1rem]">Danger Zone</h3>
+    <p class="opacity-70 text-[0.8rem] -mt-2 mb-3">Deleting your account is permanent.</p>
+
+    <button class="btn btn-error border-0 font-medium shadow-none" onclick="deleteModal.showModal()">
+      Delete Account
+    </button>
+  </div>
+</div>
+
+<dialog id="deleteModal" class="modal">
+    <div class="modal-box max-w-md">
+        <h3 class="font-semibold text-lg">Delete account?</h3>
+
+        <p class="py-3 text-sm opacity-70">
+            This action is permanent and cannot be undone.
+            All your recipes, profile, credits and activity will be deleted.
+        </p>
+
+        <form method="POST" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+
+            <div class="modal-action">
+                <button type="button"
+                        class="btn btn-ghost font-normal border-0 rounded-full shadow-none"
+                        onclick="deleteModal.close()">
+                    Cancel
+                </button>
+
+                <button type="submit" class="btn btn-error font-normal border-0 rounded-full shadow-none">
+                    Delete Account
+                </button>
+            </div>
+        </form>
+    </div>
+</dialog>

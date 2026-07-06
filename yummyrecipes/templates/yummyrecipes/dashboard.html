@@ -1,0 +1,258 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+{% block title %}
+    <title>Dashboard</title>
+{% endblock %}
+
+{% block raw_content %}
+
+    {% if user.is_authenticated or is_guest %}
+        <div class="min-h-screen w-full pt-[80px] relative">
+
+        <div class="w-full px-2 sm:px-8 sm:pr-2 pt-8 pb-20">
+
+            <header class="main-header px-5 sm:px-0 mb-3">
+                <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Dashboard</h1>
+                <p class="mt-1 text-sm opacity-75">Discover what's delicious and in demand</p>
+            </header>
+
+            <div class="flex flex-col lg:flex-row mt-8">
+
+            <div class="flex-1 min-w-0">
+
+                <section class="mt-1">
+                
+                    <div class="grid xl:grid-cols-11 gap-x-4 items-start">
+                        
+                        <aside class="xl:col-span-2 sticky top-23 z-20 min-w-0 max-w-full w-full">
+                            <div class="min-w-0 max-w-full">
+
+                                <div class="dashboard-aside rounded-full xl:rounded-none card mb-5 xl:mb-0 w-full xl:w-50 overflow-hidden">
+
+                                    <div class="card-body p-2.5">
+
+                                        <nav class="dashboard-side-nav menu flex-row xl:flex-col flex-nowrap overflow-x-auto w-full gap-1 p-0 pr-4 md:pr-0 snap-x snap-mandatory" style="scrollbar-width: none; -ms-overflow-style: none;">
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_overview' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=overview"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'overview' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'overview' %}icon-active{% endif %}">dashboard</span>
+                                                    Overview
+                                                </a>
+                                            </li>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_my_recipes' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=my-recipes"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'my-recipes' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'my-recipes' %}icon-active{% endif %}">menu_book</span>
+                                                    My Recipes
+                                                </a>
+                                            </li>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_favourites' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=favorites"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'favorites' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'favorites' %}icon-active{% endif %}">favorite</span>
+                                                    Favoruites
+                                                </a>
+                                            </li>
+
+                                            <div class="divider my-1"></div>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_credits' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=credits"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'credits' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'credits' %}icon-active{% endif %}">paid</span>
+                                                    Credits
+                                                </a>
+                                            </li>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_likes' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=likes"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'likes' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'likes' %}icon-active{% endif %}">thumb_up</span>
+                                                    Likes
+                                                </a>
+                                            </li>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_dislikes' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=dislikes"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'dislikes' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'dislikes' %}icon-active{% endif %}">thumb_down</span>
+                                                    Dislikes
+                                                </a>
+                                            </li>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_views' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=views"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'views' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'views' %}icon-active{% endif %}">visibility</span>
+                                                    Views
+                                                </a>
+                                            </li>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_timeline' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=timeline"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'timeline' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'timeline' %}icon-active{% endif %}">timeline</span>
+                                                    Timeline
+                                                </a>
+                                            </li>
+
+                                            <li class="flex-shrink-0 snap-center">
+                                                <a hx-get="{% url 'dashboard_network' %}"
+                                                hx-target="#dashboard-content"
+                                                hx-push-url="{% url 'dashboard' %}?tab=network"
+                                                hx-swap="innerHTML"
+                                                class="dashboard-nav rounded-2xl shadow-none {% if active_tab == 'network' %}menu-active{% endif %}">
+                                                    <span class="material-symbols-rounded dashboard-aside-icon !text-[1.15rem] {% if active_tab == 'network' %}icon-active{% endif %}">group</span>
+                                                    Network
+                                                </a>
+                                            </li>
+
+                                        </nav>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </aside>
+
+                        <section class="xl:col-span-9 mr-0 md:mr-4">
+                            <div id="dashboard-content" hx-get="{% url initial_tab_url %}" hx-trigger="load"
+                                hx-swap="innerHTML">
+                                <div class="card">
+                                    <div class="card-body py-20 items-center">
+                                        <span class="loading loading-spinner loading-lg"></span>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                        </section>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            </div>
+
+        </div>
+
+        </div>
+    {% else %}
+        <script>
+        location.href = "{% url 'login' %}";
+        </script>
+    {% endif %}
+
+{# side navigation #}
+<script>
+    document.body.addEventListener("htmx:beforeRequest", function (event) {
+
+        const link = event.detail.elt.closest(".dashboard-nav");
+
+        if (!link) return;
+
+        document.querySelectorAll(".dashboard-nav").forEach(item => {
+
+            item.classList.remove("menu-active");
+
+            const icon = item.querySelector(".dashboard-aside-icon");
+
+            if (icon) {
+                icon.classList.remove("icon-active");
+            }
+
+        });
+
+        link.classList.add("menu-active");
+
+        const activeIcon = link.querySelector(".dashboard-aside-icon");
+
+        if (activeIcon) {
+            activeIcon.classList.add("icon-active");
+        }
+
+    });
+</script>
+
+{# feed filter & sort values to maintain state #}
+<script>
+    document.body.addEventListener("htmx:configRequest", function (event) {
+
+    const trigger = event.detail.elt;
+
+    // Update filter state
+    if (trigger.dataset.filter) {
+        document.getElementById("current-filter").value = trigger.dataset.filter;
+        document.getElementById("filter-label").textContent = trigger.textContent.trim();
+    }
+
+    // Update sort state
+    if (trigger.dataset.sort) {
+        document.getElementById("current-sort").value = trigger.dataset.sort;
+        document.getElementById("sort-label").textContent = trigger.textContent.trim();
+    }
+
+});
+</script>
+
+{# update the filter & sort labels based on selected #}
+<script>
+    document.body.addEventListener("htmx:configRequest", function (event) {
+
+    const trigger = event.detail.elt;
+
+    if (trigger.dataset.filter) {
+
+        document.getElementById("current-filter").value = trigger.dataset.filter;
+
+        document.getElementById("filter-label").textContent =
+            trigger.textContent.trim();
+
+    }
+
+    if (trigger.dataset.sort) {
+
+        document.getElementById("current-sort").value = trigger.dataset.sort;
+
+        document.getElementById("sort-label").textContent =
+            trigger.textContent.trim();
+
+    }
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,162 @@
+<div class="space-y-4">
+
+    <!-- Header -->
+    <header class="ml-5 md:ml-0">
+        <h1 class="text-lg md:text-xl font-medium">Credits</h1>
+        <p class="mt-1 text-sm opacity-60">Manage your credits, redeem them, and review your credit activity</p>
+    </header>
+
+    {# Top summary cards #}
+    <div class="credit-top-cards grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 tracking-tight">
+
+        <div class="card rounded-3xl">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Current Balance</p>
+                <h2 class="text-3xl font-medium mt-2">{{ current_balance }}</h2>
+            </div>
+        </div>
+
+        <div class="card rounded-3xl">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Credits Earned</p>
+                <h2 class="text-3xl font-medium mt-2">{{ earned_credits }}</h2>
+            </div>
+        </div>
+
+        <div class="card rounded-3xl">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Redeemed</p>
+                <h2 class="text-3xl font-medium mt-2">{{ redeemed_total }}</h2>
+            </div>
+        </div>
+
+        <div class="card rounded-3xl">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Credits Spent</p>
+                <h2 class="text-3xl font-medium mt-2">{{ total_credits_spent }}</h2>
+            </div>
+        </div>
+
+        <div class="card rounded-3xl">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Avg / Month</p>
+                <h2 class="text-3xl font-medium mt-2">{{ average_credit_spent|floatformat:0 }}</h2>
+            </div>
+        </div>
+
+        <div class="card text-primary-content rounded-3xl">
+            <div class="card-body p-5">
+                <p class="text-sm opacity-80">Available</p>
+                <h2 class="text-3xl font-medium mt-1">{{ earned_credits }}</h2>
+
+                <div class="load-more-recipe-container">
+                <button type="button" class="btn btn-sm btn-soft rounded-xl mt-4 border-0 w-full font-medium shadow-none"
+                    onclick="redeem_modal.showModal()">
+                    Redeem
+                </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {# credit history #}
+    <div class="grid xl:grid-cols-3 items-start mt-6">
+        <div class="dashboard-activity-container col-span-full">
+            <div class="card p-0 mt-4">
+
+                <div class="card-body p-0 ml-5 md:ml-0">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg md:text-xl font-medium">Credit Activity</h2>
+                            <p class="text-sm opacity-60 mt-1">View your monthly summary, earned, redeemed and spent credits</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div role="tablist" class="tabs border-0 mt-4 mb-2 gap-2">
+                        <button class="tab tab-active credit-tab shadow-none" hx-get="{% url 'dashboard_credit_monthly' %}"
+                                hx-target="#credit-history-content" hx-swap="innerHTML">
+                                Monthly
+                        </button>
+
+                    <button class="tab credit-tab shadow-none" hx-get="{% url 'dashboard_credit_earned' %}"
+                            hx-target="#credit-history-content" hx-swap="innerHTML">
+                            Earned
+                    </button>
+                    
+                    <button class="tab credit-tab shadow-none" hx-get="{% url 'dashboard_credit_redeemed' %}"
+                            hx-target="#credit-history-content" hx-swap="innerHTML">
+                            Redeemed
+                    </button>
+                    
+                    <button class="tab credit-tab shadow-none" hx-get="{% url 'dashboard_credit_spent' %}"
+                            hx-target="#credit-history-content" hx-swap="innerHTML">
+                            Spent
+                    </button>
+                </div>
+
+
+                <div id="credit-history-content" class="overflow-y-auto max-h-[650px] pb-6 mr-0" 
+                    hx-get="{% url 'dashboard_credit_monthly' %}" hx-trigger="load" hx-swap="innerHTML">
+                    {% include "yummyrecipes/dashboard/credits/credit_monthly.html" %}
+                    {% include "yummyrecipes/dashboard/credits/earned.html" %}
+                    {% include "yummyrecipes/dashboard/credits/redeemed.html" %}
+                    {% include "yummyrecipes/dashboard/credits/spent.html" %}
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+{# Redeem dialog #}
+<dialog id="redeem_modal" class="modal redeem-modal">
+    <div class="modal-box rounded-[2rem] max-w-md">
+        <div class="mb-6">
+            <h3 class="text-xl font-medium">Redeem Credits</h3>
+            <p class="text-sm opacity-60 mt-1">Convert your earned credits into your account balance</p>
+        </div>
+
+        <div class="mb-6">
+            <p class="text-sm opacity-60">Available Credits</p>
+            <h2 class="text-4xl font-medium mt-1">{{ earned_credits }}</h2>
+        </div>
+
+        <form hx-post="{% url 'dashboard_redeem_credit' %}" class="space-y-5 redeem-credit-form" hx-target="#dashboard-content" hx-swap="innerHTML">
+            {% csrf_token %}
+
+            <input id="redeem_amount" name="redeem_amount" type="number" min="0" step="1" max="{{ earned_credits }}"
+                   placeholder="Enter amount" class="input w-full shadow-none rounded-xl" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
+            <div class="modal-action mt-6">
+                <form method="dialog">
+                    <button class="btn btn-transparent bg-transparent border-0 font-normal shadow-none">Cancel</button>
+                </form>
+                <div class="load-more-recipe-container">
+                    <button type="submit" class="btn btn-primary bg-transparent border-0 rounded-full font-normal shadow-none">Redeem Credits</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button></button>
+    </form>
+</dialog>
+
+{# History active tab switch class only #}
+<script>
+    document.addEventListener("click", function (e) {
+        const tab = e.target.closest(".credit-tab");
+        if (!tab) return;
+
+        document.querySelectorAll(".credit-tab").forEach(btn => {
+            btn.classList.remove("tab-active");
+        });
+
+        tab.classList.add("tab-active");
+    });
+</script>

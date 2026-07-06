@@ -1,0 +1,1047 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Appearance</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'yummyrecipes/indexnew.css' %}">
+{% endblock %}
+
+{% block raw_content %}
+
+  {% if user.is_authenticated or is_guest %}
+
+    <div class="min-h-screen w-full pt-[80px] relative">
+      
+      <div class="w-full px-4 sm:px-8 pt-8 pb-20">
+
+        <header class="main-header px-5 sm:px-0 mb-3">
+          <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Appearance</h1>
+          <p class="mt-1 text-sm opacity-75">Personalize the look of your workspace</p>
+        </header>
+          
+        <div class="flex justify-center mt-8">
+          
+          <div class="w-full max-w-4xl">
+            
+            <div class="theme-container grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+
+                {# Day #}
+                <label class="cursor-pointer">
+                  <input type="radio" name="appearance" value="day" class="theme-radio hidden" {% if active_theme == "day" and not user.userprofile.schedule_enabled %}checked{% endif %}>
+                    <div class="appearance-card card w-full overflow-hidden" data-theme-card="day">
+
+                      <div class="p-3">
+                        <div class="theme-preview-container h-28 p-4 px-2">
+                          <div class="h-2.5 w-full rounded-full mb-4 opacity-60" style="background-color: var(--tertiary-color);"></div>
+
+                          <div class="flex gap-3 h-[calc(100%-26px)]">
+                            <div class="flex-1 flex flex-col justify-center gap-2">
+                              <div class="h-2.5 rounded-full opacity-25" style="background-color: var(--tertiary-color);"></div>
+                              <div class="h-2.5 rounded-full opacity-35" style="background-color: var(--tertiary-color);"></div>
+                              <div class="h-2.5 rounded-full opacity-45" style="background-color: var(--tertiary-color);"></div>
+                            </div>
+
+                            <div class="w-[60px] rounded-2xl opacity-60" style="background-color: var(--tertiary-color);"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="px-4 pb-4">
+                          <div class="flex items-center justify-between">
+
+                              <div class="flex items-center gap-2">
+                                  <input type="checkbox" data-theme-checkbox="day" class="theme-checkbox checkbox checkbox-xs pointer-events-none shadow-none">
+                                  <span class="font-medium text-sm">Day</span>
+                              </div>
+
+                              <span class="material-symbols-rounded text-base-content/70 !text-[1.2rem]">
+                                  light_mode
+                              </span>
+
+                          </div>
+                      </div>
+                  </div>
+                </label>
+
+                {# Night #}
+                <label class="cursor-pointer">
+                    <input type="radio" name="appearance" value="night" class="theme-radio hidden" {% if active_theme == "night" and not user.userprofile.schedule_enabled %}checked{% endif %}>
+
+                    <div class="appearance-card card w-full overflow-hidden" data-theme-card="night">
+
+                        <div class="p-3">
+                            <div class="theme-preview-container h-28 p-4 px-2">
+
+                                <div class="h-2.5 w-full rounded-full bg-slate-600 mb-4"></div>
+
+                                <div class="flex gap-3 h-[calc(100%-26px)]">
+                                    <div class="flex-1 flex flex-col justify-center gap-2">
+                                        <div class="h-2.5 rounded-full bg-slate-400"></div>
+                                        <div class="h-2.5 rounded-full bg-slate-600"></div>
+                                        <div class="h-2.5 rounded-full bg-slate-700"></div>
+                                    </div>
+
+                                    <div class="w-[60px] rounded-2xl bg-slate-700"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-4 pb-4">
+                            <div class="flex items-center justify-between">
+
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-theme-checkbox="night" class="theme-checkbox checkbox checkbox-xs pointer-events-none shadow-none">
+                                    <span class="font-medium text-sm">Night</span>
+                                </div>
+
+                                <span class="material-symbols-rounded text-base-content/70 !text-[1.2rem]">
+                                    dark_mode
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                {# Blur #}
+                <label class="cursor-pointer">
+                    <input type="radio" name="appearance" class="hidden">
+
+                    <div class="appearance-card card w-full overflow-hidden" data-theme-card="blur">
+
+                        <div class="p-3">
+                          <div class="theme-preview-container theme-preview-blur h-28 relative overflow-hidden rounded-xl">
+                            <img src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="absolute inset-0 h-full w-full object-cover"/>
+
+                            <div class="absolute inset-0 bg-black/20"></div>
+
+                            <div class="absolute inset-0 rounded-inherit bg-white/25 backdrop-blur-md"></div>
+                          </div>
+                        </div>
+
+                        <div class="px-4 pb-4">
+                            <div class="flex items-center justify-between">
+
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-theme-checkbox="blur" class="theme-checkbox checkbox checkbox-xs pointer-events-none shadow-none">
+                                    <span class="font-medium text-sm">Blur</span>
+                                </div>
+
+                                <span class="material-symbols-rounded text-base-content/70 !text-[1.2rem]">
+                                    blur_on
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                {# Schedule #}
+                <div class="relative">
+                  <input type="radio" name="appearance" value="schedule" class="theme-radio hidden" id="schedule-radio" {% if user.userprofile.schedule_enabled %}checked{% endif %}>
+
+                    <div for="schedule-radio" class="appearance-card card w-full overflow-hidden" onclick="scheduleDialog.showModal()" data-theme-card="schedule">
+
+                        <div class="p-3">
+                          <div class="theme-preview-container h-28 relative overflow-hidden rounded-[2.2rem]">
+                              <svg class="absolute inset-0 w-full h-full" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet">
+
+                                <defs>
+                                    <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#fbbf24"/>
+                                        <stop offset="50%" stop-color="#d1d5db"/>
+                                        <stop offset="100%" stop-color="#000000"/>
+                                    </linearGradient>
+                                </defs>
+
+                                <path d="M 26 70 Q 100 10 174 70" fill="none" stroke="url(#arcGradient)" stroke-width="6" stroke-linecap="round"/>
+
+                                <circle cx="18" cy="55" r="7" fill="#fbbf24"/>
+
+                                <g transform="translate(172 47) scale(0.75) rotate(15, 12, 12)">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#000000"/>
+                                </g>
+
+                              </svg>
+                          </div>
+                        </div>
+
+                        <div class="px-4 pb-4">
+                            <div class="flex items-center justify-between">
+
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" data-theme-checkbox="schedule" class="theme-checkbox checkbox checkbox-xs pointer-events-none shadow-none">
+                                    <span  id="schedule-label" class="font-medium text-sm">
+                                      {% if user.userprofile.schedule_enabled %}
+                                        {% if user.userprofile.schedule_mode == "auto" %}
+                                            Auto
+                                        {% else %}
+                                            Custom time
+                                        {% endif %}
+                                      {% else %}
+                                          Schedule
+                                      {% endif %}
+                                    </span>
+                                </div>
+
+                                <span class="material-symbols-rounded text-base-content/70 !text-[1.2rem]">
+                                    auto_mode
+                                </span>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-18">
+
+              <div class="mb-3">
+                  <h2 class="text-2xl font-medium">Theme studio</h2>
+                  <p class="text-sm opacity-75">Build or generate your custom color palette</p>
+              </div>
+
+              <div class="ts-container group/theme flex flex-col w-full mt-1">
+
+                {# tab navigation #}
+                <div class="ts-btn-container flex w-full mb-4 p-2.5">
+
+                  <label class="theme-pill flex-1 cursor-pointer has-[:checked]:shadow-sm has-[:checked]:font-semibold hover:font-medium">
+                      <input type="radio" name="theme_mode" id="mode-custom" class="hidden" {% if theme_studio_tab == "custom" %}checked{% endif %}>
+                      <div class="flex items-center justify-center gap-2 px-6 py-4">
+                          <span class="material-symbols-rounded ts-icon">palette</span>
+                          <div>
+                              <div class="text-sm md:text-md">Custom theme</div>
+                              <!-- <div class="text-sm opacity-80 mt-1">Pick colors manually</div> -->
+                          </div>
+                      </div>
+                  </label>
+
+                  <label class="theme-pill flex-1 cursor-pointer has-[:checked]:shadow-sm has-[:checked]:font-semibold hover:font-medium">
+                      <input type="radio" name="theme_mode" id="mode-generate" class="hidden" {% if theme_studio_tab == "ai" %}checked{% endif %}>
+                      <div class="flex items-center justify-center gap-2 px-6 py-4">
+                          <span class="material-symbols-rounded ts-icon">auto_awesome</span>
+                          <div>
+                              <div class="text-sm md:text-md">AI Generated</div>
+                              <!-- <div class="text-sm opacity-80 mt-1">AI generated palette</div> -->
+                          </div>
+                      </div>
+                  </label>
+                </div>
+  
+                {# tab content #}
+                <div class="ts-tab-container w-full">
+
+                  <div class="hidden group-has-[#mode-custom:checked]/theme:block w-full">
+                      <div class="grid xs:grid-cols-1 md:grid-cols-3 gap-3">
+                          
+                        <form id="custom-theme-form" class="md:col-span-3">
+                            {% csrf_token %}
+
+                            <div class="grid xs:grid-cols-1 md:grid-cols-3 gap-3">
+
+                              <div class="card">
+                                <div class="card-body">
+                                  <h3 class="card-title text-[1rem] font-normal">Primary</h3>
+
+                                  <input id="primary-color" type="color" name="primary_color" class="w-full h-14 cursor-pointer"
+                                      value="{{ request.user.userprofile.primary_color|default:'#6750A4' }}">
+                                </div>
+                              </div>
+
+                              <div class="card">
+                                <div class="card-body">
+                                  <h3 class="card-title text-[1rem] font-normal">Secondary</h3>
+
+                                  <input id="secondary-color" type="color" name="secondary_color" class="w-full h-14 cursor-pointer"
+                                      value="{{ request.user.userprofile.secondary_color|default:'#625B71' }}">
+                                </div>
+                              </div>
+
+                              <div class="card">
+                                <div class="card-body">
+                                  <h3 class="card-title text-[1rem] font-normal">Tertiary</h3>
+
+                                  <input id="tertiary-color" type="color" name="tertiary_color" class="w-full h-14 cursor-pointer"
+                                      value="{{ request.user.userprofile.tertiary_color|default:'#7D5260' }}">
+                                </div>
+                              </div>
+
+                            </div>
+
+                            <div class="mt-4 flex justify-end">
+                                <button type="submit" class="btn btn-transparent font-medium px-6 border-0 shadow-none">
+                                    Apply
+                                </button>
+                            </div>
+                        </form>
+                      </div>
+                  </div>
+
+                  <div class="hidden group-has-[#mode-generate:checked]/theme:block w-full">  
+                    <div class="ts-ai-theme">
+                      <form id="ai-theme-generator">
+                        {% csrf_token %}
+                        <div class="theme-input-container border border-transparent p-4 focus-within:ring-1 focus-within:ring-primary focus-within:!border-transparent transition-colors">
+                            <textarea name="theme_description"
+                                class="textarea border-0 shadow-none focus:outline-none focus:ring-0 w-full h-41 resize-none p-0 bg-transparent"
+                                placeholder="Describe your theme" required></textarea>
+
+                            <button type="submit" class="btn btn-transparent border-0 mt-2 font-medium shadow-none ml-auto block">Generate theme</button>
+                        </div>
+                      </form>
+                      
+                      {# current applied ai themes #}
+                      <div class="grid md:grid-cols-2 gap-4">
+                        <div id="current-ai-theme-wrapper"
+                            class="applied-ai-theme-container mt-6 {% if user.userprofile.theme != 'ai' %}hidden{% endif %}">
+
+                            <h2 class="text-md font-medium mb-2">Current theme</h2>
+
+                            <form id="current-ai-theme" class="card">
+                                {% csrf_token %}
+
+                                <div class="card-body">
+                                    <h3 id="current-theme-name" class="mb-1">
+                                        {{ user.userprofile.theme_name|default:"AI Theme" }}
+                                    </h3>
+
+                                    <div class="grid grid-cols-7 gap-2">
+                                        <div class="h-10 rounded border-0 bg-[var(--primary-color)]"></div>
+                                        <div class="h-10 rounded border-0 bg-[var(--secondary-color)]"></div>
+                                        <div class="h-10 rounded border-0 bg-[var(--tertiary-color)]"></div>
+                                        <div class="h-10 rounded border-0 bg-[var(--neutral-primary)]"></div>
+                                        <div class="h-10 rounded border-0 bg-[var(--neutral-secondary)]"></div>
+                                        <div class="h-10 rounded border-0 bg-[var(--active-link-color)]"></div>
+                                        <div class="h-10 rounded border-0 bg-[var(--hover-color)]"></div>
+                                    </div>
+
+                                    <input id="current-theme-name-input" type="hidden" name="theme_name"
+                                          value="{{ user.userprofile.theme_name }}">
+                                    <input id="current-primary-input" type="hidden" name="primary_color"
+                                          value="{{ user.userprofile.primary_color }}">
+                                    <input id="current-secondary-input" type="hidden" name="secondary_color"
+                                          value="{{ user.userprofile.secondary_color }}">
+                                    <input id="current-tertiary-input" type="hidden" name="tertiary_color"
+                                          value="{{ user.userprofile.tertiary_color }}">
+                                    <input id="current-neutral-primary-input" type="hidden" name="neutral_primary"
+                                          value="{{ user.userprofile.neutral_primary }}">
+                                    <input id="current-neutral-secondary-input" type="hidden" name="neutral_secondary"
+                                          value="{{ user.userprofile.neutral_secondary }}">
+                                    <input id="current-active-link-input" type="hidden" name="active_link_color"
+                                          value="{{ user.userprofile.active_link_color }}">
+                                    <input id="current-hover-input" type="hidden" name="hover_color"
+                                          value="{{ user.userprofile.hover_color }}">
+                                </div>
+                            </form>
+                        </div>
+                      </div>
+
+                      {# generated ai themes #}
+                      <!-- {% if user.userprofile.theme == 'ai' %}<hr class="my-6">{% endif %} -->
+
+                      <div id="generated-themes" class="hidden mt-6">
+
+                        <h2 class="text-md font-medium mb-2">Generated themes</h2>
+
+                        <div id="generated-theme-list" class="generated-ai-theme-container grid md:grid-cols-2 gap-4">
+
+                            <form id="generated-theme-template" class="card hidden border-0">
+                                {% csrf_token %}
+
+                                <div class="card-body">
+                                    <h3 class="theme-name text-md mb-1"></h3>
+
+                                    <div class="grid grid-cols-7 gap-2 mb-4">
+                                        <div class="theme-color h-10 rounded border-0" data-field="primary_color"></div>
+                                        <div class="theme-color h-10 rounded border-0" data-field="secondary_color"></div>
+                                        <div class="theme-color h-10 rounded border-0" data-field="tertiary_color"></div>
+                                        <div class="theme-color h-10 rounded border-0" data-field="neutral_primary"></div>
+                                        <div class="theme-color h-10 rounded border-0" data-field="neutral_secondary"></div>
+                                        <div class="theme-color h-10 rounded border-0" data-field="active_link_color"></div>
+                                        <div class="theme-color h-10 rounded border-0" data-field="hover_color"></div>
+                                    </div>
+
+                                    <input type="hidden" name="theme_name">
+                                    <input type="hidden" name="primary_color">
+                                    <input type="hidden" name="secondary_color">
+                                    <input type="hidden" name="tertiary_color">
+                                    <input type="hidden" name="neutral_primary">
+                                    <input type="hidden" name="neutral_secondary">
+                                    <input type="hidden" name="active_link_color">
+                                    <input type="hidden" name="hover_color">
+
+                                    <button type="submit" class="btn btn-transparent font-medium border-0 w-full shadow-none">
+                                        Apply theme
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+      
+    </div>
+
+  {% else %}
+    <script>
+      location.href = "{% url 'login' %}";
+    </script>
+  {% endif %}
+
+  {% block modals %}
+  <dialog id="scheduleDialog" class="modal">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Schedule theme</h3>
+
+        <div class="mt-6 space-y-6">
+            <div class="space-y-3">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="radio" name="schedule-mode" value="off" class="radio radio-primary"
+                        {% if not user.userprofile.schedule_enabled %}checked{% endif %}>
+                    <span>Off</span>
+                </label>
+
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="radio" name="schedule-mode" value="auto" class="radio radio-primary"
+                        {% if user.userprofile.schedule_enabled and user.userprofile.schedule_mode == "auto" %}checked{% endif %}>
+                    <span>Automatic</span>
+                </label>
+
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="radio" name="schedule-mode" value="custom" class="radio radio-primary"
+                        {% if user.userprofile.schedule_enabled and user.userprofile.schedule_mode == "custom" %}checked{% endif %}>
+                    <span>Custom Schedule</span>
+                </label>
+            </div>
+
+            <div id="custom-times" class="hidden space-y-4">
+                <div>
+                    <label class="label">Night Starts</label>
+
+                    <input id="night-start" type="time" class="input input-bordered w-full"
+                        value="{% if user.userprofile.night_start %}{{ user.userprofile.night_start|time:'H:i' }}{% else %}18:00{% endif %}">
+                </div>
+
+                <div>
+                    <label class="label">Night Ends</label>
+
+                    <input id="night-end" type="time" class="input input-bordered w-full"
+                        value="{% if user.userprofile.night_end %}{{ user.userprofile.night_end|time:'H:i' }}{% else %}06:00{% endif %}">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-action">
+            <button type="button" id="save-schedule-btn" class="btn btn-primary">
+                Save Schedule
+            </button>
+        </div>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button></button>
+    </form>
+  </dialog>
+  {% endblock %}
+
+
+  {# theme switch script #}
+  <script>
+    const THEME_ENDPOINTS = {
+        day: "{% url 'apply_day_theme' %}",
+        night: "{% url 'apply_night_theme' %}",
+        blur: null,
+        schedule: null,
+        custom: null,
+        ai: null
+    };
+
+    function applyThemeVariables(colors) {
+        const root = document.documentElement;
+
+        Object.entries({
+            "--primary-color": colors.primary_color,
+            "--secondary-color": colors.secondary_color,
+            "--tertiary-color": colors.tertiary_color,
+            "--active-link-color": colors.active_link_color,
+            "--hover-color": colors.hover_color,
+            "--neutral-primary": colors.neutral_primary,
+            "--neutral-secondary": colors.neutral_secondary
+        }).forEach(([key, value]) => {
+            root.style.setProperty(key, value);
+        });
+
+        updateCustomThemeInputs(colors);
+    }
+
+    function updateCustomThemeInputs(colors) {
+      if (!colors) return;
+
+      const fields = {
+          "primary-color": colors.primary_color,
+          "secondary-color": colors.secondary_color,
+          "tertiary-color": colors.tertiary_color,
+      };
+
+      Object.entries(fields).forEach(([id, value]) => {
+          const input = document.getElementById(id);
+
+          if (input && value) {
+              input.value = value;
+          }
+      });
+    }
+
+    function toggleCurrentAITheme(show) {
+        const wrapper = document.getElementById("current-ai-theme-wrapper");
+
+        if (!wrapper) return;
+
+        wrapper.classList.toggle("hidden", !show);
+    }
+
+    function updateCurrentAITheme(theme) {
+      // Theme name
+      document.getElementById("current-theme-name").textContent =
+          theme.theme_name;
+
+      // Hidden inputs
+      const hiddenFields = {
+          "current-theme-name-input": theme.theme_name,
+          "current-primary-input": theme.primary_color,
+          "current-secondary-input": theme.secondary_color,
+          "current-tertiary-input": theme.tertiary_color,
+          "current-neutral-primary-input": theme.neutral_primary,
+          "current-neutral-secondary-input": theme.neutral_secondary,
+          "current-active-link-input": theme.active_link_color,
+          "current-hover-input": theme.hover_color,
+      };
+
+      Object.entries(hiddenFields).forEach(([id, value]) => {
+          const input = document.getElementById(id);
+
+          if (input) {
+              input.value = value;
+          }
+      });
+
+      // Update the 7 preview color blocks
+      const colors = [
+          theme.primary_color,
+          theme.secondary_color,
+          theme.tertiary_color,
+          theme.neutral_primary,
+          theme.neutral_secondary,
+          theme.active_link_color,
+          theme.hover_color
+      ];
+
+      document
+          .querySelectorAll("#current-ai-theme .grid > div")
+          .forEach((box, index) => {
+              if (colors[index]) {
+                  box.style.backgroundColor = colors[index];
+              }
+          });
+      }
+
+    function setActiveAppearanceCard(theme) {
+
+        document
+            .querySelectorAll(".appearance-card")
+            .forEach(card => {
+                card.classList.remove(
+                    "border-primary",
+                    "ring-2",
+                    "ring-primary"
+                );
+            });
+
+        if (!theme) return;
+
+        const card = document.querySelector(
+            `[data-theme-card="${theme}"]`
+        );
+
+        if (card) {
+            card.classList.add(
+                "border-primary",
+                "ring-2",
+                "ring-primary"
+            );
+        }
+    }
+
+    function clearAppearanceRadios() {
+      document.querySelectorAll(".theme-radio").forEach(radio => {
+          radio.checked = false;
+      });
+    }
+
+      function setAppearanceState(
+          appearance = null,
+          themeStudio = "custom",
+          showCurrentAI = false
+      ) {
+
+        clearAppearanceRadios();
+
+        if (appearance) {
+            const radio = document.querySelector(
+                `.theme-radio[value="${appearance}"]`
+            );
+
+            if (radio) {
+                radio.checked = true;
+            }
+        }
+
+        // Appearance cards
+        setActiveAppearanceCard(appearance);
+
+        // Checkboxes
+        updateThemeCheckboxes(appearance);
+
+        // Current AI card
+        toggleCurrentAITheme(showCurrentAI);
+
+        // Theme Studio tab
+        document.getElementById("mode-custom").checked =
+            themeStudio === "custom";
+
+        document.getElementById("mode-generate").checked =
+            themeStudio === "ai";
+    }
+
+    function updateThemeCheckboxes(activeTheme = null) {
+
+        document.querySelectorAll(".theme-checkbox").forEach(cb => {
+            cb.checked = false;
+        });
+
+        // Schedule always wins
+        if (scheduleState.enabled) {
+            const scheduleCheckbox = document.querySelector(
+                '[data-theme-checkbox="schedule"]'
+            );
+
+            if (scheduleCheckbox) {
+                scheduleCheckbox.checked = true;
+            }
+
+            return;
+        }
+
+        if (!activeTheme) {
+            return;
+        }
+
+        const checkbox = document.querySelector(
+            `[data-theme-checkbox="${activeTheme}"]`
+        );
+
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+    }
+
+    async function applyTheme(theme) {
+        const endpoint = THEME_ENDPOINTS[theme];
+
+        if (!endpoint) {
+            console.log(`${theme} not implemented`);
+            return;
+        }
+
+        try {
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                return;
+            }
+
+            applyThemeVariables(data.colors);
+
+            scheduleState.enabled = data.schedule_enabled;
+            scheduleState.mode = data.schedule_mode;
+
+            renderScheduleUI();
+
+            setAppearanceState(
+                data.theme,
+                "custom",
+                false
+            );
+
+        } catch (err) {
+            console.error(err);
+        } 
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".theme-radio").forEach(radio => {
+            radio.addEventListener("change", function () {
+                applyTheme(this.value);
+            });
+        });
+
+        // updateThemeCheckboxes("{{ active_theme }}");
+        // setActiveAppearanceCard("{{ active_theme }}");
+        setAppearanceState(
+          "{{ active_theme }}",
+          "{{ theme_studio_tab }}",
+          "{{ user.userprofile.theme }}" === "ai"
+        );
+    });
+  </script>
+
+
+  {# schedule script #}
+  <script>
+    const scheduleState = {
+        enabled: false,
+        mode: "off"
+    };
+
+    function renderScheduleUI(activeTheme = null) {
+        const label = document.getElementById("schedule-label");
+        const customTimes = document.getElementById("custom-times");
+
+        document.querySelector('[data-theme-checkbox="schedule"]').checked =
+            scheduleState.enabled;
+
+        if (!scheduleState.enabled) {
+            label.textContent = "Schedule";
+        } else if (scheduleState.mode === "auto") {
+            label.textContent = "Auto";
+        } else {
+            label.textContent = "Custom time";
+        }
+
+        document.querySelector(
+            'input[name="schedule-mode"][value="off"]'
+        ).checked = !scheduleState.enabled;
+
+        document.querySelector(
+            'input[name="schedule-mode"][value="auto"]'
+        ).checked =
+            scheduleState.enabled &&
+            scheduleState.mode === "auto";
+
+        document.querySelector(
+            'input[name="schedule-mode"][value="custom"]'
+        ).checked =
+            scheduleState.enabled &&
+            scheduleState.mode === "custom";
+
+        customTimes.classList.toggle(
+            "hidden",
+            !scheduleState.enabled ||
+            scheduleState.mode !== "custom"
+        );
+    }
+
+    async function saveSchedule() {
+        const mode =
+            document.querySelector(
+                'input[name="schedule-mode"]:checked'
+            ).value;
+
+        const formData = new FormData();
+        formData.append("mode", mode);
+
+        if (mode === "custom") {
+            const start = document.getElementById("night-start").value;
+            const end = document.getElementById("night-end").value;
+
+            if (!start || !end) {
+                alert("Please select both times.");
+                return;
+            }
+
+            formData.append("night_start", start);
+            formData.append("night_end", end);
+        }
+
+        try {
+            const response = await fetch(
+                "{% url 'save_schedule' %}",
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: formData
+                }
+            );
+
+            const data = await response.json();
+
+            if (!data.success) {
+              alert(data.message || "Failed to save schedule.");
+              return;
+            }
+
+            scheduleState.enabled = data.schedule_enabled;
+            scheduleState.mode = data.schedule_mode;
+
+            renderScheduleUI();
+            applyThemeVariables(data.colors);
+
+            setAppearanceState(
+                "schedule",
+                "custom",
+                false
+            );
+
+            document.getElementById("scheduleDialog").close();
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong.");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        scheduleState.enabled =
+            document.getElementById("schedule-radio").checked;
+
+        scheduleState.mode =
+            document.querySelector(
+                'input[name="schedule-mode"]:checked'
+            ).value;
+
+        renderScheduleUI();
+
+        document
+            .querySelectorAll('input[name="schedule-mode"]')
+            .forEach(radio => {
+                radio.addEventListener("change", e => {
+                    const mode = e.target.value;
+
+                    scheduleState.enabled = mode !== "off";
+                    scheduleState.mode = mode;
+
+                    renderScheduleUI();
+                });
+            });
+
+        document.getElementById("save-schedule-btn").addEventListener("click", saveSchedule);
+    });
+  </script>
+
+
+  {# custom script #}
+  <script>
+    document.getElementById("custom-theme-form")
+      .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const form = e.target;
+
+          const response = await fetch(
+              "/appearance/custom-theme/",
+              {
+                  method: "POST",
+                  body: new FormData(form),
+
+                  headers: {
+                      "X-CSRFToken":
+                          form.querySelector(
+                              "[name=csrfmiddlewaretoken]"
+                          ).value,
+                  },
+              }
+          );
+
+          const data = await response.json();
+
+          if (!data.success) {
+              return;
+          }
+
+          applyThemeVariables(data.colors);
+
+          scheduleState.enabled = data.schedule_enabled;
+          scheduleState.mode = data.schedule_mode;
+
+          renderScheduleUI();
+
+          setAppearanceState(
+              null,
+              "custom",
+              false
+          );
+      });
+  </script>
+
+
+  {# ai theme script #}
+  <script>
+    const generatorForm =
+        document.getElementById("ai-theme-generator");
+
+    const generatedThemes =
+        document.getElementById("generated-themes");
+
+    const generatedThemeList =
+        document.getElementById("generated-theme-list");
+
+    const generatedThemeTemplate =
+        document.getElementById("generated-theme-template");
+
+    generatorForm.addEventListener(
+        "submit",
+        generateAIThemes
+    );
+
+    async function generateAIThemes(e) {
+        e.preventDefault();
+
+        const response = await fetch(
+            "/appearance/generate-ai-theme/",
+            {
+                method: "POST",
+
+                headers: {
+                    "X-CSRFToken":
+                        generatorForm.querySelector(
+                            "[name=csrfmiddlewaretoken]"
+                        ).value,
+                },
+
+                body: new FormData(generatorForm),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.error);
+            return;
+        }
+
+        renderGeneratedThemes(data.themes);
+    }
+
+    function renderGeneratedThemes(themes) {
+        generatedThemes.classList.remove("hidden");
+
+        generatedThemeList
+            .querySelectorAll(".generated-theme")
+            .forEach(card => card.remove());
+
+        themes.forEach(theme => {
+            const card =
+                generatedThemeTemplate.cloneNode(true);
+
+            card.removeAttribute("id");
+
+            card.classList.remove("hidden");
+            card.classList.add("generated-theme");
+
+            card.querySelector(".theme-name")
+                .textContent = theme.name;
+
+            card.querySelectorAll(".theme-color")
+                .forEach(color => {
+                    const field =
+                        color.dataset.field;
+
+                    color.style.backgroundColor =
+                        theme[field];
+                });
+
+            card.querySelectorAll("input")
+                .forEach(input => {
+                    if (input.name === "csrfmiddlewaretoken") {
+                        return;
+                    }
+
+                    if (input.name === "theme_name") {
+                        input.value = theme.name;
+                    } else {
+                        input.value = theme[input.name];
+                    }
+                });
+
+            card.addEventListener(
+                "submit",
+                applyAITheme
+            );
+
+            generatedThemeList.appendChild(card);
+        });
+    }
+
+    async function applyAITheme(e) {
+        e.preventDefault();
+
+        const form = e.target;
+
+        const response = await fetch(
+            "/appearance/apply-ai-theme/",
+            {
+                method: "POST",
+
+                headers: {
+                    "X-CSRFToken":
+                        generatorForm.querySelector(
+                            "[name=csrfmiddlewaretoken]"
+                        ).value,
+                },
+
+                body: new FormData(form),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+            return;
+        }
+
+        applyThemeVariables(data);
+        updateCurrentAITheme(data);
+
+        // AI theme disables schedule
+        scheduleState.enabled = data.schedule_enabled;
+        scheduleState.mode = data.schedule_mode;
+
+        renderScheduleUI();
+
+        setAppearanceState(
+            null,
+            "ai",
+            true
+        );
+    }
+  </script>
+
+
+{% endblock %}

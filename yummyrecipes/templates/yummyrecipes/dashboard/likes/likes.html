@@ -1,0 +1,96 @@
+<div class="space-y-4">
+
+    <header class="ml-5 md:ml-0">
+        <h1 class="text-lg md:text-xl font-medium">Likes</h1>
+        <p class="mt-1 text-sm opacity-60">Track liked recipes and received likes</p>
+    </header>
+
+    <div class="likes-top-cards grid grid-cols-2 md:grid-cols-3 gap-2">
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Recipes Liked</p>
+                <h2 class="text-3xl font-medium mt-2">{{ total_liked_recipes }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Likes Received</p>
+                <h2 class="text-3xl font-medium mt-2">{{ total_received_likes }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Highest Likes</p>
+                <h2 class="text-3xl font-medium mt-2">{{ top_likes }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid xl:grid-cols-3 items-start">
+
+        <div class="dashboard-activity-container col-span-full">
+
+            <div class="card mt-2">
+
+                <div class="card-body p-0 ml-5 md:ml-0">
+                    <div>
+                        <h2 class="text-lg md:text-xl font-medium">Likes Activity</h2>
+                        <p class="text-sm opacity-60 mt-1">Liked recipes & received likes.</p>
+                    </div>
+                </div>
+
+                <div role="tablist" class="tabs border-0 p-1 mt-4 mb-1 gap-2">
+
+                    <button class="tab tab-active likes-tab shadow-none"
+                            hx-get="{% url 'dashboard_liked_recipes' %}"
+                            hx-target="#likes-content"
+                            hx-swap="innerHTML">
+                        Liked Recipes
+                    </button>
+
+                    <button class="tab likes-tab shadow-none"
+                            hx-get="{% url 'dashboard_likes_received' %}"
+                            hx-target="#likes-content"
+                            hx-swap="innerHTML">
+                        Likes Received
+                    </button>
+
+                    <button class="tab likes-tab shadow-none"
+                            hx-get="{% url 'dashboard_top_liked_recipes' %}"
+                            hx-target="#likes-content"
+                            hx-swap="innerHTML">
+                        Top Liked
+                    </button>
+
+                </div>
+
+                <div id="likes-content"
+                     class="overflow-y-auto max-h-[650px] pb-6"
+                     hx-get="{% url 'dashboard_liked_recipes' %}"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("click", e => {
+    const tab = e.target.closest(".likes-tab");
+    if (!tab) return;
+
+    document.querySelectorAll(".likes-tab")
+        .forEach(b => b.classList.remove("tab-active"));
+
+    tab.classList.add("tab-active");
+});
+</script>

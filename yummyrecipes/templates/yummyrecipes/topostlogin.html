@@ -1,0 +1,268 @@
+{% extends 'yummyrecipes/base.html' %}
+
+{% load static %}
+{% load socialaccount %}
+
+{% block title %}
+<title>Login required — Yummy Recipes</title>
+{% endblock %}
+
+{% block raw_content %}
+<div class="flex flex-col min-[1000px]:flex-row w-full h-[100dvh] pt-20 overflow-hidden select-none">
+
+    {% if not user.is_authenticated or login_success_name %}
+
+    <div class="max-[999px]:hidden min-[1000px]:flex w-[55%] h-full p-6 pb-12 relative overflow-hidden">
+        <div class="auth-image-panel w-full h-full">
+            <img {% if img %} src="{{ img.image.url }}" {% else %} src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?q=80&w=1400&auto=format&fit=crop" {% endif %}
+                alt="Fresh ingredients arranged for cooking">
+        </div>
+    </div>
+
+    <div class="w-full min-[1000px]:w-[45%] h-full flex flex-col justify-center items-center px-6 lg:px-12 relative z-10 pb-16">
+        <div class="w-full max-w-[400px] space-y-7">
+
+            <div id="login-header" class="text-left space-y-2">
+                <h1 class="text-3xl lg:text-4xl font-bold text-stone-900 tracking-tight">
+                    Login to view recipe
+                </h1>
+                <p class="text-red-500 text-sm font-light">{{recipes.title}}</p>
+            </div>
+
+            <form method="POST" hx-post="{% url 'login' %}" class="login-signup-form signup-form space-y-4" hx-target="#login-header" hx-swap="innerHTML">
+                {% csrf_token %}
+
+                <input
+                    type="email"
+                    name="email"
+                    id="inputEmail3"
+                    class="w-full px-5 py-4 rounded-full premium-input border border-stone-200 
+                            text-sm text-stone-900 placeholder-stone-400 bg-stone-50 outline-none transition
+                            focus:border-stone-700 focus:bg-white transition duration-300"
+                    placeholder="Email Address" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}"
+                    value="{{ request.session.existing_user_email|default:'' }}"
+                    required>
+
+                <div class="relative w-full">
+                    <input
+                        type="password"
+                        name="password"
+                        id="inputPassword3"
+                        class="w-full px-5 py-4 rounded-full premium-input border border-stone-200 
+                            text-sm text-stone-900 placeholder-stone-400 bg-stone-50 outline-none transition
+                            focus:border-stone-700 focus:bg-white transition duration-300 pr-12 text-sm"
+                        placeholder="Password" required>
+                    <button
+                        type="button"
+                        onclick="togglePassword()"
+                        class="btn btn-ghost btn-circle btn-sm absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-800"
+                        aria-label="Toggle password visibility">
+                        <span id="pwd-icon" class="material-symbols-rounded text-[20px]">visibility</span>
+                    </button>
+                </div>
+
+                <div class="flex justify-end pt-1">
+                    <a href="{% url 'password_reset' %}" class="link link-hover text-[11px] font-medium text-stone-900 hover:text-orange-600 uppercase tracking-wider">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <button type="submit" class="btn btn-neutral px-5 py-4 w-full rounded-full font-medium mt-2">Login</button>
+            </form>
+
+            <div class="divider text-[10px] font-bold text-stone-400 uppercase tracking-widest">
+                Or login with
+            </div>
+
+            <div class="space-y-3">
+                <a href="{% provider_login_url 'google' %}" class="btn btn-outline w-full rounded-full border-stone-200 bg-white text-stone-700 hover:bg-stone-50 hover:text-stone-900">
+                    
+                    <button class="btn bg-white text-black border-0">
+                        <svg aria-label="Google logo" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g><path d="m0 0H512V512H0" fill="#fff"></path><path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path><path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path><path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path><path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path></g></svg>
+                        Login with Google
+                    </button>
+                </a>
+
+                <!-- {% if not is_guest %}
+                <button type="button" onclick="guest_modal.showModal()" class="btn btn-soft w-full rounded-full text-stone-700">
+                    <span class="material-symbols-rounded text-[18px]">person</span>
+                    Continue as Guest
+                </button>
+                {% endif %} -->
+            </div>
+
+            <p class="text-center text-sm text-stone-500 pt-2">
+                Don't have an account?
+                <a href="{% url 'signup' %}" class="link link-hover font-bold text-stone-900 hover:text-orange-600">Register Now</a>
+            </p>
+        </div>
+    </div>
+
+    {% else %}
+        <script>
+            location.href = "{% url 'home' %}";
+        </script>
+    {% endif %}
+
+</div>
+
+{% block modals %}
+
+    <dialog id="loginErrorModal" class="modal">
+        <div class="modal-box max-w-md">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-rounded !text-[1.1rem]">
+                    error
+                </span>
+
+                <div>
+                    <h3 class="font-semibold text-lg">Login Failed</h3>
+                    <p id="loginErrorText" class="text-sm opacity-70"></p>
+                </div>
+            </div>
+
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn btn-ghost border-0 bg-transparent shadow-none rounded-full font-normal">
+                        Close
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <form method="dialog" class="modal-backdrop">
+            <button></button>
+        </form>
+    </dialog>
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if "login-error" in message.tags %}
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        document.getElementById("loginErrorText").textContent = "{{ message|escapejs }}";
+                        document.getElementById("loginErrorModal").showModal();
+                    });
+                </script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <dialog id="guest_modal" class="modal">
+        <div class="modal-box bg-white rounded-3xl border border-stone-200 shadow-xl p-0 overflow-hidden max-w-md">
+            <div class="modal-slide-content relative" id="guestSlideContent">
+
+                <div class="slide-panel p-8">
+                    <h2 class="text-2xl font-bold text-stone-900">Guest Login</h2>
+                    <p class="text-sm text-stone-500 mt-1 mb-6">Proceeding as a guest.</p>
+
+                    <form method="post" id="guestInputForm" action="{% url 'guest_mode' %}" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="relative w-full">
+                            <input
+                                type="text"
+                                name="guest_user_name"
+                                id="guest_user_name"
+                                class="input input-bordered w-full rounded-full bg-stone-50 border-stone-200 text-sm"
+                                placeholder="Enter your first name"
+                                maxlength="50"
+                                required
+                            >
+                            <p id="guest-error" class="hidden text-xs text-red-500 mt-2 ml-4">Name is required.</p>
+                        </div>
+                    </form>
+
+                    <div class="modal-action mt-8">
+                        <form method="dialog">
+                            <button class="btn btn-ghost rounded-full px-6">Cancel</button>
+                        </form>
+                        <button type="button" id="guestContinueBtn" class="btn btn-neutral rounded-full px-8">Next</button>
+                    </div>
+                </div>
+
+                <div class="slide-panel p-8 flex flex-col justify-center">
+                    <h2 class="text-2xl font-bold text-stone-900" id="guestDisplayTitle">Welcome!</h2>
+                    <p class="text-sm text-stone-500 mt-2 mb-6 leading-relaxed">
+                        As a guest user, some features are restricted. Consider signing up for the full experience later.
+                    </p>
+
+                    <div class="modal-action mt-auto">
+                        <button type="button" id="guestBackBtn" class="btn btn-ghost rounded-full px-6 mr-auto">Back</button>
+                        <button type="submit" form="guestInputForm" class="btn btn-neutral rounded-full px-8">Start Cooking</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% if login_success_name and redirect_url %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+            window.location.href = "{{ redirect_url|escapejs }}";
+        });
+    });
+</script>
+{% endif %}
+
+<script>
+    function togglePassword() {
+        const pwdInput = document.getElementById("inputPassword3");
+        const icon = document.getElementById("pwd-icon");
+
+        if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            icon.textContent = "visibility_off";
+            icon.classList.add("text-stone-900");
+        } else {
+            pwdInput.type = "password";
+            icon.textContent = "visibility";
+            icon.classList.remove("text-stone-900");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const continueBtn = document.getElementById("guestContinueBtn");
+        const backBtn = document.getElementById("guestBackBtn");
+        const slideContent = document.getElementById("guestSlideContent");
+        const nameField = document.getElementById("guest_user_name");
+        const guestTitle = document.getElementById("guestDisplayTitle");
+        const errorMsg = document.getElementById("guest-error");
+
+        if (continueBtn && backBtn) {
+            continueBtn.addEventListener("click", () => {
+                if (!nameField.value.trim()) {
+                    errorMsg.classList.remove("hidden");
+                    nameField.classList.add("input-error");
+                    return;
+                }
+
+                errorMsg.classList.add("hidden");
+                nameField.classList.remove("input-error");
+                guestTitle.textContent = `Welcome, ${nameField.value.trim()}!`;
+                slideContent.style.transform = "translateX(-50%)";
+            });
+
+            backBtn.addEventListener("click", () => {
+                slideContent.style.transform = "translateX(0)";
+            });
+
+            nameField.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    continueBtn.click();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

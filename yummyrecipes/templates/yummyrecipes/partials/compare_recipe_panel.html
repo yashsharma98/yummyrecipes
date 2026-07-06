@@ -1,0 +1,116 @@
+{% if recipe %}
+<article class="compare-recipe-panel">
+    <div class="recipe-image">
+        {% if photo %}
+            <img loading="lazy" src="{{ photo.image.url }}" alt="{{ recipe.title }} image">
+        {% endif %}
+    </div>
+
+    <div class="mt-4 px-2">
+        <h2 class="text-2xl md:text-4xl font-semibold capitalize leading-tight">{{ recipe.title }}</h2>
+        <p class="mt-1 text-sm opacity-60">
+            By {{ recipe.author.get_full_name|default:recipe.author.username }}
+        </p>
+    </div>
+
+    <div class="mt-5 flex flex-wrap gap-3 px-2">
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">schedule</span>
+            <p>{{ recipe.timing }} min{% if recipe.timing > 1 %}s{% endif %}</p>
+        </div>
+
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">groups</span>
+            <p>{{ recipe.servings }}</p>
+        </div>
+
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">category</span>
+            <p>{{ recipe.type }}</p>
+        </div>
+
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">local_dining</span>
+            <p>{{ recipe.category }}</p>
+        </div>
+
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">public</span>
+            <p>{{ recipe.cuisine|cut:" cuisine" }}</p>
+        </div>
+
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">speed</span>
+            <p>{{ recipe.difficulty|cut:" cuisine" }}</p>
+        </div>
+
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">event</span>
+            <span>Posted</span>
+            <p>{{ recipe.get_date }}</p>
+        </div>
+
+        <div class="info-pill rounded-full py-1.5 px-3 text-[0.85rem] font-normal">
+            <span class="material-symbols-rounded !text-[1rem]">update</span>
+            <span>Updated</span>
+            <p>
+                {% if recipe.get_date == recipe.get_modified_date %}
+                    No change
+                {% else %}
+                    {{ recipe.get_modified_date }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <div role="tablist" class="compare-recipe-tabs tabs tabs-border">
+
+            <input type="radio" name="compare-tabs-{{ recipe.id }}" role="tab" class="tab" aria-label="Ingredients" checked/>
+
+            <div role="tabpanel" class="tab-content mt-2">
+                <div class="compare-rich-text prose max-w-none">
+                    {{ recipe.ingredients|safe }}
+                </div>
+            </div>
+
+            <input type="radio" name="compare-tabs-{{ recipe.id }}" role="tab" class="tab" aria-label="Instructions"/>
+
+            <div role="tabpanel" class="tab-content mt-2">
+                <div class="compare-rich-text prose max-w-none">
+                    {{ recipe.content|safe }}
+                </div>
+            </div>
+
+            <input type="radio" name="compare-tabs-{{ recipe.id }}" role="tab" class="tab" aria-label="Nutrition"/>
+
+            <div role="tabpanel" class="tab-content mt-2">
+                <div class="compare-nutrition pl-4">
+                    {% if nutrition_widget %}
+                        {% if "Information is not unavailable" in nutrition_widget %}
+                            <div class="alert alert-warning rounded-lg">
+                                Nutritional information is currently unavailable.
+                            </div>
+                        {% else %}
+                            {{ nutrition_widget|safe }}
+                        {% endif %}
+                    {% else %}
+                        <div class="opacity-70">
+                            Nutrition details are not available for this recipe yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</article>
+{% else %}
+<article class="empty-recipe-panel flex min-h-[520px] flex-col items-center justify-center p-6 text-center">
+    <span class="material-symbols-rounded !text-5xl opacity-55">{{ empty_icon }}</span>
+    <h2 class="mt-4 text-2xl font-medium">{{ empty_title }}</h2>
+    <p class="mt-2 max-w-xs text-sm leading-6 opacity-70">
+        Use the selector above to load a recipe into this comparison slot.
+    </p>
+</article>
+{% endif %}

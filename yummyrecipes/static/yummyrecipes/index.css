@@ -1,0 +1,1169 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap');
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+h1,h2,h3,h4,h5,h6,
+p,a,button:not(.login-signup-form button),span{
+    color: var(--tertiary-color);
+}
+
+.header-squircle-card {
+    border-radius: 4rem; 
+    corner-shape: superellipse(2.25); 
+    overflow: hidden;
+    position: relative;
+    width: 170px;
+    height: 230px; 
+    flex-shrink: 0;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+    text-align: left;
+}
+
+.header-squircle-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.header-squircle-card:hover img {
+    transform: scale(1.05);
+}
+
+.card-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        var(--neutral-secondary) 0%,
+        color-mix(in srgb, var(--neutral-secondary) 70%, transparent) 35%,
+        color-mix(in srgb, var(--neutral-secondary) 35%, transparent) 60%,
+        transparent 100%
+    );
+    pointer-events: none;
+}
+
+.card-title-bottom {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    pointer-events: none;
+}
+
+/* meal navigation & other */
+.meal-tab{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    corner-shape: superellipse(1.5);
+    font-size: 0.8rem;
+    padding: .6rem 1.2rem;
+    transition: all 0.3s;
+}
+
+.active-meal{
+    border-radius: 4rem;
+    corner-shape: superellipse(1.5);
+    background: var(--active-link-color);
+    font-weight: 600;
+    padding: .6rem 2rem;
+}
+
+.meal-tab:hover:not(.active-meal) {
+    transform: scaleX(1.08);
+}
+
+.meal-tab:hover:active {
+    border-radius: 4rem; 
+    corner-shape: superellipse(1.5); 
+    transform: scaleX(0.9);
+}
+
+/* for custom cards as they are links */
+.custom-meal-tab:focus,.custom-meal-tab:active{
+    background: var(--active-link-color);
+    border-radius: 4rem; 
+    corner-shape: superellipse(1.5); 
+    transform: scaleX(0.9);
+    border: 1px solid var(--active-link-color);
+}
+
+/* main recipe cards */
+.recipe-cards {
+    border-radius: 2.25rem;
+    corner-shape: superellipse(1.6);
+    padding: 4px;
+    transition: transform 0.4s cubic-bezier(.22,.61,.36,1);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.img-container {
+    border-radius: calc(2.25rem - 3px);
+    corner-shape: superellipse(1.6);
+    overflow: hidden;
+}
+
+.recipe-main-img {
+    transition: transform 0.4s cubic-bezier(.22,.61,.36,1);
+}
+
+.recipe-title,.trending-cards h4{
+    font-family: "DM Serif Text", serif;
+}
+
+.recipe-cards:hover .recipe-main-img {
+    transform: scale(1.05);
+}
+
+.recipe-cards:hover .recipe-title,
+.trending-cards:hover h4 {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1.2px;
+  text-underline-offset: 2px;
+}
+
+/* recipe card switching transition */
+.recipe-main-img{
+    transform:scale(1);
+    will-change:transform;
+}
+
+.recipe-info span{
+    color: var(--tertiary-color);
+}
+
+.recipe-info-header div:last-child,
+.recipe-info-last {
+    background-color: var(--neutral-secondary);
+}
+
+.recipe-info-pill{
+    border: 1px solid var(--neutral-secondary);
+}
+
+.quickview-wrapper{
+    transform: translateX(99px);
+    transition: transform .25s ease;
+}
+
+.recipe-action span{
+    font-size: 1.05rem;
+}
+
+.recipe-cards:hover .quickview-wrapper{
+    transform:translateX(0);
+}
+
+/* 'See all recipe' link at bottom in dynamic time based recipes */
+.meal-panel .more-recipe-link{
+    background-color: var(--neutral-secondary);
+    border-radius: 2rem;
+    corner-shape: superellipse(1.5);
+}
+
+.meal-panel.animate-in .recipe-cards {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: cardReveal .5s cubic-bezier(.22,1,.36,1) forwards;
+    animation-delay: var(--delay);
+}
+
+.meal-panel.animate-in .recipe-cards .img-container{
+    animation:imageReveal .5s cubic-bezier(.22,1,.36,1) forwards;
+    animation-delay:var(--delay,0ms);
+}
+
+@keyframes cardReveal {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes imageReveal {
+    from {
+        opacity: 0;
+        transform: scale(1.08);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.recipe-action{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5rem;
+    corner-shape:superellipse(1.3);
+    background: var(--surface-color-primary);
+    transition:
+        transform .25s ease,
+        opacity .25s ease;
+}
+
+.favourite-icon{
+    transition:all 0.3s ease;
+}
+
+.favourite-added{
+    font-variation-settings: "FILL" 1, "wght" 800, "GRAD" 0, "opsz" 64;
+    color:rgb(234 88 12);
+}
+
+/* quick view drawer */
+.qv-drawer-img-container{
+    border-radius: 3rem;
+    corner-shape: superellipse(1.6)
+}
+
+.qv-stat-card{
+    aspect-ratio: 1.4 / 1;
+    background: var(--secondary-color);
+    border-radius: 1.75rem;
+    corner-shape: superellipse(1.4);
+    color: var(--tertiary-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0.75rem;
+}
+
+.qv-stat-label{
+    font-size: 0.7rem;
+    margin-bottom: 0.5rem;
+}
+
+.qv-stat-value{
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.qv-drawer-link{
+    border-radius: 2rem; 
+    corner-shape: superellipse(1.5); 
+    background-color: var(--primary-color);
+    border: 0;
+    font-weight: normal;
+    transition: 0.3s ease;
+}
+
+.qv-drawer-link:hover {
+    background: var(--hover-color);
+    transform: scaleX(1.04);
+}
+
+.qv-drawer-link:active {
+    background: var(--hover-color);
+    border-radius: 4rem; 
+    corner-shape: superellipse(1.5); 
+    transform: scaleX(0.95);
+}
+
+/* trending cards */
+.trending-cards{
+    /* background: var(--bg-color); */
+    border-radius: 2rem; 
+    corner-shape: superellipse(1.5);
+}
+
+.trending-cards figure{
+    width: 6.5rem;
+    height: 6rem;
+    border-radius: 2rem;
+    corner-shape: superellipse(1.5); 
+}
+
+.trending-cards img{
+    transition: transform 0.5s cubic-bezier(.22,1,.36,1);
+}
+
+.trending-cards:hover img {
+    transform: scale(1.05);
+}
+
+/* recipes section  home page*/
+.recommended-recipe-section{
+    border-radius: 5rem;
+    corner-shape:superellipse(2.2);
+    background: var(--surface-color-primary);
+}
+
+.cuisine-modal .modal-box ul{
+    border-radius: 1.2rem;
+    corner-shape:superellipse(1.5);
+    border-width: 0.5px;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--tertiary-color) 50%, transparent);
+}
+
+.cuisine-modal .modal-box ul li a{
+    border-radius: 1.5rem;
+    corner-shape:superellipse(1.5);   
+}
+
+.cuisine-modal .modal-box ul li a:hover,
+.cuisine-modal .modal-box ul li a:focus,
+.cuisine-modal .modal-box ul li a:active{
+    background-color: var(--hover-color);
+}
+
+/* create post page */
+.create-recipe-section .card-body input{
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--tertiary-color) 50%, transparent);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.create-recipe-section .card-body select,
+.redeem-modal .redeem-credit-form input{
+    background-color: var(--secondary-color);
+    border-width: 0.5px;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--tertiary-color) 50%, transparent);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.create-recipe-section .card-body input:focus,
+.redeem-modal .redeem-credit-form input:focus,
+.create-recipe-section .card-body select:focus,
+.create-recipe-section .card-body select:focus-visible{
+    border-color: var(--tertiary-color);
+}
+
+.create-recipe-section .card-body select option{
+    border-radius: 0.5rem;
+}
+
+.create-recipe-section .card-body select option:hover{
+    background-color: var(--hover-color);
+}
+
+.create-recipe-section .card-body select option:focus,
+.create-recipe-section .card-body select option:active{
+    background-color: var(--active-link-color);
+}
+
+#imageCard { 
+    border: 0.3px solid transparent; 
+    transition: border-color .2s ease, box-shadow .2s ease; 
+} 
+
+#imageCard.image-error { 
+    border: 0.3px solid red;  
+    transition: border-color .2s ease, box-shadow .2s ease; 
+}
+
+.createpost-select-img-btn{
+    border: 1px solid var(--tertiary-color);
+    color: var(--tertiary-color);
+}
+
+.createpost-gen-img-btn{
+    background: radial-gradient(
+    circle at top left,
+    var(--primary-color),
+    var(--active-link-color)
+    );
+}
+
+.createpost-publish-btn{
+    background-color: var(--primary-color);
+}
+
+.preview-image-container {
+    position: relative;
+}
+
+.preview-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 1rem;
+}
+
+.selected-img-name {
+    margin-top: 0.5rem;
+    padding-right: 2.5rem;
+    font-size: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.img-remove-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+/* tinymce editor */
+
+
+
+
+/* postdetail page */
+.createpost-top-section img{
+    border-radius: 7rem;
+    corner-shape:superellipse(1.5);
+}
+
+.postdetail-action-section button:not(.postdetail-action-dropdown button),
+.postdetail-links-section button{
+    border-radius: 2rem;
+    corner-shape:superellipse(1.5);
+}
+
+.follow-unfollow-form button{
+    background-color: var(--primary-color);
+}
+
+.follow-unfollow-form button:hover{
+    background-color: var(--hover-color);
+}
+
+.postdetail-action-section .like-button,
+.postdetail-action-section .dislike-button{
+    background-color: var(--neutral-secondary);
+    transition: all 0.3s ease;
+}
+
+.postdetail-action-section .like-button:hover,
+.postdetail-action-section .dislike-button:hover{
+    background-color: var(--hover-color);
+}
+
+.like-added,
+.dislike-added{
+    font-variation-settings: "FILL" 1, "wght" 800, "GRAD" 0, "opsz" 64;
+}
+
+.postdetail-links-section a,
+.postdetail-links-section button{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    corner-shape: superellipse(1.5);
+    font-size: 0.8rem;
+    padding: .6rem 1.2rem;
+    transition: all 0.3s;
+}
+
+.postdetail-links-section a:hover,
+.postdetail-links-section button:hover{
+    background-color: var(--hover-color);
+}
+
+.spoonacular-quickview{
+    display: none !important;
+}
+
+.postdetail-table-section .detail,
+.postdetail-table-section .nutri{
+    border-width: 1px;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--tertiary-color) 50%, transparent);;
+    color: var(--tertiary-color);
+    border-radius: 2.5rem;
+    corner-shape: superellipse(1.5);
+}
+
+.postdetail-table tr th{
+    padding-left: 0;   
+}
+
+.postdetail-table tr td{
+    color: var(--tertiary-color);
+}
+
+.postdetail-main-content{
+    color: var(--tertiary-color);
+}
+
+.copy-link-btn{
+    border-radius: 2.5rem;
+    corner-shape: superellipse(1.5);
+    background-color: var(--primary-color);
+}
+
+.copy-link-btn:hover{
+    background-color: var(--hover-color);
+}
+
+.share-recipe-dialog a{
+    border-radius: 2.5rem;
+    corner-shape: superellipse(1.5);
+    border: 0.5px solid var(--tertiary-color);
+}
+
+.comments-dialog textarea{
+    border-width: 0.5px;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--tertiary-color) 50%, transparent);
+    color: var(--tertiary-color);
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.comments-dialog textarea:focus,
+.comments-dialog textarea:active{
+    border-color: var(--tertiary-color);
+}
+
+/* compare recipes page */
+.compare-selector-card select{
+    background-color: var(--secondary-color);
+    border-width: 1px;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--tertiary-color) 50%, transparent);
+    outline: none;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+.compare-selector-card select:focus{
+    border-color: var(--tertiary-color);
+}
+
+.compare-selector-card select option{
+    border-radius: 1rem;
+}
+
+.compare-selector-card select option:hover{
+    background-color: var(--hover-color);
+}
+
+.compare-recipe-panel .recipe-image,
+.compare-recipe-panel img{
+    border-radius: 2rem;
+    corner-shape: superellipse(1.5);   
+}
+
+.recipe-image {
+    aspect-ratio: 16 / 10;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.recipe-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.info-pill {
+    border: 1px solid var(--tertiary-color);
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    gap: 0.5rem;
+}
+
+.compare-recipe-tabs input.tab::after{
+    color: var(--tertiary-color);
+}
+
+.compare-rich-text ul,
+.compare-rich-text ol {
+    padding-left: 1.25rem;
+    margin: 0.5rem 0;
+}
+
+.compare-rich-text li {
+    margin: 0.35rem 0;
+}
+
+.compare-rich-text p {
+    margin: 0.45rem 0;
+}
+
+.compare-nutrition {
+    overflow-x: auto;
+}
+
+.compare-nutrition table {
+    width: 100% !important;
+}
+
+.compare-nutrition img {
+    max-width: 100%;
+    height: auto;
+}
+
+.compare-nutrition .spoonacular-caption {
+    display: none !important;
+}
+
+/* update recipe page */
+.preview-image-container {
+    position: relative;
+}
+
+.preview-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 1rem;
+    border: 0;
+    background: transparent;
+}
+
+.selected-img-name {
+    margin-top: 0.5rem;
+    padding-right: 2.5rem;
+    font-size: 0.75rem;
+    color: var(--tertiary-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.img-remove-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+/* appearance page */
+.theme-container .card{
+    background: var(--neutral-secondary);
+    border-radius: 2.2rem;
+    corner-shape:superellipse(1.2);
+}
+
+.theme-container .theme-preview-container,
+.theme-preview-blur:last-child div{
+    border-radius: 1.7rem;
+    corner-shape:superellipse(1.2);
+}
+
+.ts-container {
+    /* background-color: red; */
+    /* background: var(--surface-color-main); */
+    /* border-radius: 3rem; */
+    corner-shape:superellipse(1.5);
+}
+
+/* Container Background & Radius */
+.ts-btn-container{
+    background: var(--surface-color-primary);
+    border-radius: 6rem;
+    corner-shape:superellipse(1);
+}
+
+/* Tab inactive colors & radius */
+.theme-pill {
+    border-radius: 4.5rem;
+    color: var(--tertiary-color);
+    transition: all 0.3s;
+}
+
+.theme-pill:has(input:checked) {
+  background-color: var(--active-link-color);
+  color: var(--tertiary-color);
+}
+
+.theme-pill:hover:not(:has(input:checked)) {
+    opacity: 0.75;
+}
+
+/* .theme-pill:hover:not(:has(input:checked)) {
+    transform: scaleX(0.95);
+} */
+
+.theme-pill .ts-icon{
+    font-size: 1.2rem;
+}
+
+.theme-pill:has(input:checked) .ts-icon{
+    font-variation-settings: "FILL" 1, "wght" 800, "GRAD" 0, "opsz" 64;
+}
+
+.ts-tab-container .card{
+    background: var(--neutral-secondary);
+    border-radius: 3rem;
+    corner-shape:superellipse(1.8);
+}
+
+input[type="checkbox"]{
+    background: var(--secondary-color);
+    color: var(--tertiary-color);
+    border: 0;
+}
+
+input[type="color"] {
+    border-radius: 1.5rem;
+    corner-shape:superellipse(1.5);
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    padding: 0;
+    background: transparent;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+}
+
+input[type="color"]::-moz-color-swatch {
+  border: none;
+}
+
+.ts-tab-container form button{
+    background: var(--primary-color);
+    border-radius: 3rem;
+    corner-shape:superellipse(1.8);
+}
+
+.ts-ai-theme form div{
+    border-radius: 3rem;
+    corner-shape:superellipse(1.8);
+}
+
+.ts-ai-theme .theme-input-container{
+    background-color: var(--neutral-secondary);
+}
+
+.ts-ai-theme form button{
+    border-radius: 6rem;
+    corner-shape:superellipse(1.2);
+}
+
+.ts-tab-container form button:hover,
+.ts-ai-theme form button:hover{
+    background-color: var(--hover-color);
+}
+
+.applied-ai-theme-container .card-body,
+.generated-ai-theme-container .card-body{
+    background-color: var(--surface-color-secondary);
+}
+
+
+/* Dashboard page */
+.dashboard-aside{
+    background-color: var(--secondary-color);
+}
+
+.dashboard-side-nav li a.menu-active,
+.dashboard-side-nav li a:active{
+    background-color: var(--active-link-color);
+}
+
+.dashboard-nav .dashboard-aside-icon{
+    transition: all .2s ease;
+}
+
+.dashboard-nav .icon-active{
+    font-variation-settings: "FILL" 1, "wght" 800, "GRAD" 0, "opsz" 64;
+}
+
+/* dashboard partial pages */
+.recent-recipe .card{
+    background-color: var(--neutral-secondary);
+    border: 1px solid var(--neutral-secondary);
+    border-radius: 3rem;
+    corner-shape:superellipse(1.5);
+}
+
+.recent-recipe .card:hover{
+    border: 1px solid var(--hover-color);
+}
+
+.recipe-top-right-card,
+.recipe-top-cards,
+.credit-top-cards .card,
+.likes-top-cards .card{
+    border-radius: 3rem;
+    corner-shape:superellipse(1.5);
+    background-color: var(--surface-color-primary);
+}
+
+.dashobard-content a:hover{
+    background-color: var(--hover-color) !important;
+}
+
+.dashboard-activity-container .tabs{
+    background-color: transparent;
+}
+
+.dashboard-activity-container .credit-tab,
+.dashboard-activity-container .likes-tab,
+.dashboard-activity-container .dislike-tab,
+.dashboard-activity-container .views-tab,
+.dashboard-activity-container .timeline-tab,
+.dashboard-activity-container .network-tab{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    corner-shape: superellipse(1.5);
+    font-size: 0.8rem;
+    padding: .6rem 1.2rem;
+    transition: all 0.3s;
+}
+
+.dashboard-activity-container .tab-active,
+.dashboard-activity-container .tab-active{
+    border-radius: 4rem;
+    corner-shape: superellipse(1.5);
+    background: var(--active-link-color);
+    font-weight: 600;
+    padding: .6rem 2rem;
+}
+
+.dashboard-activity-container button:hover:not(.tab-active),
+.dashboard-activity-container button:hover:not(.tab-active) {
+    transform: scaleX(1.08);
+}
+
+.dashboard-activity-container .credit-tab:hover:active,
+.dashboard-activity-container .likes-tab.hover:not(.tab-active) {
+    border-radius: 4rem;
+    corner-shape: superellipse(1.5); 
+    transform: scaleX(0.9);
+}
+
+.dashboard-table tr th{
+    color: var(--tertiary-color);
+}
+
+.dashboard-table tr th,
+.dashboard-table tr td{
+    border-bottom-color: var(--neutral-secondary);
+}
+
+.dashboard-views-collapse{
+    background-color: var(--surface-color-primary);
+    border-radius: 2.5rem;
+    corner-shape: superellipse(1.5);
+}
+
+.dashboard-views-collapse .card,
+.dashboard-views-collapse .timeline-stats .stat{
+    border:1px solid var(--neutral-secondary);
+    border-radius: 2rem;
+    corner-shape: superellipse(1.5);
+}
+
+.timeline-collapse{
+    background-color: var(--surface-color-primary);
+    border-radius: 2rem;
+    corner-shape: superellipse(1.5);
+}
+
+.timeline-collapse .custom-badge{
+    background-color: var(--primary-color);
+}
+
+.timeline-history{
+    background-color: var(--neutral-secondary);
+    border-radius: 2rem;
+    corner-shape: superellipse(1.5);
+}
+
+.dashboard-top-recipe-tag{
+    background-color: var(--primary-color);
+    color: var(--tertiary-color);
+}
+
+.dashboard-info-grid {
+    border-radius: 2rem;
+    corner-shape:superellipse(1.5);
+}
+
+.dashboard-info-grid a{
+    border-radius: inherit;
+    background-color: var(--surface-color-primary);
+}
+
+.dashboard-info-grid a img{
+    border-radius: 2rem;
+    corner-shape:superellipse(1.8);
+}
+
+.dashboard-icon-container{
+    background-color: var(--neutral-secondary);
+}
+
+.dashboard-recipe-dropdown .trigger:not(.postdetail-action-dropdown .trigger){
+    background-color: var(--surface-color-secondary);
+}
+
+.dashboard-recipe-card .trigger{
+    background-color: transparent;
+}
+
+.dashboard-recipe-dropdown .trigger:hover{
+    background-color: var(--hover-color);
+}
+
+.dashboard-recipe-dropdown .dropdown-content li a{
+    border-radius: 4rem;
+    corner-shape:superellipse(1.2);    
+}
+
+.custom-badge{
+   background-color: var(--surface-color-primary); 
+   border: 1px solid var(--primary-color);
+   color: var(--tertiary-color);
+   font-size: 0.85em;
+}
+
+/* Profile page */
+.profile-avatar-container .avatar img{
+    border-radius: 6rem;
+    corner-shape:superellipse(2);
+}
+
+.load-more-recipe-container button,
+.notification-clear-all-btn button{
+    background-color: var(--primary-color);
+}
+
+.profile-partial-back-btn button,
+.load-more-recipe-container button,
+.notification-clear-all-btn button {
+    border-radius: 2rem;
+    corner-shape:superellipse(1.2);
+}
+
+.profile-partial-back-btn button:hover,
+.load-more-recipe-container button:hover,
+.notification-clear-all-btn button:hover,
+.notification-clear-btn:hover,
+.drawer-dialog-close-btn:hover{
+    background-color: var(--hover-color);
+}
+
+.profile-container .divider::before,
+.profile-container .divider::after {
+    background-color: var(--neutral-secondary);
+}
+
+.profile-partials-container{
+    /* background-color: var(--neutral-secondary); */
+    border: 2px solid var(--neutral-secondary);
+    border-radius: 4rem;
+    corner-shape:superellipse(1.8);
+}
+
+.profile-partials-container .progress{
+    color: var(--active-link-color);
+}
+
+.profile-partials-container legend,
+.profile-partials-container label{
+    color: var(--tertiary-color);
+}
+
+.profile-partials-container input,
+.profile-partials-container .select,
+.profile-partials-container textarea{
+    background-color: transparent;
+    border-radius: 2rem;
+    corner-shape:superellipse(1.5);
+    border: 1px solid var(--neutral-secondary);
+    transition: all 0.3s ease;
+}
+
+.profile-partials-container .select:focus,
+.profile-partials-container .select:active,
+.profile-partials-container .select:focus-visible,
+.profile-partials-container .select:focus-within,
+.profile-partials-container .select:open {
+    --input-color: var(--tertiary-color);
+    border: 0;
+    outline: none;
+    box-shadow: none;
+    background-image: none;
+    background-color: var(--neutral-secondary);
+}
+
+.profile-partials-container input:focus,
+.profile-partials-container input:active{
+    border-color: var(--tertiary-color);
+}
+
+.profile-partials-container button,
+.profile-partials-container a{
+    border-radius: 2rem;
+    corner-shape:superellipse(1.5);
+}
+
+.profile-partials-container button[type="submit"],
+.profile-partials-container .edit-img-btn,
+.acc-setting-form button,
+.profile-partials-container a{
+    background-color: var(--primary-color);
+}
+
+.profile-partials-container button[type="submit"]:hover,
+.profile-partials-container .edit-img-btn:hover,
+.acc-setting-form button:hover,
+.profile-partials-container a:hover{
+    background-color: var(--hover-color);
+}
+
+.profile-partials-password-requirements{
+    border-radius: 2rem;
+    corner-shape:superellipse(1.5);
+    background-color: var(--surface-color-primary);
+}
+
+.profile-nav{
+    transition: all 0.3s ease;
+    border-radius: 2rem;
+    corner-shape:superellipse(1.5);   
+}
+
+.profile-nav:hover{
+    background-color: var(--hover-color);
+}
+
+.profile-nav-active-link {
+    background: var(--active-link-color);
+    border-radius: 4rem;
+    corner-shape:superellipse(1);  
+    font-weight: 500;
+}
+
+.profile-nav:hover span{
+    font-variation-settings: "FILL" 0, "wght" 800, "GRAD" 0, "opsz" 64;
+}
+
+.profile-nav-active-link span{
+    font-variation-settings: "FILL" 1, "wght" 800, "GRAD" 0, "opsz" 64;
+}
+
+/* Kitchen ai page */
+.generated-recipe-content img{
+    border-radius: 5rem;
+    corner-shape:superellipse(2);
+}
+
+.generated-recipe-content table {
+    border: 1px solid var(--neutral-secondary);
+}
+
+.generated-recipe-content tbody th,
+.generated-recipe-content tbody td{
+    border-bottom-color:  var(--neutral-secondary);
+}
+
+.generated-recipe-content tbody th{
+    padding-left: 0;
+}
+
+.gen-recipe-composer{
+    background-color: var(--secondary-color);
+}
+
+.gen-recipe-form-container{
+    background-color: var(--neutral-secondary);
+}
+
+.gen-recipe-form-container,
+.gen-recipe-form-container form button{
+    border-radius: 2rem;
+    corner-shape:superellipse(1.5);
+}
+
+.gen-recipe-form-container form textarea{
+    field-sizing: content;
+}
+
+.gen-recipe-form-container form button{
+    background-color: var(--primary-color);
+}
+
+.gen-recipe-form-container form button:hover{
+    background-color: var(--hover-color);
+}
+
+/* history page */
+/* .history-grid .tabs{
+    background-color: red;
+} */
+
+.history-grid input{
+    background-color: var(--primary-color);
+    border-radius: 1rem;
+    corner-shape:superellipse(1.5);
+    color: var(--tertiary-color);
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.history-grid input:hover{
+    background-color: var(--hover-color);
+}
+
+.history-grid input:checked{
+    background-color: var(--active-link-color);
+    border-radius: 3rem;
+    corner-shape:superellipse(1.5);
+    font-weight: bold;
+}
+
+.history-grid .card figure{
+    border-radius: 1.5rem;
+    corner-shape:superellipse(1.5);
+}
+
+.history-grid a:hover,
+.history-grid button:hover{
+    background-color: var(--hover-color);
+}
+
+/* search results page */
+.search-profile-cards,
+.userchannel-hero-card{
+    border-radius: 1.5rem;
+    corner-shape:superellipse(1.5);
+    border-width: 1px;
+    border-style: solid;
+    border-color: color-mix(in srgb, var(--tertiary-color) 50%, transparent);;
+    transition: all 0.3s ease;
+}
+
+.search-profile-cards:hover{
+    border-color: var(--tertiary-color);
+}
+
+/* userchannel page */
+.userchannel-hero-card button{
+    background-color: var(--primary-color);
+}
+
+.userchannel-stats div{
+    background-color: var(--neutral-secondary);
+    border-radius: 1.5rem;
+    corner-shape:superellipse(1.5);
+}
+
+.userchannel-stats .stat-title,
+.year-recap .stat-title{
+    color: var(--tertiary-color);
+}
+
+.year-recap .stat{
+    background-color: var(--neutral-secondary);
+}

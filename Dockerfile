@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements-worker.txt
 
 COPY . .
 
-CMD ["celery", "-A", "test_project", "worker", "--loglevel=info", "--concurrency=1"]
+CMD ["celery", "-A", "recipes", "worker", "--loglevel=info", "--concurrency=1"]

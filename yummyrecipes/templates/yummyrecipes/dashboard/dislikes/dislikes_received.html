@@ -1,0 +1,24 @@
+<table class="dashboard-table table">
+    <thead>
+        <tr>
+            <th>Recipe</th>
+            <th>Published</th>
+            <th class="text-center">Dislikes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for recipe in received_dislikes_recipes %}
+        <tr>
+            <td><a href="{{ recipe.id }}" class="link link-hover font-medium">{{ recipe.title }}</a></td>
+            <td>{{ recipe.date_post|date:"d M Y" }}</td>
+            <td class="text-center font-medium">{{ recipe.num_dislikes }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center py-12 opacity-60">
+                None of your recipes have received dislikes yet.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

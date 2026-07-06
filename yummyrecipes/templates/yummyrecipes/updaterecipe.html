@@ -1,0 +1,454 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Update Recipe</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div class="min-h-screen w-full pt-[80px]">
+  <div class="w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+
+    <header class="main-header mb-5">
+      <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Update recipe</h1>
+      <p class="mt-1 text-sm opacity-75">
+        Review and update your recipe content
+      </p>
+    </header>
+
+    <div id="errorAlert" class="alert alert-error mb-5 hidden">
+      <span id="errorMessage"></span>
+    </div>
+
+    <form id="myForm" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();"
+      class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
+      {% csrf_token %}
+
+      <aside class="space-y-6 order-1 xl:order-2 xl:sticky xl:top-[96px] h-fit mt-4">
+
+        <section id="imageCard" class="card createpost-imagecard rounded-3xl">
+          <div class="card-body p-2 xl:p-4 gap-4">
+            <div>
+              <h2 class="card-title font-medium">Recipe images</h2>
+              <p class="text-xs opacity-60 mt-1">Replace current images, remove one, or add another image</p>
+            </div>
+
+            {% if image_count < 2 %}
+              <label for="add-more-image" class="btn btn-transparent bg-transparent createpost-select-img-btn border-0 shadow-none rounded-full font-normal w-full">
+                <span id="addMoreLabel">Add more image</span>
+              </label>
+
+              <input id="add-more-image" name="add_more_image" type="file" accept="image/*" class="hidden">
+            {% else %}
+              <div class="alert">
+                <span class="text-sm">Maximum 2 images added.</span>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+
+        <section id="show-sidebar" class="card">
+          <div class="card-body p-0 xl:px-4 gap-4">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="card-title font-medium">Preview</h2>
+            </div>
+
+            <div class="sidebar-recipes">
+              <div class="preview-container grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
+
+                {% for i in recipes.photo_set.all %}
+                  <div id="image-container-{{ i.pk }}" class="preview-image-container">
+                    <a href="{{ i.image.url }}" target="_blank">
+                      <img id="preview-image-{{ i.pk }}" class="preview-image" src="{{ i.image.url }}" alt="Recipe image" loading="lazy">
+                    </a>
+
+                    <p id="preview-name-{{ i.pk }}" class="selected-img-name">
+                      Current image
+                    </p>
+
+                    <div class="mt-3 grid grid-cols-1 gap-2">
+                      <label for="change-image-{{ i.pk }}"
+                        class="btn btn-transparent bg-transparent createpost-select-img-btn border-0 shadow-none rounded-full font-normal w-full">
+                        Replace image
+                      </label>
+
+                      <input type="file" name="change_image_{{ i.pk }}"
+                        accept="image/*" id="change-image-{{ i.pk }}" data-image-id="{{ i.pk }}" class="hidden change-image-input">
+
+                      {% if image_count > 1 %}
+                        <button type="submit" name="delete_image" value="{{ i.pk }}"
+                          class="btn btn-transparent bg-transparent createpost-select-img-btn border-0 shadow-none rounded-full font-normal w-full" formnovalidate>
+                          Remove image
+                        </button>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% empty %}
+                  <div id="emptyPreview" class="border border-dashed border-base-300 rounded-box p-6 text-center">
+                    <p class="text-sm text-base-content/60">No image added yet</p>
+                  </div>
+                {% endfor %}
+
+                {% if image_count < 2 %}
+                  <div id="newImagePreview" class="preview-image-container hidden">
+                    <img id="newPreviewImage" class="preview-image" src="" alt="New recipe image preview">
+
+                    <p id="newPreviewName" class="selected-img-name"></p>
+
+                    <button id="clearNewImageButton" type="button" class="btn btn-circle btn-error btn-xs img-remove-button">
+                      x
+                    </button>
+                  </div>
+                {% endif %}
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <button type="submit"
+          class="btn btn-transparent bg-transparent createpost-publish-btn border-0 shadow-none w-full rounded-full font-medium hidden xl:flex">
+          Save changes
+        </button>
+
+      </aside>
+
+      <main class="space-y-6 order-2 xl:order-1 mt-4">
+
+        <section class="card create-recipe-section">
+          <div class="card-body p-0 gap-6">
+
+            <div class="validate-field">
+              <label class="label" for="inputTitle">
+                <span class="label-text font-medium text-[0.85rem]">Recipe title</span>
+              </label>
+
+              <input id="inputTitle" name="title" type="text" value="{{ form.title.value|default_if_none:'' }}"
+                placeholder="Your recipe title" class="input validator rounded-xl mt-1 w-full" required>
+
+              <p class="validator-hint field-error text-error text-sm mt-2 hidden">
+                Recipe title is required
+              </p>
+
+              {% if form.title.errors %}
+                <p class="text-error text-sm mt-2">{{ form.title.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+              <div class="validate-field">
+                <label class="label" for="inputServings">
+                  <span class="label-text font-medium text-[0.85rem]">Serving</span>
+                </label>
+
+                <input id="inputServings" name="servings" type="number" min="1" step="1" 
+                  value="{{ form.servings.value|default_if_none:'' }}" class="input validator rounded-xl mt-1 w-full" required>
+
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">
+                  Serving is required
+                </p>
+
+                {% if form.servings.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.servings.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputType">
+                  <span class="label-text font-medium text-[0.85rem]">Type</span>
+                </label>
+
+                <select
+                  id="inputType"
+                  class="select validator rounded-xl mt-1 w-full"
+                  name="type"
+                  required
+                  title="Type of recipe">
+                  <option value="" {% if not form.type.value %}selected{% endif %}>Type</option>
+                  <option value="Breakfast" {% if form.type.value == "Breakfast" %}selected{% endif %}>Breakfast</option>
+                  <option value="Lunch" {% if form.type.value == "Lunch" %}selected{% endif %}>Lunch</option>
+                  <option value="Evening Snack" {% if form.type.value == "Evening Snack" %}selected{% endif %}>Evening Snack</option>
+                  <option value="Dinner" {% if form.type.value == "Dinner" %}selected{% endif %}>Dinner</option>
+                </select>
+
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">
+                  Type is required
+                </p>
+
+                {% if form.type.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.type.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputCuisine">
+                  <span class="label-text font-medium text-[0.85rem]">Cuisine</span>
+                </label>
+
+                <select
+                  id="inputCuisine"
+                  class="select validator rounded-xl mt-1 w-full"
+                  name="cuisine"
+                  required
+                  title="Cuisine">
+                  <option value="" {% if not form.cuisine.value %}selected{% endif %}>Cuisine</option>
+                  <option value="Indian cuisine" {% if form.cuisine.value == "Indian cuisine" %}selected{% endif %}>Indian cuisine</option>
+                  <option value="American cuisine" {% if form.cuisine.value == "American cuisine" %}selected{% endif %}>American cuisine</option>
+                  <option value="Italian cuisine" {% if form.cuisine.value == "Italian cuisine" %}selected{% endif %}>Italian cuisine</option>
+                </select>
+
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">
+                  Cuisine is required
+                </p>
+
+                {% if form.cuisine.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.cuisine.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputCategory">
+                  <span class="label-text font-medium text-[0.85rem]">Category</span>
+                </label>
+
+                <select
+                  id="inputCategory"
+                  class="select validator rounded-xl mt-1 w-full"
+                  name="category"
+                  required
+                  title="Category">
+                  <option value="" {% if not form.category.value %}selected{% endif %}>Category</option>
+                  <option value="Veg" {% if form.category.value == "Veg" %}selected{% endif %}>Veg</option>
+                  <option value="Non-Veg" {% if form.category.value == "Non-Veg" %}selected{% endif %}>Non-Veg</option>
+                </select>
+
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">
+                  Category is required
+                </p>
+
+                {% if form.category.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.category.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputDifficulty">
+                  <span class="label-text font-medium text-[0.85rem]">Difficulty</span>
+                </label>
+
+                <select
+                  id="inputDifficulty"
+                  class="select validator rounded-xl mt-1 w-full"
+                  name="difficulty"
+                  required
+                  title="Difficulty">
+                  <option value="" {% if not form.difficulty.value %}selected{% endif %}>Difficulty</option>
+                  <option value="Easy" {% if form.difficulty.value == "Easy" %}selected{% endif %}>Easy</option>
+                  <option value="Medium" {% if form.difficulty.value == "Medium" %}selected{% endif %}>Medium</option>
+                  <option value="Hard" {% if form.difficulty.value == "Hard" %}selected{% endif %}>Hard</option>
+                </select>
+
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">
+                  Difficulty is required
+                </p>
+
+                {% if form.difficulty.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.difficulty.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-body p-0 gap-6">
+
+            <div class="validate-field">
+              <label class="label">
+                <span class="label-text font-medium text-[0.85rem]">
+                  Ingredients
+                </span>
+              </label>
+
+              {{ form.ingredients }}
+
+              {% if form.ingredients.errors %}
+                <p class="text-error text-sm mt-2">
+                  {{ form.ingredients.errors.0 }}
+                </p>
+              {% endif %}
+            </div>
+
+            <div class="validate-field">
+              <label class="label">
+                <span class="label-text font-medium text-[0.85rem]">
+                  Cooking instructions
+                </span>
+              </label>
+
+              {{ form.content }}
+
+              {% if form.content.errors %}
+                <p class="text-error text-sm mt-2">
+                  {{ form.content.errors.0 }}
+                </p>
+              {% endif %}
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+
+      <div class="order-3 xl:hidden">
+        <button
+          type="submit"
+          class="btn btn-transparent bg-transparent createpost-publish-btn border-0 shadow-none rounded-full font-medium w-full">
+          Save changes
+        </button>
+      </div>
+
+    </form>
+
+    <div style="display: none;">
+      {{ form.media }}
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.performance && window.performance.navigation.type === 2) {
+      location.reload();
+    }
+  });
+</script>
+
+<script>
+  const errorAlert = document.getElementById('errorAlert');
+  const errorMessage = document.getElementById('errorMessage');
+  const addMoreInput = document.getElementById('add-more-image');
+  const addMoreLabel = document.getElementById('addMoreLabel');
+  const newImagePreview = document.getElementById('newImagePreview');
+  const newPreviewImage = document.getElementById('newPreviewImage');
+  const newPreviewName = document.getElementById('newPreviewName');
+  const clearNewImageButton = document.getElementById('clearNewImageButton');
+
+  function showError(message) {
+    errorMessage.textContent = message;
+    errorAlert.classList.remove('hidden');
+    errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function hideError() {
+    errorMessage.textContent = '';
+    errorAlert.classList.add('hidden');
+  }
+
+  function previewFile(input, imageElement, nameElement, labelElement) {
+    const file = input.files && input.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      imageElement.src = event.target.result;
+
+      if (nameElement) {
+        nameElement.textContent = file.name;
+      }
+
+      if (labelElement) {
+        labelElement.textContent = '1 file selected';
+      }
+
+      if (newImagePreview && input.id === 'add-more-image') {
+        newImagePreview.classList.remove('hidden');
+      }
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  document.querySelectorAll('.change-image-input').forEach(function (input) {
+    input.addEventListener('change', function () {
+      hideError();
+
+      const imageId = input.dataset.imageId;
+      const imageElement = document.getElementById('preview-image-' + imageId);
+      const nameElement = document.getElementById('preview-name-' + imageId);
+
+      previewFile(input, imageElement, nameElement, null);
+    });
+  });
+
+  if (addMoreInput) {
+    addMoreInput.addEventListener('change', function () {
+      hideError();
+      previewFile(addMoreInput, newPreviewImage, newPreviewName, addMoreLabel);
+    });
+  }
+
+  if (clearNewImageButton && addMoreInput) {
+    clearNewImageButton.addEventListener('click', function () {
+      addMoreInput.value = '';
+      newPreviewImage.src = '';
+      newPreviewName.textContent = '';
+      addMoreLabel.textContent = 'Add more image';
+      newImagePreview.classList.add('hidden');
+    });
+  }
+
+  function validateForm() {
+    hideError();
+
+    if (window.tinymce) {
+        tinymce.triggerSave();
+    }
+
+    const form = document.getElementById("myForm");
+
+    // TinyMCE editors
+    const ingredientsEditor = tinymce.get("inputIngredients");
+    const contentEditor = tinymce.get("id_content");
+
+    const ingredientsValid =
+        ingredientsEditor.getContent({ format: "text" }).trim() !== "";
+
+    const contentValid =
+        contentEditor.getContent({ format: "text" }).trim() !== "";
+
+    // Native HTML validation
+    const formValid = form.checkValidity();
+
+    if (!formValid || !ingredientsValid || !contentValid) {
+
+        if (!formValid) {
+            form.reportValidity();
+        }
+
+        if (formValid) {
+            if (!ingredientsValid) {
+                showError("Ingredients are required.");
+                ingredientsEditor.focus();
+            } else if (!contentValid) {
+                showError("Cooking instructions are required.");
+                contentEditor.focus();
+            }
+        }
+
+        return false;
+    }
+
+    return true;
+  }
+</script>
+
+{% endblock %}

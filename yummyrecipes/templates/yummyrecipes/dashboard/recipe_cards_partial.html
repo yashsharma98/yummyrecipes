@@ -1,0 +1,205 @@
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+{% for post in posts %}
+
+    <div class="recipe-row" data-id="{{ post.id }}">
+        <div class="flex gap-5 py-3 md:pr-4 first:pt-0 transition-all duration-300">
+            <!-- Recipe Image -->
+            <div class="w-30 md:w-50 h-30 md:h-45 shrink-0">
+
+                {% for i in post.photo_set.all %}
+                    {% if forloop.first %}
+                        <img loading="lazy"
+                            src="{{ i.image.url }}"
+                            alt="{{ post.title }}"
+                            class="w-full h-full rounded-3xl object-cover">
+                    {% endif %}
+                {% empty %}
+                    <img loading="lazy"
+                        src="{% static 'yummyrecipes/media/empty4.jpg' %}"
+                        alt="{{ post.title }}"
+                        class="w-full h-full rounded-3xl object-cover">
+                {% endfor %}
+
+            </div>
+
+            <!-- Recipe Info -->
+            <div class="flex flex-col flex-1 min-w-0">
+
+                <!-- Title + Menu -->
+                <div class="flex items-start justify-between gap-3">
+
+                    <div class="min-w-0 flex-1">
+
+                        <h3 class="text-xl md:text-3xl capitalize font-medium leading-tight line-clamp-2 break-words">{{ post.title }}</h3>
+
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <div class="badge badge-outline text-xs rounded-full">{{ post.type }}</div>
+                            <div class="badge badge-outline text-xs rounded-full">{{ post.category }}</div>
+                        </div>
+
+                    </div>
+
+                    <!-- Dropdown Menu -->
+                    <div class="dashboard-recipe-dropdown dashboard-recipe-card dropdown dropdown-end border-0">
+
+                        <div tabindex="0" role="button" class="trigger btn btn-circle bg-transparent border-0 shadow-none">
+                            <span class="material-symbols-rounded">
+                                more_vert
+                            </span>
+                        </div>
+
+                        <ul tabindex="0"
+                            class="drawer-dropdown-content dashobard-content p-2.5 dropdown-content menu rounded-box shadow-xl w-55 z-50">
+
+                            <li>
+                                <a href="{{ post.recipe.id }}" class="">
+                                    <span class="material-symbols-rounded !text-[1.2rem]">open_in_new</span>
+                                    View Recipe
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{% url 'updaterecipe' post.title post.pk %}">
+                                    <span class="material-symbols-rounded !text-[1.2rem]">edit</span>
+                                    Edit Recipe
+                                </a>
+                            </li>
+
+                            <li>
+                                <a>
+                                    <span class="material-symbols-rounded !text-[1.2rem]">favorite</span>
+                                    Add to Favorites
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#" class="delete-recipe text-error" data-id="{{ post.id }}" data-title="{{ post.title }}">
+                                    <span class="material-symbols-rounded !text-[1.2rem]">delete</span>
+                                    Delete
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <!-- Spacer -->
+                <div class="flex-1"></div>
+
+                <!-- Bottom Stats -->
+                <div class="flex flex-wrap items-center gap-3 pt-5 text-sm">
+
+                    <div class="flex items-center gap-1 text-xs md:text-sm">
+                        <span class="material-symbols-rounded opacity-65 !text-[1.05rem]">thumb_up</span>
+                        <span class="font-medium">{{ post.total_likes }}</span>
+                        <span>Likes</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-1 text-xs md:text-sm">
+                        <span class="material-symbols-rounded opacity-65 !text-[1.05rem]">visibility</span>
+                        <span class="font-medium">{% get_hit_count for post %}</span>
+                        <span>Views</span>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-xs md:text-sm">
+                        <span class="material-symbols-rounded opacity-65 !text-[1.05rem]">calendar_today</span>
+                        <span>{{ post.date_post|date:"d M Y" }}</span>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% empty %}
+
+<div class="py-20 text-center">
+
+    <span class="material-symbols-rounded text-6xl opacity-20">
+        menu_book
+    </span>
+
+    <h3 class="mt-4 text-lg md:text-xl font-medium">
+        No recipes found
+    </h3>
+
+    <p class="text-sm mt-0.5 mt-2">
+        Upload your first recipe to get started.
+    </p>
+
+</div>
+
+{% endfor %}
+
+<dialog id="deleteRecipeModal" class="modal">
+  <div class="modal-box">
+    <h3 class="text-xl font-medium">Delete Recipe?</h3>
+
+    <p class="py-3">
+      <span class="opacity-70">Are you sure you want to delete</span>
+
+      <strong id="deleteRecipeTitle"></strong>?
+    </p>
+
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-transparent bg-transparent font-normal border-0 shadow-none">Cancel</button>
+      </form>
+
+      <button id="confirmDeleteRecipe" class="btn btn-error btn-transparent font-normal rounded-full border-0 shadow-none">Delete</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  let deleteRecipeId = null;
+
+  document.addEventListener("click", function (e) {
+    const btn = e.target.closest(".delete-recipe");
+
+    if (!btn) return;
+
+    e.preventDefault();
+
+    deleteRecipeId = btn.dataset.id;
+
+    document.getElementById("deleteRecipeTitle").textContent =
+      btn.dataset.title;
+
+    document.getElementById("deleteRecipeModal").showModal();
+  });
+
+  document
+    .getElementById("confirmDeleteRecipe")
+    .addEventListener("click", function () {
+      $.ajax({
+        type: "POST",
+
+        url: "/dashboard/delete/" + deleteRecipeId + "/",
+
+        data: {
+          csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val(),
+        },
+
+        success: function (response) {
+          if (!response.success) return;
+
+          $("#deleteRecipeModal")[0].close();
+
+          $(".recipe-row[data-id='" + deleteRecipeId + "']").slideUp(
+            250,
+            function () {
+              $(this).remove();
+            },
+          );
+        },
+      });
+    });
+</script>

@@ -1,0 +1,22 @@
+<table class="dashboard-table table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Action</th>
+            <th class="text-center">Credits</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for history in credit_history %}
+        <tr>
+            <td>{{ history.earned_timestamp|date:"d M Y" }}</td>
+            <td>{{ history.get_credit_action_display }}</td>
+            <td class="text-center font-medium">+{{ history.amount }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center py-12 opacity-60">No earned credits yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

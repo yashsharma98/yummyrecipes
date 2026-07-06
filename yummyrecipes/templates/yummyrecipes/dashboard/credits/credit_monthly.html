@@ -1,0 +1,20 @@
+<table class="dashboard-table table">
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th class="text-right">Earned</th>
+            <th class="text-center">Redeemed</th>
+            <th class="text-center">Spent</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for month in monthly_summary_list %}
+        <tr>
+            <td>{{ month.month }}</td>
+            <td class="text-right">{{ month.earned }}</td>
+            <td class="text-center">{{ month.redeemed }}</td>
+            <td class="text-center">{{ month.spent }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

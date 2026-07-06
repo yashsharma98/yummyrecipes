@@ -1,0 +1,30 @@
+<table class="dashboard-table table">
+    <thead>
+        <tr>
+            <th>Recipe</th>
+            <th>Author</th>
+            <th class="text-center">Dislikes</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for recipe in disliked_recipes %}
+        <tr>
+            <td>
+                <a href="{{ recipe.id }}" class="link link-hover font-medium">
+                    {{ recipe.title }}
+                </a>
+            </td>
+            <td>{{ recipe.author.get_full_name }}</td>
+            <td class="text-center font-medium">{{ recipe.num_dislikes }}</td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center py-12 opacity-60">
+                You haven't disliked any recipes yet.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

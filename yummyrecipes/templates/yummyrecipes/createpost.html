@@ -1,0 +1,561 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Create Recipe</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div class="min-h-screen w-full pt-[80px]">
+  <div class="w-full max-w-7x mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
+
+    <header class="main-header mb-5">
+      <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Create recipe</h1>
+      <p class="mt-1 text-sm opacity-75">
+        Add recipe details, upload photos, or generate one image from your title
+      </p>
+    </header>
+
+    {% if newrecipe_error_message %}
+      <div class="alert alert-error mb-5">
+        <span>{{ newrecipe_error_message }}</span>
+      </div>
+    {% endif %}
+
+    <div id="errorAlert" class="alert alert-error mb-5 hidden">
+      <span id="errorMessage"></span>
+    </div>
+
+    <form id="myForm" method="POST" enctype="multipart/form-data" action="{% url 'createpost' %}" onsubmit="return validateForm();"
+      class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-6">
+      {% csrf_token %}
+
+      <input type="hidden" name="image_path" id="imageURLField">
+      <input type="hidden" id="imageTitle">
+
+      <aside class="space-y-6 order-1 xl:order-2 xl:sticky xl:top-[96px] h-fit mt-4">
+
+        <section id="imageCard" class="card createpost-imagecard rounded-3xl">
+          <div class="card-body p-2 xl:p-4 gap-4">
+            <div>
+              <h2 class="card-title font-medium">Recipe image</h2>
+              <p class="text-xs opacity-60 mt-1">
+                Upload images or generate one from your recipe title.
+              </p>
+            </div>
+
+            <label for="images" id="imagesPickerLabel" class="btn btn-transparent bg-transparent createpost-select-img-btn border-0 shadow-none rounded-full font-normal w-full">
+              <span class="preview-counter">Select images</span>
+            </label>
+
+            <input id="images" name="image" type="file" accept="image/*" multiple class="hidden">
+            
+            <div class="divider my-0">or</div>
+
+            <button id="generateImageButton" type="button"
+              class="btn btn-transparent bg-transparent createpost-gen-img-btn border-0 shadow-none rounded-full font-normal w-full">
+              Generate image
+            </button>
+
+          </div>
+        </section>
+
+        <section id="show-sidebar" class="card">
+          <div class="card-body p-0 xl:px-4 gap-4">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="card-title font-medium">Preview</h2>
+              <button id="clearImagesButton" type="button" class="btn btn-ghost btn-sm hidden">
+                Clear
+              </button>
+            </div>
+
+            <div class="sidebar-recipes">
+              <div class="preview-container grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3"></div>
+            </div>
+
+            <div id="emptyPreview" class="border border-dashed border-base-300 rounded-box p-6 text-center">
+              <p class="text-sm text-base-content/60">No image selected yet</p>
+            </div>
+          </div>
+        </section>
+
+        <button type="submit" class="btn btn-transparent bg-transparent createpost-publish-btn border-0 shadow-none w-full rounded-full font-medium hidden xl:flex">
+          Publish recipe
+        </button>
+
+      </aside>
+
+      <main class="space-y-6 order-2 xl:order-1 mt-4">
+
+        <section class="card create-recipe-section">
+          <div class="card-body p-0 gap-6">
+
+            <div class="validate-field">
+              <label class="label" for="inputTitle">
+                <span class="label-text font-medium text-[0.85rem]">Recipe title</span>
+              </label>
+              <input id="inputTitle" name="title" type="text" value="{{ form.title.value|default_if_none:'' }}"
+                placeholder="Your recipe title" class="input validator rounded-xl mt-1 w-full shadow-none" required>
+
+              <p class="validator-hint field-error text-error text-sm mt-2 hidden">Recipe title is required</p>
+              {% if form.title.errors %}
+                <p class="text-error text-sm mt-2">{{ form.title.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+              <div class="validate-field">
+                <label class="label" for="inputServings">
+                  <span class="label-text font-medium text-[0.85rem]">Serving</span>
+                </label>
+                <input id="inputServings" name="servings" type="number" min="1" step="1"
+                  value="{{ form.servings.value|default_if_none:'' }}" class="input validator rounded-xl mt-1 w-full shadow-none" required>
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">Serving is required</p>
+                {% if form.servings.errors %}
+                  <p class="validator-hint text-error text-sm mt-2">{{ form.servings.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputType">
+                  <span class="label-text font-medium text-[0.85rem]">Type</span>
+                </label>
+                <select class="select validator rounded-xl mt-1 w-full shadow-none" name="type" required title="Type of recipe">
+                    <option value="" {% if not form.type.value %}selected{% endif %}>Type</option>
+                    <option value="Breakfast" {% if form.type.value == "Breakfast" %}selected{% endif %}>Breakfast</option>
+                    <option value="Lunch" {% if form.type.value == "Lunch" %}selected{% endif %}>Lunch</option>
+                    <option value="Evening Snack" {% if form.type.value == "Evening Snack" %}selected{% endif %}>Evening Snack</option>
+                    <option value="Dinner" {% if form.type.value == "Dinner" %}selected{% endif %}>Dinner</option>
+                </select>
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">Type is required</p>
+                {% if form.type.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.type.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputCuisine">
+                  <span class="label-text font-medium text-[0.85rem]">Cuisine</span>
+                </label>
+                <select class="select validator rounded-xl mt-1 w-full shadow-none" name="cuisine" required title="Cuisine">
+                    <option value="" {% if not form.cuisine.value %}selected{% endif %}>Cuisine</option>
+                    <option value="Indian cuisine" {% if form.cuisine.value == "Indian cuisine" %}selected{% endif %}>Indian cuisine</option>
+                    <option value="American cuisine" {% if form.cuisine.value == "American cuisine" %}selected{% endif %}>American cuisine</option>
+                    <option value="Italian cuisine" {% if form.cuisine.value == "Italian cuisine" %}selected{% endif %}>Italian cuisine</option>
+                </select>
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">Cuisine is required</p>
+                {% if form.cuisine.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.cuisine.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputCategory">
+                  <span class="label-text font-medium text-[0.85rem]">Category</span>
+                </label>
+                <select class="select validator rounded-xl mt-1 w-full shadow-none" name="category" required title="Category">
+                    <option value="" {% if not form.category.value %}selected{% endif %}>Category</option>
+                    <option value="Veg" {% if form.category.value == "Veg" %}selected{% endif %}>Veg</option>
+                    <option value="Non-Veg" {% if form.category.value == "Non-Veg" %}selected{% endif %}>Non-Veg</option>
+                </select>
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">Category is required</p>
+                {% if form.category.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.category.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="validate-field">
+                <label class="label" for="inputDifficulty">
+                  <span class="label-text font-medium text-[0.85rem]">Difficulty</span>
+                </label>
+                <select class="select validator rounded-xl mt-1 w-full shadow-none" name="difficulty" required title="Difficulty">
+                    <option value="" {% if not form.difficulty.value %}selected{% endif %}>Difficulty</option>
+                    <option value="Easy" {% if form.difficulty.value == "Easy" %}selected{% endif %}>Easy</option>
+                    <option value="Medium" {% if form.difficulty.value == "Medium" %}selected{% endif %}>Medium</option>
+                    <option value="Hard" {% if form.difficulty.value == "Hard" %}selected{% endif %}>Hard</option>
+                </select>
+                <p class="validator-hint field-error text-error text-sm mt-2 hidden">Difficulty is required</p>
+                {% if form.difficulty.errors %}
+                  <p class="text-error text-sm mt-2">{{ form.difficulty.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-body p-0 gap-6">
+            <div class="validate-field">
+                <label class="label mb-1">
+                    <span class="label-text font-medium text-[0.85rem]">
+                        Ingredients
+                    </span>
+                </label>
+
+                {{ form.ingredients }}
+
+                {% if form.ingredients.errors %}
+                    <p class="text-error text-sm mt-2">
+                        {{ form.ingredients.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="validate-field">
+                <label class="label mb-1">
+                    <span class="label-text font-medium text-[0.85rem]">
+                        Cooking instructions
+                    </span>
+                </label>
+
+                {{ form.content }}
+
+                {% if form.content.errors %}
+                    <p class="text-error text-sm mt-2">
+                        {{ form.content.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+        </section>
+
+      </main>
+
+      <div class="order-3 xl:hidden">
+        <button type="submit" class="btn btn-transparent bg-transparent createpost-publish-btn border-0 shadow-none rounded-full font-medium w-full">
+          Publish recipe
+        </button>
+      </div>
+
+    </form>
+
+    <div style="display: none;">
+      {{form.media}}
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.performance && window.performance.navigation.type === 2) {
+      location.reload();
+    }
+  });
+</script>
+
+<script>
+  const imagesInput = document.getElementById('images');
+  const imagesPickerLabel = document.getElementById('imagesPickerLabel');
+  const imagesFieldError = document.getElementById('imagesFieldError');
+  const previewContainer = document.querySelector('.sidebar-recipes .preview-container');
+  const previewCounter = document.querySelector('.preview-counter');
+  const clearImagesButton = document.getElementById('clearImagesButton');
+  const emptyPreview = document.getElementById('emptyPreview');
+  const imageURLField = document.getElementById('imageURLField');
+  const generateImageButton = document.getElementById('generateImageButton');
+  const errorAlert = document.getElementById('errorAlert');
+  const errorMessage = document.getElementById('errorMessage');
+  const imageCard = document.getElementById("imageCard");
+
+  let selectedFiles = [];
+
+  function showError(message) {
+    errorMessage.textContent = message;
+    errorAlert.classList.remove('hidden');
+    errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function hideError() {
+    errorMessage.textContent = '';
+    errorAlert.classList.add('hidden');
+  }
+
+  function clearFieldError(control) {
+    if (!control) {
+      return;
+    }
+
+    const wrapper = control.closest('.validate-field');
+    const errorText = wrapper ? wrapper.querySelector('.field-error') : null;
+
+    control.classList.remove('input-error', 'select-error', 'textarea-error');
+    control.removeAttribute('aria-invalid');
+
+    if (wrapper) {
+      wrapper.classList.remove('field-has-error');
+    }
+
+    if (errorText) {
+      errorText.classList.add('hidden');
+    }
+
+    if (window.tinymce && control.id && tinymce.get(control.id)) {
+      const editorContainer = tinymce.get(control.id).getContainer();
+
+      if (editorContainer) {
+        editorContainer.classList.remove('tinymce-error');
+      }
+    }
+  }
+
+  function syncFileInput() {
+    const dataTransfer = new DataTransfer();
+
+    selectedFiles.forEach(function (file) {
+      dataTransfer.items.add(file);
+    });
+
+    imagesInput.files = dataTransfer.files;
+  }
+
+  function updateCounter() {
+    const count = selectedFiles.length;
+    const hasUploadedImages = count > 0;
+    const hasGeneratedImage = imageURLField.value.trim() !== '';
+
+    if (count === 1) {
+      previewCounter.textContent = '1 file selected';
+    } else if (count > 1) {
+      previewCounter.textContent = count + ' files selected';
+    } else {
+      previewCounter.textContent = 'Select images';
+    }
+
+    emptyPreview.classList.toggle('hidden', hasUploadedImages || hasGeneratedImage);
+    clearImagesButton.classList.toggle('hidden', !hasUploadedImages && !hasGeneratedImage);
+
+    if (hasUploadedImages || hasGeneratedImage) {
+      imageCard.classList.remove('image-error');
+      imagesFieldError.classList.add('hidden');
+    }
+  }
+
+  function createPreviewItem(src, name, onRemove) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'preview-image-container';
+
+    const image = document.createElement('img');
+    image.className = 'preview-image';
+    image.src = src;
+    image.alt = name || 'Recipe image preview';
+
+    wrapper.appendChild(image);
+
+    if (name) {
+      const fileName = document.createElement('div');
+      fileName.className = 'selected-img-name';
+      fileName.textContent = name;
+      wrapper.appendChild(fileName);
+    }
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.className = 'btn btn-circle btn-error btn-xs img-remove-button';
+    removeButton.textContent = 'x';
+    removeButton.addEventListener('click', onRemove);
+
+    wrapper.appendChild(removeButton);
+
+    return wrapper;
+  }
+
+  function clearAllImages() {
+    selectedFiles = [];
+    imagesInput.value = '';
+    imageURLField.value = '';
+    previewContainer.innerHTML = '';
+    updateCounter();
+  }
+
+  function renderUploadedImages() {
+    previewContainer.innerHTML = '';
+
+    selectedFiles.forEach(function (file) {
+      const reader = new FileReader();
+
+      reader.onload = function () {
+        const removeHandler = function () {
+          selectedFiles = selectedFiles.filter(function (item) {
+            return item !== file;
+          });
+
+          syncFileInput();
+          renderUploadedImages();
+        };
+
+        previewContainer.appendChild(createPreviewItem(reader.result, file.name, removeHandler));
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    updateCounter();
+  }
+
+  imagesInput.addEventListener('change', function () {
+    selectedFiles = Array.from(imagesInput.files);
+    imageURLField.value = '';
+    hideError();
+    renderUploadedImages();
+  });
+
+  function showGeneratedImage(url) {
+    selectedFiles = [];
+    imagesInput.value = '';
+    previewContainer.innerHTML = '';
+
+    const removeGenerated = function () {
+      imageURLField.value = '';
+      previewContainer.innerHTML = '';
+      updateCounter();
+    };
+
+    previewContainer.appendChild(createPreviewItem(url, 'Generated image', removeGenerated));
+    updateCounter();
+  }
+
+  clearImagesButton.addEventListener('click', clearAllImages);
+
+  generateImageButton.addEventListener('click', function (event) {
+    event.preventDefault();
+    hideError();
+
+    const title = document.getElementById('inputTitle').value.trim();
+
+    if (!title) {
+      const titleField = document.getElementById('inputTitle');
+      titleField.reportValidity();
+      titleField.focus();
+      showError('Please enter a recipe title before generating an image.');
+      return;
+    }
+
+    generateImageButton.classList.add('loading');
+    generateImageButton.disabled = true;
+    generateImageButton.textContent = 'Generating...';
+
+    $.ajax({
+      url: '{% url "createpost" %}',
+      method: 'POST',
+      data: {
+        img_type: 'mainimage',
+        title: title
+      },
+      headers: {
+        'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+      },
+      success: function (response) {
+        if (response.image_url && response.saved_path) {
+          imageURLField.value = response.saved_path;
+          showGeneratedImage(response.image_url);
+          generateImageButton.textContent = 'Regenerate image';
+        } else if (response.error) {
+          showError(response.error);
+          generateImageButton.textContent = 'Generate image';
+        } else {
+          showError('Unable to generate image right now.');
+          generateImageButton.textContent = 'Generate image';
+        }
+      },
+      error: function (xhr) {
+        const message = xhr.responseJSON && xhr.responseJSON.error
+          ? xhr.responseJSON.error
+          : 'An unexpected error occurred while generating the image.';
+
+        showError(message);
+        generateImageButton.textContent = 'Generate image';
+      },
+      complete: function () {
+        generateImageButton.classList.remove('loading');
+        generateImageButton.disabled = false;
+      }
+    });
+  });
+
+  function validateForm() {
+    hideError();
+
+    if (window.tinymce) {
+        tinymce.triggerSave();
+    }
+
+    const form = document.getElementById("myForm");
+
+    // TinyMCE validation
+    const ingredientsEditor = tinymce.get("inputIngredients");
+    const contentEditor = tinymce.get("id_content");
+
+    const ingredientsValid =
+        ingredientsEditor.getContent({ format: "text" }).trim() !== "";
+
+    const contentValid =
+        contentEditor.getContent({ format: "text" }).trim() !== "";
+
+    // Native HTML validation
+    const formValid = form.checkValidity();
+
+    // Image validation
+    const hasUploadedImages = imagesInput.files.length > 0;
+    const hasGeneratedImage = imageURLField.value.trim() !== "";
+    const imageValid = hasUploadedImages || hasGeneratedImage;
+
+    // Show only ONE top error message
+    if (formValid) {
+        if (!ingredientsValid) {
+            showError("Ingredients are required.");
+        } else if (!contentValid) {
+            showError("Cooking instructions are required.");
+        } else if (!imageValid) {
+            showError("Please upload or generate one image.");
+        }
+    }
+
+    // Stop submission if anything is invalid
+    if (!formValid || !ingredientsValid || !contentValid || !imageValid) {
+
+        if (!formValid) {
+            form.reportValidity();
+        }
+
+        // Focus TinyMCE editors
+        if (formValid) {
+            if (!ingredientsValid) {
+                ingredientsEditor.focus();
+            } else if (!contentValid) {
+                contentEditor.focus();
+            } else if (!imageValid) {
+                imageCard.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            }
+        }
+
+        return false;
+    }
+
+    return true;
+  }
+  updateCounter();
+</script>
+
+<script>
+document.querySelectorAll(".createpost-publish-btn").forEach(button => {
+    button.addEventListener("click", function () {
+
+        const hasUploadedImages = imagesInput.files.length > 0;
+        const hasGeneratedImage = imageURLField.value.trim() !== "";
+
+        if (!hasUploadedImages && !hasGeneratedImage) {
+            imageCard.classList.add("image-error");
+        } else {
+            imageCard.classList.remove("image-error");
+        }
+    });
+});
+</script>
+
+{% endblock %}

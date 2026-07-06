@@ -1,0 +1,20 @@
+<table class="dashboard-table table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th class="text-center">Credits Redeemed</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for redeemed in redeemed_credits %}
+        <tr>
+            <td>{{ redeemed.redeemed_timestamp|date:"d M Y" }}</td>
+            <td class="text-center font-medium">-{{ redeemed.amount }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2" class="text-center py-12 opacity-60">No redeemed credits yet.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

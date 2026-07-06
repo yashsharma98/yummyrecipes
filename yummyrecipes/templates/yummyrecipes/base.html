@@ -1,0 +1,1281 @@
+{% load static %}
+{% load hitcount_tags %}
+{% load i18n %}
+{% load humanize %}
+{% load read_time_pluralize %}
+{% load notifications_tags %}
+{% load noti_date_filter %}
+
+{% url 'landingpg' as landingpg %}
+{% url 'explore' as explore %}
+{% url 'signup' as signup %}
+{% url 'login' as login %}
+{% url 'topostlogin' recipes.id as topostlogin %}
+{% url 'home' as home %}
+{% url 'createpost' as createpost %}
+{% url 'searchresults' as searchresults %}
+{% url 'profile' as profile %}
+{% url 'trending' as trending %}
+{% url 'timeline' as timeline %}
+{% url 'viewpost' post.id as viewpost %}
+{% url 'updateprofile' as updateprofile %}
+{% url 'updaterecipe' recipes.title recipes.id as updaterecipe %}
+{% url 'updatepassword' as updatepassword %}
+{% url 'profiledetails' user.id as profiledetails %}
+{% url 'dashboard' as dashboard %}
+{% url 'blog_history' as blog_history %}
+{% url 'compare_recipes' pk as compare_recipes %}
+{% url 'compare_view' recipe_id1=recipe1.id recipe_id2=recipe2.id as comparing_recipes %}
+{% url 'kitchen_ai' as kitchen_ai %}
+{% url 'year_recap' as year_recap %}
+{% url 'feedback' as feedback %}
+{% url 'appearance' as appearance %}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.2/dist/full.min.css" rel="stylesheet" type="text/css" /> -->
+    <link rel="icon" type="image/x-icon" href="{% static 'yummyrecipes/media/Newlogo.ico' %}">
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="{% static 'yummyrecipes/base.css' %}">
+    <link rel="stylesheet" href="{% static 'yummyrecipes/index.css' %}">
+
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://kit.fontawesome.com/1b42d32fed.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ctrl/tinycolor/dist/index.umd.min.js"></script>
+    {% block css %}
+    {% endblock %}
+
+    {% block title %}
+
+    {% endblock %}
+
+    {% if user.is_authenticated and not login_success_name or is_guest %}
+      <style>
+        :root{
+            --primary-color: {{ user.userprofile.primary_color }};
+            --secondary-color: {{ user.userprofile.secondary_color }};
+            --tertiary-color: {{ user.userprofile.tertiary_color }};
+            --active-link-color: {{ user.userprofile.active_link_color|default:"#007bff" }};
+            --hover-color: {{ user.userprofile.hover_color }};
+            --neutral-primary: {{ user.userprofile.neutral_primary }};
+            --neutral-secondary: {{ user.userprofile.neutral_secondary }};
+        }
+      </style>
+
+    {% endif %}
+  </head>
+
+  <body class="h-screen w-screen overflow-hidden flex flex-col antialiased">
+    <!-- Temp csrf token -->
+    {% csrf_token %}
+
+    <div class="drawer">
+
+      <input id="mobile-drawer" type="checkbox" class="drawer-toggle" />
+
+      {# top nav bar & side nav rail #}
+      <div class="drawer-content">
+
+        <div id="main-ui" class="flex flex-col h-screen">
+          
+          {# top navbar #}
+          <div id="topnav-wrapper" class="w-full fixed top-0 left-0 z-40 px-0 pt-0 floating-topnav-transition pointer-events-none {% if hide_authenticated_layout %}hidden{% endif %}">
+
+            <header id="topnav" class="navbar w-full h-15 bg-transparent px-4 md:px-6 topnav-header-transition pointer-events-auto">
+
+              <div class="navbar-start gap-2">
+
+                {# Mobile Drawer Toggle #}
+                <label for="mobile-drawer" class="mobile-drawer-left-btn btn btn-transparent bg-transparent btn-circle border-0 shadow-none md:hidden" aria-label="Open Navigation Menu">
+                  <span class="material-symbols-rounded !text-[1.3rem]">menu</span>
+                </label>
+
+                <a href="{% url 'home' %}" class="flex items-center gap-4 select-none">
+                  <div class="brand-logo-container p-1 -ml-2">
+                    <svg class="nvarbar-circle-svg" jsname="maK7T"viewBox="0 0 47 47" xmlns="http://www.w3.org/2000/svg">
+
+                      <path class="navbar-circle-svg-path" opacity="1.0"
+                          d="M34.4458 5.34261C37.6659 5.30972 40.4257 7.83079 40.6834 11.0408C40.8308 12.8764 41.8179 14.5725 43.3585 15.6372C46.0524 17.499 46.8569 21.1021 45.1766 23.7809C44.2158 25.3127 44.0347 27.227 44.6859 28.9685C45.8248 32.0139 44.3666 35.3228 41.3901 36.4472C39.6881 37.0902 38.408 38.4915 37.9212 40.2446C37.0698 43.3103 33.9061 45.061 30.7703 44.2016C28.9772 43.7101 27.087 44.0631 25.6481 45.1583C23.1318 47.0733 19.4708 46.5972 17.3736 44.0822C16.1742 42.644 14.396 41.8139 12.5546 41.8327C9.33445 41.8656 6.5747 39.3445 6.31696 36.1345C6.16958 34.2989 5.18246 32.6028 3.64192 31.5381C0.947945 29.6763 0.143532 26.0732 1.82378 23.3944C2.78462 21.8626 2.96568 19.9483 2.31445 18.2068C1.17563 15.1614 2.63381 11.8525 5.61024 10.7281C7.3123 10.0851 8.59239 8.68384 9.07922 6.93071C9.93055 3.86498 13.0943 2.11426 16.2301 2.9737C18.0232 3.46517 19.9134 3.11215 21.3523 2.01704C23.8686 0.101991 27.5295 0.578086 29.6268 3.09312C30.8261 4.53133 32.6044 5.36141 34.4458 5.34261Z">
+                      </path>
+                    </svg>
+
+                    <img loading="lazy" src="{% static 'yummyrecipes/media/NewLogo.png' %}" onerror="this.onerror=null; this.src='https://img.icons8.com/color/96/cooking-book.png';"
+                          class="nrweb-logo" alt="Yummy Recipes">
+                  </div>
+
+                  <span class="brand-font text-xl font-medium tracking-tight whitespace-nowrap ml-0 sm:ml-2">Yummy Recipes</span>
+                </a>
+
+              </div>
+
+              <div class="navbar-end gap-3">
+                <button onclick="search_modal.showModal()" id="search-btn" class="btn btn-transparent bg-transparent btn-circle border-0 shadow-none {% if not user.is_authenticated %}bg-white{% endif %}" 
+                  aria-label="Search Recipes">
+                  <span class="material-symbols-rounded !text-[1.4rem]">search</span>
+                </button>
+
+                {% if user.is_authenticated %}
+                  <button class="btn btn-transparent bg-transparent btn-circle border-0 shadow-none" aria-label="Notifications"
+                    onclick="document.getElementById('notification-drawer').checked ^= true">
+                    <span class="material-symbols-rounded !text-[1.4rem]">notifications</span>
+                  </button>
+                {% endif %}
+              </div>
+
+            </header>
+
+          </div>
+
+          {# side nav rail #}
+          <div class="flex flex-row flex-1 h-full w-full overflow-hidden relative">
+            
+            <aside id="nav-rail" class="side-nav-rail-container hidden {% if not hide_authenticated_layout %}md:flex{% endif %} w-18 fixed left-0 top-20 bottom-0 flex-col items-center bg-transparent z-30">
+              <nav class="flex flex-col gap-2 w-full h-full justify-center">
+                
+                {% if user.is_authenticated and not login_success_name or is_guest %}
+                  <a href="{% url 'home' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == home %}nav-icon-active{% endif %}">home</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == home %}nav-label-active{% endif %}">Home</span>
+                  </a>
+
+                  <a href="{% url 'createpost' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == createpost %}nav-icon-active{% endif %}">add_circle</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == createpost %}nav-label-active{% endif %}">New recipe</span>
+                  </a>
+
+                {% if viewpost %} 
+                <a href="{% url 'viewpost' post.id %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                  <div class="flex items-center justify-center">
+                    <span class="material-symbols-rounded nav-rail-icon nav-icon-active">menu_book_2</span>
+                  </div>
+                  <span class="nav-rail-label mt-0.5 nav-label-active">Recipe</span>
+                </a>
+                {% endif %}
+
+                {% if updaterecipe %}
+                  <a class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon nav-icon-active">edit_note</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 nav-label-active">Edit</span>
+                  </a>
+                {% endif %}
+
+                  <a href="{% url 'dashboard' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == dashboard %}nav-icon-active{% endif %}">grid_view</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == dashboard %}nav-label-active{% endif %}">Dashboard</span>
+                  </a>
+
+                  <a href="{% url 'explore' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == explore %}nav-icon-active{% endif %}">explore</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == explore %}nav-label-active{% endif %}">Explore</span>
+                  </a>
+
+                  <a href="{% url 'trending' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == trending %}nav-icon-active{% endif %}">mode_heat</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == trending %}nav-label-active{% endif %}">Trending</span>
+                  </a>
+
+                  <a href="{% url 'kitchen_ai' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == kitchen_ai %}nav-icon-active{% endif %}">wand_stars</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == kitchen_ai %}nav-label-active{% endif %}">KitchenAI</span>
+                  </a>
+
+                {% else %}
+
+                  <a href="{% url 'landingpg' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == landingpg %}nav-icon-active{% endif %}">food_bank</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == landingpg %}nav-label-active{% endif %}">Home</span>
+                  </a>
+
+                  <a href="{% url 'login' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == login or request.path == topostlogin %}nav-icon-active{% endif %}">login</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == login or request.path == topostlogin %}nav-label-active{% endif %}">Login</span>
+                  </a>
+
+                  <a href="{% url 'signup' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == signup %}nav-icon-active{% endif %}">account_circle</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == signup %}nav-label-active{% endif %}">Signup</span>
+                  </a>
+
+                  <a href="{% url 'explore' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == explore %}nav-icon-active{% endif %}">explore</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == explore %}nav-label-active{% endif %}">Explore</span>
+                  </a>
+
+                  <a href="{% url 'trending' %}" class="nav-rail-item flex flex-col items-center group cursor-pointer w-full text-center py-1">
+                    <div class="flex items-center justify-center">
+                      <span class="material-symbols-rounded nav-rail-icon {% if request.path == trending %}nav-icon-active{% endif %}">mode_heat</span>
+                    </div>
+                    <span class="nav-rail-label mt-0.5 {% if request.path == trending %}nav-label-active{% endif %}">Trending</span>
+                  </a>
+
+                {% endif %}
+              </nav>
+              
+              {# drawer dropdown #}
+              {% if user.is_authenticated and not login_success_name or is_guest %}
+                <div class="pb-4 w-full">
+
+                  <div class="dropdown dropdown-top w-full">
+
+                    {# Trigger #}
+                    <div tabindex="0" role="button" class="btn btn-transparent bg-transparent border-0 w-full p-0 min-h-0 h-auto shadow-none">
+
+                        <div class="avatar">
+                            <div class="w-11 rounded-full">
+                                <img src="{% if not is_guest %}{{ user.profile.profile_img.url }}{% else %}{% static 'yummyrecipes/media/avatar.jpg' %}{% endif %}"
+                                    alt="{{ user.get_full_name }}">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {# main dropdown #}
+                    <div tabindex="0" class="drawer-dropdown-content dropdown-content z-[999] p-3 w-70 mb-2 rounded-box shadow-xl">
+
+                      <div class="flex items-center gap-2 py-2 pt-1">
+
+                        <div class="avatar w-8.5 h-8.5">
+                            <div class="w-14 rounded-full">
+                              <img src="{% if not is_guest %} {{ user.profile.profile_img.url }} {% else %} {% static 'yummyrecipes/media/avatar.jpg' %} {% endif %}" 
+                                      alt="{{ user.get_full_name }}"/>
+                            </div>
+                        </div>
+
+                        <div class="min-w-0">
+                            <p class="font-medium truncate">{{ user.get_full_name|default:user.username }}</p>
+
+                            <p class="text-xs truncate">{{ user.email }}</p>
+                        </div>
+
+                      </div>
+
+                      <div class="divider my-[-0.3rem]"></div>
+
+                      <ul class="menu w-full p-0 gap-0 text-[0.85rem]">
+
+                        <li>
+                            <a href="{% url 'profile' %}"
+                                class="{% if request.path == profile %}active{% endif %}">
+                                <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == profile %}icon-active{% endif %}">person</span>
+                                Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'blog_history' %}"
+                                class="{% if request.path == blog_history %}active{% endif %}">
+                                <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == blog_history %}icon-active{% endif %}">history</span>
+                                History
+                            </a>
+                        </li>
+
+                      </ul>
+
+                      <div class="divider my-[-0.3rem]"></div>
+
+                      <ul class="menu w-full p-0 text-[0.85rem]">
+
+                          <li>
+                              <a href="{% url 'appearance' %}"
+                                  class="{% if request.path == appearance %}active{% endif %}">
+                                  <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == appearance %}icon-active{% endif %}">palette</span>
+                                  Appearance
+                              </a>
+                          </li>
+
+                      </ul>
+
+                      <!-- <div class="divider my-[-0.3rem]"></div>
+
+                      <ul class="menu w-full p-0 text-[0.85rem]">
+
+                          <li>
+                              <a href="{% url 'feedback' %}"
+                                  class="{% if request.path == feedback %}active{% endif %}">
+                                  <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == feedback %}icon-active{% endif %}">feedback</span>
+                                  Feedback
+                              </a>
+                          </li>
+
+                      </ul> -->
+
+                      <div class="divider my-[-0.3rem]"></div>
+
+                      <ul class="menu w-full p-0 text-[0.85rem]">
+
+                          <li>
+                              <a href="{% url 'logout' %}">
+                                  <span class="material-symbols-rounded !text-[1.1rem]">logout</span>
+                                  Logout
+                              </a>
+                          </li>
+
+                      </ul>
+
+                    </div>                      
+
+                  </div>
+
+                </div>
+              {% endif %}
+            </aside>
+
+            {# main page content goes here #}
+            <div class="scroll-content flex-1 h-full pl-0 {% if not hide_authenticated_layout and request.path != landingpg %}md:pl-[70px]{% endif %} overflow-y-auto overflow-x-hidden transition-colors duration-300">
+              
+              {% block raw_content %}
+                <main class="px-6 pt-24 pb-8 sm:px-10 max-w-6xl w-full mx-auto space-y-8">
+                  
+                  {% block content %}
+                  {% endblock %}
+
+                </main>
+              {% endblock %}
+
+              {% block footer %}
+                <footer class="border-t border-m3-outline-variant/20 py-6 text-center text-xs-variant transition-colors duration-300">
+                  <p>© 2026 Yummy Recipes</p>
+                </footer>
+              {% endblock %}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {# mobile drawer #}
+      <div class="drawer-side md:hidden z-50 {% if hide_authenticated_layout %}hidden{% endif %}">
+        <label for="mobile-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+
+        <div class="w-72 drawer-content min-h-full flex flex-col justify-between">
+
+          <div>
+            <div class="drawer-divider flex items-center justify-between pl-5 px-3 py-3">
+              <h2 class="drawer-title p-0 m-0">Yummy Recipes</h2>
+
+              <label for="mobile-drawer" class="mobile-drawer-close drawer-dialog-close-btn btn btn-circle bg-transparent swap swap-rotate border-0 transition-colors shadow-none" aria-label="Close drawer">
+                <input type="checkbox" hidden/>
+                <span class="material-symbols-rounded !text-[1.2rem]">close</span>
+              </label>
+            </div>
+
+            <ul class="drawer-menu p-3">
+
+                {% if user.is_authenticated and not login_success_name or is_guest %}
+
+                <li>
+                    <a href="{% url 'home' %}"
+                      class="drawer-link {% if request.path == home %} drawer-link-active {% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">home</span>
+                        Home
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'createpost' %}"
+                      class="drawer-link {% if request.path == createpost %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">add_circle</span>
+                        New recipe
+                    </a>
+                </li>
+
+                {% if updaterecipe %}
+                  <li>
+                      <a
+                        class="drawer-link drawer-link-active">
+                          <span class="material-symbols-rounded drawer-link-icon">edit_note</span>
+                          Edit
+                      </a>
+                  </li>
+                {% endif %}
+
+                <li>
+                    <a href="{% url 'dashboard' %}"
+                      class="drawer-link {% if request.path == dashboard %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">grid_view</span>
+                        Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'explore' %}"
+                      class="drawer-link {% if request.path == explore %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">explore</span>
+                        Explore
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'trending' %}"
+                      class="drawer-link {% if request.path == trending %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">mode_heat</span>
+                        Trending
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'kitchen_ai' %}"
+                      class="drawer-link {% if request.path == kitchen_ai %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">wand_stars</span>
+                        KitchenAI
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'blog_history' %}"
+                      class="drawer-link {% if request.path == blog_history %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">history</span>
+                        History
+                    </a>
+                </li>
+
+                {% else %}
+
+                <li>
+                    <a href="{% url 'landingpg' %}"
+                      class="drawer-link {% if request.path == landingpg %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">food_bank</span>
+                        Home
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'login' %}"
+                      class="drawer-link {% if request.path == login or request.path == topostlogin %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">login</span>
+                        Login
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'signup' %}"
+                      class="drawer-link {% if request.path == signup %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">account_circle</span>
+                        Signup
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'explore' %}"
+                      class="drawer-link {% if request.path == explore %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">explore</span>
+                        Explore
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'trending' %}"
+                      class="drawer-link {% if request.path == trending %}drawer-link-active{% endif %}">
+                        <span class="material-symbols-rounded drawer-link-icon">mode_heat</span>
+                        Trending
+                    </a>
+                </li>
+
+                {% endif %}
+
+            </ul>
+
+          </div>
+
+          {% if user.is_authenticated and not login_success_name or is_guest %}
+
+          <div class="p-3">
+
+              <div class="drawer-bottom-dropdown mobile-drawer-dropdown dropdown dropdown-top w-full">
+
+                  {# Trigger #}
+                  <div tabindex="0" role="button" class="trigger btn btn-transparent bg-transparent w-full justify-between h-auto border-0 shadow-none">
+
+                      <div class="flex items-center gap-3 min-w-0">
+
+                        <div class="avatar">
+                            <div class="w-10 rounded-full">                               
+                              <img src="{% if not is_guest %} {{ user.profile.profile_img.url }} {% else %} {% static 'yummyrecipes/media/avatar.jpg' %} {% endif %}" alt="{{ user.get_full_name }}"/>
+                            </div>
+                        </div>
+
+                        <div class="text-left min-w-0"><p class="font-medium truncate">{{ user.get_full_name|default:user.username }}</p>
+                        </div>
+
+                      </div>
+
+                      <span class="material-symbols-rounded">expand_less</span>
+
+                  </div>
+
+                  {# main dropdown #}
+                  <div tabindex="0" class="drawer-dropdown-content dropdown-content z-[60] mb-2 p-3 w-full rounded-box shadow-xl">
+
+                    <div class="flex items-center gap-3 py-2 pt-1">
+
+                      <div class="avatar w-8.5 h-8.5">
+                          <div class="w-14 rounded-full">
+                            <img src="{% if not is_guest %} {{ user.profile.profile_img.url }} {% else %} {% static 'yummyrecipes/media/avatar.jpg' %} {% endif %}" 
+                                    alt="{{ user.get_full_name }}"/>
+                          </div>
+                      </div>
+
+                      <div class="min-w-0">
+                          <p class="font-medium truncate">{{ user.get_full_name|default:user.username }}</p>
+
+                          <p class="text-xs truncate">{{ user.email }}</p>
+                      </div>
+
+                    </div>
+
+                    <div class="divider my-[-0.3rem]"></div>
+
+                    <ul class="menu w-full p-0 text-[0.85rem]">
+
+                        <li>
+                            <a href="{% url 'profile' %}"
+                                class="{% if request.path == profile %}active{% endif %}">
+                                <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == profile %}icon-active{% endif %}">person</span>
+                                Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{% url 'blog_history' %}"
+                                class="{% if request.path == blog_history %}active{% endif %}">
+                                <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == blog_history %}icon-active{% endif %}">history</span>
+                                History
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <div class="divider my-[-0.3rem]"></div>
+
+                    <ul class="menu w-full p-0 text-[0.85rem]">
+
+                        <li>
+                            <a href="{% url 'appearance' %}"
+                                class="{% if request.path == appearance %}active{% endif %}">
+                                <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == appearance %}icon-active{% endif %}">palette</span>
+                                Appearance
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <!-- <div class="divider my-[-0.3rem]"></div>
+
+                    <ul class="menu w-full p-0 text-[0.85rem]">
+
+                        <li>
+                            <a href="{% url 'feedback' %}"
+                                class="{% if request.path == feedback %}active{% endif %}">
+                                <span class="material-symbols-rounded !text-[1.1rem] {% if request.path == feedback %}icon-active{% endif %}">feedback</span>
+                                Feedback
+                            </a>
+                        </li>
+
+                    </ul> -->
+
+                    <div class="divider my-[-0.3rem]"></div>
+
+                    <ul class="menu w-full p-0 text-[0.85rem]">
+
+                        <li>
+                            <a href="{% url 'logout' %}">
+                                <span class="material-symbols-rounded !text-[1.1rem]">logout</span>
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+
+                  </div>
+
+              </div>
+
+          </div>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    {# search dialog #}
+    <dialog id="search_modal" class="modal">
+      <div class="modal-box search-dialog w-screen h-screen max-w-none max-h-none rounded-none md:w-4/5 md:max-w-4xl md:h-[650px] md:rounded-3xl shadow-4xl p-0 overflow-hidden">
+        <div class="flex flex-col h-full">
+          <div class="p-6 pb-2"><h3 class="font-normal text-lg brand-font">Search Recipes</h3></div>
+
+          <div class="flex-1 flex flex-col overflow-hidden px-6 py-3">
+            <form method="GET" id="searchform" action="{% url 'searchresults' %}" autocomplete="off" class="flex flex-col h-full">
+              <div class="search-input-wrapper flex items-center px-2 py-2.5 rounded-full transition-all duration-200 flex-shrink-0">
+                <button type="submit" class="grid place-items-center bg-transparent border-0 p-0" aria-label="Search"><span class="material-symbols-rounded">search</span></button>
+                <input id="idquery" type="text" name="query" placeholder="Search for recipes, ingredients..." class="bg-transparent w-full pl-3 text-sm" required {% if query %}value="{{ query }}"{% elif profile_details %}value="{{ profile_details.get_full_name }}"{% endif %} />
+              </div>
+
+              <div id="autocomplete-options-container" class="autocomplete-options-container flex-1 overflow-y-auto mt-4 min-h-0">
+                <div class="autocomplete-pages-history-container">
+                  <div class="pages-options-autocomplete"></div>
+                  <div class="history-options-autocomplete"></div>
+                </div>
+              </div>
+
+            </form>
+          </div>
+          <div class="p-4 flex justify-end">
+            <form method="dialog"><button class="btn btn-sm btn-transparent bg-transparent border-0 rounded-full shadow-none font-normal">Close</button></form>
+          </div>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop"><button></button></form>
+    </dialog>
+
+    {# search autocomplete js #}
+    <script>
+        function autocomplete(inp, data) {
+          if (!inp) return;
+
+          let currentFocus = -1;
+          const MAX_RESULTS = 10;
+
+          const autocompleteContainer = document.createElement("div");
+          autocompleteContainer.className = "autocomplete-container";
+
+          const optionsContainer = document.getElementById("autocomplete-options-container");
+          optionsContainer.prepend(autocompleteContainer);
+
+          const historyContainer = document.querySelector(
+              "#search_modal .history-options-autocomplete"
+          );
+
+          const suggestions = data.suggestions || [];
+          const history = data.history || [];
+
+          inp.addEventListener("input", function () {
+              const val = this.value.trim();
+
+              closeAllLists();
+
+              if (!val) {
+                  clearAdditionalOptions();
+                  return;
+              }
+
+              currentFocus = -1;
+
+              const list = document.createElement("div");
+              list.id = this.id + "autocomplete-list";
+              list.className = "autocomplete-items";
+
+              autocompleteContainer.appendChild(list);
+
+              const valLower = val.toLowerCase();
+
+              const startsWith = [];
+              const contains = [];
+
+              for (const suggestion of suggestions) {
+                  const lower = suggestion.toLowerCase();
+
+                  if (lower.startsWith(valLower)) {
+                      startsWith.push(suggestion);
+                  } else if (lower.includes(valLower)) {
+                      contains.push(suggestion);
+                  }
+              }
+
+              const rankedResults = [...startsWith, ...contains].slice(0, MAX_RESULTS);
+
+              if (rankedResults.length === 0) {
+                  list.innerHTML = `
+                      <div class="autocomplete-option opacity-60 cursor-default">
+                          No results found
+                      </div>
+                  `;
+              } else {
+                  rankedResults.forEach((suggestion) => {
+                      const idx = suggestion.toLowerCase().indexOf(valLower);
+
+                      const option = document.createElement("div");
+                      option.className = "autocomplete-option";
+
+                      option.innerHTML =
+                          suggestion.substring(0, idx) +
+                          "<strong>" +
+                          suggestion.substring(idx, idx + val.length) +
+                          "</strong>" +
+                          suggestion.substring(idx + val.length);
+
+                      option.innerHTML += `<input type="hidden" value="${suggestion}">`;
+
+                      option.addEventListener("click", function () {
+                          inp.value = suggestion;
+                          document.getElementById("searchform").submit();
+                      });
+
+                      list.appendChild(option);
+                  });
+              }
+
+              fromHistoryOptions(val);
+          });
+
+          inp.addEventListener("keydown", function (e) {
+              let items = document.getElementById(this.id + "autocomplete-list");
+
+              if (items) {
+                  items = items.getElementsByTagName("div");
+              }
+
+              switch (e.key) {
+                  case "ArrowDown":
+                      currentFocus++;
+                      addActive(items);
+                      break;
+
+                  case "ArrowUp":
+                      currentFocus--;
+                      addActive(items);
+                      break;
+
+                  case "Enter":
+                      if (currentFocus > -1 && items) {
+                          e.preventDefault();
+                          items[currentFocus].click();
+                      }
+                      break;
+              }
+          });
+
+          function addActive(items) {
+              if (!items || !items.length) return;
+
+              removeActive(items);
+
+              if (currentFocus >= items.length) {
+                  currentFocus = 0;
+              }
+
+              if (currentFocus < 0) {
+                  currentFocus = items.length - 1;
+              }
+
+              if (items[currentFocus].innerText !== "No results found") {
+                  items[currentFocus].classList.add("autocomplete-active");
+                  inp.value = items[currentFocus].innerText;
+              }
+          }
+
+          function removeActive(items) {
+              for (const item of items) {
+                  item.classList.remove("autocomplete-active");
+              }
+          }
+
+          function closeAllLists() {
+              document
+                  .querySelectorAll("#search_modal .autocomplete-items")
+                  .forEach((el) => el.remove());
+
+              if (!inp.value.trim()) {
+                  clearAdditionalOptions();
+              }
+          }
+
+          function clearAdditionalOptions() {
+              historyContainer.innerHTML = "";
+          }
+
+          function fromHistoryOptions(val) {
+              historyContainer.innerHTML = "";
+
+              const matches = history.filter((option) =>
+                  option.toLowerCase().includes(val.toLowerCase())
+              );
+
+              if (!matches.length) return;
+
+              const heading = document.createElement("div");
+              heading.className = "autocomplete-pages-heading";
+              heading.innerHTML = "<p>From your history</p>";
+
+              historyContainer.appendChild(heading);
+
+              matches.forEach((option) => {
+                  const div = document.createElement("div");
+                  div.className = "additional-option";
+                  div.innerText = option;
+
+                  div.addEventListener("click", function () {
+                      inp.value = option;
+                      location.href = "{% url 'blog_history' %}";
+                  });
+
+                  historyContainer.appendChild(div);
+              });
+          }
+        }
+
+      const autocomplete_results = JSON.parse('{{ autocomplete_list_json|safe }}');
+
+      autocomplete(
+          document.getElementById("idquery"),
+          autocomplete_results
+      );
+    </script>
+
+    {# scroll to pill nav #}
+    <script>
+      const scrollContent = document.querySelector('.scroll-content');
+      const topnavWrapper = document.getElementById('topnav-wrapper');
+      const topnav = document.getElementById('topnav');
+
+      if (scrollContent) {
+        scrollContent.addEventListener('scroll', () => {
+          const scrollY = scrollContent.scrollTop;
+
+          if (scrollY > 15) {
+            topnavWrapper.classList.add('pt-3', 'px-4', 'sm:px-6');
+            topnav.classList.add(
+              'rounded-full',
+              'backdrop-blur-md'
+            );
+          } else {
+            topnavWrapper.classList.remove('pt-3', 'px-4', 'sm:px-6');
+            topnav.classList.remove(
+              'rounded-m3-full',
+              'backdrop-blur-md'
+            );
+          }
+        });
+      }
+    </script>
+
+    {# quick view drawer #}
+    <div class="drawer drawer-end z-[999]">
+        <input id="recipe-drawer" type="checkbox" class="drawer-toggle">
+
+        <div class="drawer-side">
+            <label for="recipe-drawer" class="drawer-overlay"></label>
+
+            <div class="qv-drawer w-[430px] min-h-screen overflow-y-auto">
+
+                <div class="sticky top-0 z-20 backdrop-blur-xl px-5 py-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg font-normal text-stone-900">Recipe Details</h2>
+                        </div>
+
+                        <label for="recipe-drawer" class="mobile-drawer-close btn btn-circle bg-transparent swap swap-rotate border-0 transition-colors shadow-none">
+                            <span class="material-symbols-rounded">close</span>
+                        </label>
+                        
+                    </div>
+                </div>
+
+                <div class="p-4 pt-0 qv-drawer-body">
+
+                    <div class="overflow-hidden qv-drawer-img-container aspect-[4/3]">
+                        <img id="qv-image" src="" alt="" class="w-full h-full object-cover">
+                    </div>
+
+                    <div class="mt-5">
+
+                        <h1 id="qv-title" class="text-3xl font-medium tracking-tight leading-tight"></h1>
+
+                        <div class="mt-3">
+
+                            <div class="flex items-center gap-3 text-sm">
+
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-rounded text-[16px]">thumb_up</span>
+                                    <span id="qv-likes" class="font-medium"></span>
+                                </div>
+                                <span class="mx-1">•</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-rounded text-[16px]">thumb_down</span>
+                                    <span id="qv-dislikes" class="font-medium"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="text-sm mt-2">
+                                <span id="qv-author" class="font-medium"></span>
+                                <span class="mx-1">•</span>
+                                <span id="qv-views"></span>
+                                views
+                                <span class="mx-1">•</span>
+                                <span id="qv-readtime"></span>
+                            </div>
+
+                            <div class="text-sm mt-2">
+                                Published :
+                                <span id="qv-published"></span>
+                                <span class="mx-1">•</span>
+                                Modified :
+                                <span id="qv-modified"></span>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-2 flex flex-wrap items-center gap-1 text-sm">
+                            <div>
+                                <span id="qv-author" class="font-medium"></span>
+                            </div>
+
+                            <div id="qv-updated-wrapper" class="hidden">
+                                <span>•</span>
+                                <span id="qv-updated"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+
+                            <div class="grid grid-cols-3 gap-2">
+
+                                <div class="qv-stat-card">
+                                    <div class="qv-stat-label">Category</div>
+                                    <div id="qv-category" class="qv-stat-value"></div>
+                                </div>
+
+                                <div class="qv-stat-card">
+                                    <div class="qv-stat-label">Type</div>
+                                    <div id="qv-type" class="qv-stat-value"></div>
+                                </div>
+
+                                <div class="qv-stat-card">
+                                    <div class="qv-stat-label">Cuisine</div>
+                                    <div id="qv-cuisine" class="qv-stat-value"></div>
+                                </div>
+
+                                <div class="qv-stat-card">
+                                    <div class="qv-stat-label">Prep Time</div>
+                                    <div id="qv-time" class="qv-stat-value"></div>
+                                </div>
+
+                                <div class="qv-stat-card">
+                                    <div class="qv-stat-label">Servings</div>
+                                    <div id="qv-servings" class="qv-stat-value"></div>
+                                </div>
+
+                                <div class="qv-stat-card">
+                                    <div class="qv-stat-label">Difficulty</div>
+                                    <div id="qv-difficulty" class="qv-stat-value"></div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4">
+                            <a id="qv-link" href="#" class="qv-drawer-link btn btn-transparent w-full text-sm shadow-none group inline-flex items-center gap-1">
+                                View recipe 
+                                <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    {# qv detail script #}
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+
+        const drawer = document.getElementById("recipe-drawer");
+
+        document.addEventListener("click", (e) => {
+
+            const btn = e.target.closest(".quick-view-btn");
+            if (!btn || !drawer) return;
+
+            document.getElementById("qv-title").textContent = btn.dataset.title;
+            document.getElementById("qv-author").textContent = btn.dataset.author;
+            document.getElementById("qv-image").src = btn.dataset.image;
+            document.getElementById("qv-published").textContent = btn.dataset.published;
+            document.getElementById("qv-modified").textContent = btn.dataset.modified;
+            document.getElementById("qv-type").textContent = btn.dataset.type;
+            document.getElementById("qv-likes").textContent = btn.dataset.likes;
+            document.getElementById("qv-dislikes").textContent = btn.dataset.dislikes;
+            document.getElementById("qv-time").textContent = `${btn.dataset.time} min`;
+            document.getElementById("qv-servings").textContent = btn.dataset.servings;
+            document.getElementById("qv-difficulty").textContent = btn.dataset.difficulty;
+            document.getElementById("qv-cuisine").textContent = btn.dataset.cuisine;
+            document.getElementById("qv-category").textContent = btn.dataset.category;
+            document.getElementById("qv-views").textContent = btn.dataset.views;
+            document.getElementById("qv-readtime").textContent = btn.dataset.readtime;
+            document.getElementById("qv-link").href = btn.dataset.url;
+
+            drawer.checked = true;
+
+        });
+      });
+    </script>
+
+    {# add to favourite #}
+    <script>
+      $(document).on('click', '.favourite-action', function (e) {
+
+        e.preventDefault();
+
+        const $button = $(this);
+        const postId = $button.data('post-id');
+        const $icon = $button.find('.favourite-icon');
+
+        const csrf = $('input[name="csrfmiddlewaretoken"]').val();
+
+        $.ajax({
+            type: "POST",
+            url: "/fav/" + postId + "/",
+            data: {
+                csrfmiddlewaretoken: csrf,
+            },
+            success: function (response) {
+              if (response.action === "add") {
+
+                  $button.addClass("active");
+                  $button.attr("data-tip", "Remove");
+
+                  $icon.addClass("favourite-added");
+
+              } else {
+
+                  $button.removeClass("active");
+                  $button.attr("data-tip", "Favourites");
+
+                  $icon.removeClass("favourite-added")
+              }
+            }
+        });
+      });
+    </script>
+
+    {# Notification drawer #}
+    <div class="drawer drawer-end z-50">
+      <input id="notification-drawer" type="checkbox" class="drawer-toggle" />
+
+      <div class="drawer-side">
+        <label for="notification-drawer" aria-label="Close notifications" class="drawer-overlay"></label>
+
+        <aside class="min-h-full w-96 max-w-[92vw] shadow-2xl">
+          <div class="sticky top-0 z-10 flex items-center justify-between px-5 py-3">
+            <div>
+              <h2 class="text-lg font-medium">Notifications</h2>
+              {% if notifications %}
+                <p class="text-xs opacity-60">
+                  You have {{ notifications|length }} notification{{ notifications|length|pluralize }}
+                </p>
+              {% endif %}
+            </div>
+
+            <label for="notification-drawer" class="btn btn-transparent bg-transparent border-0 shadow-none btn-circle btn-sm drawer-dialog-close-btn" aria-label="Close">
+              <span class="material-symbols-rounded !text-[1.2rem]">close</span>
+            </label>
+          </div>
+
+          <div class="space-y-2 p-4">
+            {% if notifications %}
+              {% for notification in notifications %}
+                <div id="notification-{{ notification.id }}"
+                  class="alert-notification group rounded-xl p-4 shadow-sm transition hover:border-primary/30 hover:bg-base-200/40">
+                  <div class="flex gap-3">
+                    <div class="shrink-0">
+                      {% if 'disliked' in notification.verb %}
+                        <div class="grid size-5 place-items-center rounded-full text-error">
+                          <span class="material-symbols-rounded !text-[1rem]">thumb_down</span>
+                        </div>
+                      {% elif 'liked' in notification.verb %}
+                        <div class="grid size-5 place-items-center rounded-full text-success">
+                          <span class="material-symbols-rounded !text-[1rem]">thumb_up</span>
+                        </div>
+                      {% elif 'commented' in notification.verb %}
+                        <div class="grid size-5 place-items-center rounded-full text-info">
+                          <span class="material-symbols-rounded !text-[1rem]">comment</span>
+                        </div>
+                      {% elif 'following' in notification.verb %}
+                        <div class="avatar">
+                          <div class="size-5 rounded-full">
+                            <img loading="lazy" src="{{ notification.actor.profile.profile_img.url }}" alt="{{ notification.actor.get_full_name }}">
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                      {% if 'disliked' in notification.verb or 'liked' in notification.verb %}
+                        <div class="mb-1 flex items-center gap-2 text-[0.7rem] font-normal opacity-60">
+                          <span>{{ notification.verb|title }} recipe</span>
+                          <span>•</span>
+                          <span class="text-xs font-normal">
+                            {{ notification.timestamp|total_days_ago }}
+                          </span>
+                        </div>
+
+                        <p class="text-xs leading-6">
+                          <span class="text-medium capitalize">{{ notification.actor.get_full_name }}</span>
+                          {{ notification.verb }} your recipe
+                          {% if notification.action_object %}
+                            <a class="link link-primary font-medium" href="{% url 'viewpost' notification.action_object.pk %}">
+                              {{ notification.action_object.title }}
+                            </a>
+                          {% endif %}
+                        </p>
+                      {% endif %}
+
+                      {% if 'commented' in notification.verb %}
+                        <div class="mb-1 flex items-center gap-2 text-[0.7rem] font-normal opacity-60">
+                          <span>Comment</span>
+                          <span>•</span>
+                          <span class="text-xs font-normal">
+                            {{ notification.timestamp|total_days_ago }}
+                          </span>
+                        </div>
+
+                        <p class="text-xs leading-6">
+                          <span class="text-medium capitalize">{{ notification.actor.get_full_name }}</span>
+                          {{ notification.verb }}
+                          <span class="text-normal">"{{ notification.description }}"</span>
+                          on your recipe
+                          {% if notification.action_object %}
+                            <a class="link link-primary font-medium" href="{% url 'viewpost' notification.action_object.pk %}">
+                              {{ notification.action_object.title }}
+                            </a>
+                          {% endif %}
+                        </p>
+                      {% endif %}
+
+                      {% if 'following' in notification.verb %}
+                        <div class="mb-1 flex items-center gap-2 text-sm font-medium">
+                          <span>Follower</span>
+                          <span>•</span>
+                          <span class="text-xs font-normal">
+                            {{ notification.timestamp|total_days_ago }}
+                          </span>
+                        </div>
+
+                        <p class="text-sm leading-6">
+                          <a class="link link-primary font-medium"
+                            href="{% url 'userchannelpage' first=notification.actor.first_name last=notification.actor.last_name pk=notification.actor.pk %}">
+                            {{ notification.actor.get_full_name }}
+                          </a>
+                          started {{ notification.verb }} you
+                        </p>
+                      {% endif %}
+                    </div>
+
+                    <button
+                      type="button"
+                      class="btn btn-transparent bg-transparent btn-circle border-0 shadow-none notification-clear-btn btn-xs opacity-60 transition hover:opacity-100"
+                      aria-label="Remove notification"
+                      onclick="removeNotification('{{ notification.id }}')"
+                    >
+                      <span class="material-symbols-rounded !text-[1rem]">close</span>
+                    </button>
+                  </div>
+                </div>
+              {% endfor %}
+
+              <div class="mt-4">
+                <div class="notification-clear-all-btn">
+                  <button class="btn btn-transparent bg-transparent btn-sm border-0 font-normal shadow-none rounded-full w-full" onclick="clearAllNotifications()">
+                    Clear all
+                  </button>
+                </div>
+              </div>
+            {% else %}
+              <div class="grid min-h-64 place-items-center rounded-xl border border-dashed border-base-300 text-center">
+                <div>
+                  <span class="material-symbols-rounded mb-2 text-4xl ">notifications</span>
+                  <p class="text-sm">No notifications</p>
+                </div>
+              </div>
+            {% endif %}
+
+            <div class="no-notifications text-center text-sm"></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <dialog id="noCreditsModal" class="modal">
+      <div class="modal-box max-w-md">
+          <div class="flex items-center gap-3 mb-4">
+              <h3 class="font-medium text-lg">No Credits Remaining</h3>
+
+          </div>
+
+          <p class="py-2 text-[0.85rem] opacity-75">
+              Earn more credits or redeem them before viewing additional recipes
+          </p>
+
+          <div class="modal-action">
+              <form method="dialog">
+                  <button class="btn btn-ghost border-0 bg-transparent shadow-none rounded-full font-normal">
+                      Close
+                  </button>
+              </form>
+          </div>
+      </div>
+
+      <form method="dialog" class="modal-backdrop">
+          <button></button>
+      </form>
+    </dialog>
+
+    {% if messages %}
+      {% for message in messages %}
+        {% if "no-more-credits" in message.tags %}
+          <script>
+            document.addEventListener("DOMContentLoaded", function () {
+              document.getElementById("noCreditsModal").showModal();
+            });
+          </script>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+  </body>
+</html>

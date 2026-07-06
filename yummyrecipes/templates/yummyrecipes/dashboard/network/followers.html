@@ -1,0 +1,78 @@
+{% load humanize %}
+
+{% if followers %}
+
+<div class="divide-y divide-base-300">
+
+    {% for follow in followers %}
+
+    <div class="py-2">
+
+        <div class="flex items-center gap-4">
+
+            <!-- Avatar -->
+            <div class="avatar">
+                <div class="w-10 rounded-full overflow-hidden">
+
+                    {% if follow.follower.profile.profile_img %}
+                        <img src="{{ follow.follower.profile.profile_img.url }}"
+                             alt="{{ follow.follower.username }}">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center">
+                            <span class="material-symbols-rounded text-3xl">person</span>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+            <!-- User -->
+            <div class="flex-1 min-w-0">
+                <h3 class="font-medium truncate">
+                    {{ follow.follower.get_full_name|default:follow.follower.username }}
+                </h3>
+                <p class="text-sm opacity-60">@{{ follow.follower.username }}</p>
+            </div>
+
+            <!-- Date -->
+            <div class="text-right">
+                <p class="text-xs opacity-60">Followed</p>
+                <p class="font-medium">{{ follow.created_at|date:"d M Y" }}</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="text-center py-16">
+
+    <span class="material-symbols-rounded text-6xl opacity-30">group</span>
+    <p class="mt-4 opacity-60">No followers this year.</p>
+
+</div>
+
+{% endif %}
+
+<script>
+    document.addEventListener("click", function (e) {
+
+        const tab = e.target.closest(".network-tab");
+
+        if (!tab) return;
+
+        const tablist = tab.closest("[role='tablist']");
+
+        tablist.querySelectorAll(".network-tab").forEach(btn => {
+            btn.classList.remove("tab-active");
+        });
+
+        tab.classList.add("tab-active");
+
+    });
+</script>

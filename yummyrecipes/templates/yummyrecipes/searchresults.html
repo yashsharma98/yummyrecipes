@@ -1,0 +1,229 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+{% block title %}
+    <title>Search results</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div class="min-h-screen w-full pt-[80px] relative">
+
+  <div class="w-full px-2 sm:px-8 sm:pr-2 xl:pr-4 pt-8 pb-20">
+
+  <header class="main-header px-5 sm:px-0 mb-3">
+
+      <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Search results</h1>
+
+      {% if results or profile_results %}
+          <p class="mt-1 text-sm opacity-75">
+              Showing results for
+              <span class="font-semibold text-primary">
+                  "{{ query }}"
+              </span>
+          </p>
+
+      {% elif recipe_description %}
+          <p class="mt-1 text-sm opacity-75">
+              AI overview for
+              <span class="font-semibold text-primary">
+                  "{{ query }}"
+              </span>
+          </p>
+
+      {% else %}
+          <p class="mt-1 text-sm opacity-75">
+              No results found for
+              <span class="font-semibold text-primary">
+                  "{{ query }}"
+              </span>
+          </p>
+      {% endif %}
+
+  </header>
+
+    <div class="flex flex-col lg:flex-row mt-8">
+
+      <div class="flex-1 min-w-0">
+
+        <section class="mt-1">
+          
+          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 gap-y-5">
+
+              {% if profile_results %}
+
+              <div class="col-span-full">
+
+                  <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+                      {% for profile_result in profile_results %}
+
+                        {% if profile_result.first_name or profile_result.last_name %}
+
+                          <div class="search-profile-cards card shadow-none cursor-pointer">
+
+                              <div class="card-body p-4">
+
+                                  <div class="flex items-center gap-4">
+
+                                      <div class="avatar">
+                                          <div class="w-16 rounded-full">
+                                              <img src="{{ profile_result.profile.profile_img.url }}">
+                                          </div>
+                                      </div>
+
+                                      <div class="flex-1">
+
+                                          <a href="{% url 'userchannelpage' first=profile_result.first_name last=profile_result.last_name pk=profile_result.pk %}"
+                                            class="font-semibold hover:text-primary">
+                                              {{ profile_result.get_full_name }}
+                                          </a>
+
+                                          <div class="mt-2 flex gap-2 flex-wrap">
+
+                                              <span class="badge badge-outline">
+                                                  {{ profile_result.followers.count }}
+                                                  follower{{ profile_result.followers.count|pluralize }}
+                                              </span>
+
+                                              <span class="badge badge-outline">
+                                                  {{ profile_result.post_set.count }}
+                                                  recipe{{ profile_result.post_set.count|pluralize }}
+                                              </span>
+
+                                          </div>
+
+                                      </div>
+
+                                      {% if user.is_authenticated and profile_result != request.user %}
+
+                                          {% for key,value in is_following.items %}
+
+                                              {% if key == profile_result.username %}
+
+                                              <form method="post"
+                                                    action="{% url 'follow_unfollow_user' profile_result.username %}">
+
+                                                  {% csrf_token %}
+
+                                                  <button class="btn btn-sm {% if value %}btn-outline{% else %}btn-primary{% endif %}">
+
+                                                      {% if value %}
+                                                          Following
+                                                      {% else %}
+                                                          Follow
+                                                      {% endif %}
+
+                                                  </button>
+
+                                              </form>
+
+                                              {% endif %}
+
+                                          {% endfor %}
+
+                                      {% endif %}
+
+                                  </div>
+
+                              </div>
+
+                          </div>
+
+                        {% endif %}
+
+                      {% endfor %}
+
+                  </div>
+
+              </div>
+
+              {% endif %}
+
+
+              {% if recipe_results %}
+
+                  {% for post in recipe_results %}
+
+                      {% include "yummyrecipes/recipe_card.html" with post=post %}
+
+                  {% endfor %}
+
+              {% elif not profile_results %}
+
+              <div class="col-span-full">
+
+                  <div class="hero rounded-3xl border">
+
+                      <div class="hero-content text-center py-16">
+
+                          <div>
+
+                              <span class="material-symbols-rounded text-7xl opacity-30">
+                                  search_off
+                              </span>
+
+                              <h2 class="text-3xl font-semibold mt-4">
+                                  No results found
+                              </h2>
+
+                              <p class="opacity-70 mt-2 mb-8">
+                                  Try another search or generate it with AI.
+                              </p>
+
+                              <div class="flex justify-center gap-3 flex-wrap">
+
+                                  {% if show_google %}
+                                  <a href="https://www.google.com/search?q={{ query }}"
+                                    target="_blank"
+                                    class="btn btn-outline rounded-xl">
+
+                                      <span class="material-symbols-rounded">
+                                          travel_explore
+                                      </span>
+
+                                      Search Google
+
+                                  </a>
+                                  {% endif %}
+
+                                  {% if show_kitchen_ai %}
+                                  <a href="{% url 'kitchen_ai' %}?query={{ query|urlencode }}" class="btn btn-ghost rounded-xl">
+
+                                      <span class="material-symbols-rounded">
+                                          auto_awesome
+                                      </span>
+
+                                      Generate with AI
+
+                                  </a>
+                                  {% endif %}
+
+                              </div>
+
+                          </div>
+
+                      </div>
+
+                  </div>
+
+              </div>
+
+              {% endif %}
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

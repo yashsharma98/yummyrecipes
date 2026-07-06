@@ -1,0 +1,136 @@
+{% extends 'yummyrecipes/base.html' %}
+
+{% load static %}
+
+{% block title %}
+    <title>Profile</title>
+{% endblock %}
+
+{% block raw_content %}
+
+{% if user.is_authenticated or is_guest %}
+
+<div class="min-h-screen w-full pt-[80px] relative">
+
+    <div class="w-full px-2 sm:px-8 sm:pr-2 pt-8 pb-20">
+
+        <header class="main-header px-5 sm:px-0 mb-3">
+            <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Profile</h1>
+            <p class="mt-1 text-sm opacity-75">Manage your personal information and account</p>
+        </header>
+
+        <div class="flex flex-col lg:flex-row mt-8 gap-10 profile-container">
+
+            <aside class="w-full lg:w-[30%] shrink-0">
+
+                <div class="sticky top-28">
+
+                    <div class="profile-avatar-container flex flex-col items-center">
+
+                        <div class="avatar">
+                            <div class="w-full max-w-[320px] h-[210px] overflow-hidden">
+                                <img src="{{ user.profile.profile_img.url }}"
+                                    class="w-full h-full object-cover"
+                                    alt="{{ user.username }}">
+                            </div>
+                        </div>
+
+                        <h2 class="text-3xl font-semibold mt-8 text-center">
+                            {{ user.get_full_name|default:user.username }}
+                        </h2>
+
+                        <p class="text-center opacity-70 mt-3 max-w-xs leading-relaxed">
+                            {{ user.profile.bio|default:"Passionate home cook exploring flavours from around the world." }}
+                        </p>
+
+                    </div>
+
+                    <div class="w-full max-w-[250px] mx-auto">
+                        <div class="divider my-4 hidden lg:flex"></div>
+                    </div>
+
+
+                    <div class="flex justify-center">
+                        <div class="w-full lg:w-[250px]">
+                            <div class="overflow-x-auto scrollbar-hide">
+                                <nav class="flex flex-row lg:flex-col justify-center lg:justify-start items-center lg:items-stretch gap-1 mt-5 lg:mt-0 min-w-fit lg:min-w-0 lg:w-full mx-auto">
+
+                                    <a hx-get="{% url 'updateprofile' %}" hx-target="#profile-content" hx-swap="innerHTML"
+                                        class="profile-nav btn btn-transparent font-light border-0 bg-transparent whitespace-nowrap flex items-center gap-2 lg:w-full lg:justify-start shadow-none">
+                                        <span class="material-symbols-rounded !text-[1.2rem]">edit</span>
+                                        Edit profile
+                                    </a>
+
+                                    <a hx-get="{% url 'updatepassword' %}" hx-target="#profile-content" hx-swap="innerHTML"
+                                    class="profile-nav btn btn-transparent font-light border-0 bg-transparent whitespace-nowrap flex items-center gap-2 lg:w-full lg:justify-start shadow-none">
+                                        <span class="material-symbols-rounded !text-[1.2rem]">lock</span>
+                                        Change password
+                                    </a>
+
+                                    <a hx-get="{% url 'account_settings' %}" hx-target="#profile-content" hx-swap="innerHTML"
+                                    class="profile-nav btn btn-transparent font-light border-0 bg-transparent whitespace-nowrap flex items-center gap-2 lg:w-full lg:justify-start shadow-none">
+                                        <span class="material-symbols-rounded !text-[1.2rem]">settings</span>
+                                        Settings
+                                    </a>
+
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </aside>
+
+            <div id="profile-content" class="flex-1 min-w-0 xl:max-w-[50%]">
+
+                {% include "yummyrecipes/profile/partials/personal_details.html" %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const links = document.querySelectorAll(".profile-nav");
+
+    links.forEach(link => {
+
+        link.addEventListener("click", function () {
+
+            links.forEach(l => l.classList.remove("profile-nav-active-link"));
+
+            this.classList.add("profile-nav-active-link");
+
+        });
+
+    });
+
+});
+
+document.body.addEventListener("htmx:afterSwap", function (e) {
+
+    if (e.detail.target.id !== "profile-content") return;
+
+    const title = e.detail.target.querySelector("h2");
+
+    if (!title) return;
+
+    if (title.textContent.trim() === "Personal details") {
+        document.querySelectorAll(".profile-nav")
+            .forEach(link => link.classList.remove("profile-nav-active-link"));
+    }
+
+});
+</script>
+
+
+
+{% endblock %}

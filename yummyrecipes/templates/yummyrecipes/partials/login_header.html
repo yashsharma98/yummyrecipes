@@ -1,0 +1,34 @@
+{% if login_success_name %}
+    <h1 class="text-3xl lg:text-4xl font-semibold text-stone-900 tracking-tight">
+        Welcome Back, {{ login_success_name }}!
+    </h1>
+
+    <script>
+        setTimeout(() => {
+            window.location.href = "{{ redirect_url|escapejs }}";
+        });
+    </script>
+{% elif login_error %}
+    <h1 class="text-3xl lg:text-4xl font-bold text-stone-900 tracking-tight">
+        Welcome Back!
+    </h1>
+    <p class="text-red-500 text-sm font-light">{{ login_error }}</p>
+{% elif request.session.existing_user_first_name %}
+    <h1 class="text-3xl lg:text-4xl font-semibold text-stone-900 tracking-tight">
+        Welcome, {{ request.session.existing_user_first_name }}!
+    </h1>
+    <p class="text-stone-500 text-sm font-semibold">Sign in with your Email and Password</p>
+{% elif not user.is_authenticated and is_guest %}
+    <h1 class="text-3xl lg:text-4xl font-semibold text-stone-900 tracking-tight">Login required</h1>
+    <p class="text-stone-500 text-sm font-light opacity-60">Sign in with your Email and Password</p>
+{% else %}
+    <h1 class="text-3xl lg:text-4xl font-semibold text-stone-900 tracking-tight">Welcome Back!</h1>
+    <p class="text-stone-500 text-sm font-light opacity-60">Sign in with your Email and Password</p>
+{% endif %}
+
+{% if login_error %}
+    <script>
+        document.getElementById("loginErrorText").textContent = "{{ login_error|escapejs }}";
+        document.getElementById("loginErrorModal").showModal();
+    </script>
+{% endif %}

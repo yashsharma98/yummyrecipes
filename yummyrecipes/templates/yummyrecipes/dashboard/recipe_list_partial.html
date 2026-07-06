@@ -1,0 +1,20 @@
+{% load static %}
+{% load hitcount_tags %}
+
+<div class="flex items-center justify-between mb-3">
+    <p class="text-sm badge badge-md custom-badge rounded-full py-3 px-4 bg-transparent border-0">
+        {{ posts.paginator.count }} recipes
+    </p>
+</div>
+
+<div>
+
+    <div id="recipe-cards" class="divide-y space-y-3 divide-base-300">
+        {% include "yummyrecipes/dashboard/recipe_cards_partial.html" %}
+    </div>
+
+    <div id="load-more" class="pt-6">
+        {% include "yummyrecipes/dashboard/load_more_partial.html" %}
+    </div>
+
+</div>

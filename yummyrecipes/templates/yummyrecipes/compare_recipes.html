@@ -1,0 +1,132 @@
+{% extends 'yummyrecipes/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block title %}
+<title>
+    {% if recipe1 and recipe2 %}
+        {{ recipe1.title }} vs {{ recipe2.title }}
+    {% else %}
+        Compare recipes
+    {% endif %}
+</title>
+{% endblock %}
+
+{% block raw_content %}
+{% if user.is_authenticated %}
+
+<div class="min-h-screen w-full pt-[80px] relative">
+
+    <div class="w-full px-2 sm:px-8 sm:pr-2 xl:pr-4 pb-20">
+
+        <header class="main-header px-5 sm:px-0 pt-8 mb-3">
+            <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Compare recipes</h1>
+        </header>
+
+        <div class="flex flex-col lg:flex-row mt-8">
+
+            <div class="flex-1 min-w-0">
+                <section class="compare-page compare-page-wrap w-full max-w-none space-y-5">
+
+                    <form action="{% url 'compare_recipes' %}" method="POST" class="grid w-full gap-4 md:grid-cols-[1fr_auto_1fr] md:items-end">  
+                        {% csrf_token %}
+
+                        <label class="compare-selector-card w-full py-3">
+                            <span class="label-text mb-2 font-medium">First recipe</span>
+                            <select name="recipe1" id="recipe1" class="select bg-transparent rounded-xl border-0 shadow-none w-full" required>
+                                {% if recipe1 %}
+                                    <option value="{{ recipe1.id }}">{{ recipe1.title }}</option>
+                                {% else %}
+                                    <option selected disabled hidden>Choose first recipe</option>
+                                {% endif %}
+
+                                {% for recipe in titles %}
+                                    <option value="{{ recipe.id }}">{{ recipe.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+
+                        <div class="load-more-recipe-container">
+                        <button type="submit" class="btn min-h-12 rounded-full border-0 font-medium px-7 md:mb-3 shadow-none">
+                            Compare
+                        </button>
+                        </div>
+
+                        <label class="compare-selector-card w-full border-0 py-3">
+                            <span class="label-text mb-2 font-medium">Second recipe</span>
+                            <select name="recipe2" id="recipe2" class="select bg-transparent rounded-xl border-0 shadow-none w-full" required>
+                                {% if recipe2 %}
+                                    <option value="{{ recipe2.id }}">{{ recipe2.title }}</option>
+                                {% else %}
+                                    <option selected disabled hidden>Choose second recipe</option>
+                                {% endif %}
+
+                                {% for recipe in titles %}
+                                    <option value="{{ recipe.id }}">{{ recipe.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </form>
+
+                    <div class="grid gap-4 md:grid-cols-[1fr_auto_1fr] md:items-start">
+                        {% include 'yummyrecipes/partials/compare_recipe_panel.html' with recipe=recipe1 photo=photo1 nutrition_widget=nutrition_widget1 empty_title='Pick your first recipe' empty_icon='restaurant_menu' %}
+
+                        <div class="compare-vs-pill hidden h-12 w-12 items-center justify-center rounded-full text-sm font-bold md:sticky md:top-28 md:mt-28 md:flex">
+                            VS
+                        </div>
+
+                        {% include 'yummyrecipes/partials/compare_recipe_panel.html' with recipe=recipe2 photo=photo2 nutrition_widget=nutrition_widget2 empty_title='Pick your second recipe' empty_icon='compare' %}
+                    </div>
+
+                </section>
+        
+            </div>
+
+        </div>   
+             
+    </div>
+
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        {% if 'no-more-credits' in message.tags %}
+            <dialog id="messagesModal" class="modal">
+                <div class="modal-box rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-rounded">warning</span>
+                        <h3 class="text-lg font-semibold">Alert</h3>
+                    </div>
+
+                    <p class="mt-4">{{ message }}</p>
+
+                    <div class="modal-action">
+                        <form method="dialog">
+                            <button class="btn btn-ghost">Close</button>
+                        </form>
+                        <a href="{% url 'profile' %}#credits" class="btn btn-primary">View credits</a>
+                    </div>
+                </div>
+
+                <form method="dialog" class="modal-backdrop">
+                    <button>close</button>
+                </form>
+            </dialog>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const modal = document.getElementById("messagesModal");
+                    if (modal) modal.showModal();
+                });
+            </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{% else %}
+<script>
+    location.href = "{% url 'home' %}";
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,96 @@
+<div class="space-y-4">
+
+    <header class="ml-5 md:ml-0">
+        <h1 class="text-lg md:text-xl font-medium">Views</h1>
+        <p class="mt-1 text-sm opacity-60">Track recipe performance & visitor activity</p>
+    </header>
+
+    <div class="likes-top-cards grid grid-cols-2 md:grid-cols-3 gap-2">
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Total Views</p>
+                <h2 class="text-3xl font-medium mt-2">{{ total_views }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Average Views</p>
+                <h2 class="text-3xl font-medium mt-2">{{ average_views }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Highest Views</p>
+                <h2 class="text-3xl font-medium mt-2">{{ highest_views }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid xl:grid-cols-3 items-start">
+
+        <div class="dashboard-activity-container col-span-full">
+
+            <div class="card mt-2">
+
+                <div class="card-body p-0 ml-5 md:ml-0">
+                    <div>
+                        <h2 class="text-lg md:text-xl font-medium">Views Activity</h2>
+                        <p class="text-sm opacity-60 mt-1">Yearly insights & recipe performance.</p>
+                    </div>
+                </div>
+
+                <div role="tablist" class="tabs border-0 p-1 mt-4 mb-1 gap-2">
+
+                    <button class="tab tab-active views-tab shadow-none"
+                            hx-get="{% url 'dashboard_views_overview' %}"
+                            hx-target="#views-content"
+                            hx-swap="innerHTML">
+                        Overview
+                    </button>
+
+                    <button class="tab views-tab shadow-none"
+                            hx-get="{% url 'dashboard_top_viewed' %}"
+                            hx-target="#views-content"
+                            hx-swap="innerHTML">
+                        Top Viewed
+                    </button>
+
+                    <button class="tab views-tab shadow-none"
+                            hx-get="{% url 'dashboard_all_views' %}"
+                            hx-target="#views-content"
+                            hx-swap="innerHTML">
+                        All Recipes
+                    </button>
+
+                </div>
+
+                <div id="views-content"
+                     class="overflow-y-auto max-h-[650px] pb-6"
+                     hx-get="{% url 'dashboard_views_overview' %}"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("click", e => {
+    const tab = e.target.closest(".views-tab");
+    if (!tab) return;
+
+    document.querySelectorAll(".views-tab")
+        .forEach(b => b.classList.remove("tab-active"));
+
+    tab.classList.add("tab-active");
+});
+</script>

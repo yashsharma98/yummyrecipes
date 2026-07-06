@@ -1,0 +1,329 @@
+{% extends 'yummyrecipes/base.html' %}
+
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'yummyrecipes/landingpg.css' %}">
+{% endblock %}
+
+{% block title %}
+<title>Yummy Recipes</title>
+{% endblock %}
+
+{% block raw_content %}
+<div class="select-none">
+
+{% if not user.is_authenticated %}
+
+  <section class="top-section relative min-h-screen overflow-hidden">
+
+    <div class="absolute inset-0 lg:hidden">
+        <img
+            src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1800&auto=format&fit=crop"
+            alt="image" draggable="false" class="h-full w-full object-cover opacity-20 select-none">
+
+        <div class="absolute inset-0"></div>
+    </div>
+
+    <div class="relative min-h-screen grid lg:grid-cols-2">
+
+        <div class="flex items-center justify-center px-6 py-20 lg:pl-[90px]">
+
+            <div class="max-w-xl">
+
+                <p class="uppercase tracking-[0.35em] text-xs font-semibold mb-5 text-primary">
+                    Welcome to Yummy Recipes
+                </p>
+
+                <h1 class="text-6xl xl:text-8xl font-black tracking-tight leading-[0.95]">
+                    Discover recipes you'll actually cook.
+                </h1>
+
+                <p class="mt-7 opacity-70 max-w-lg">
+                    Browse delicious recipes, discover cuisines from around
+                    the world, save your favourites, and let AI help you cook with
+                    ingredients already in your kitchen.
+                </p>
+
+                <div class="inline-flex items-center gap-3 mt-10 max-w-md lg:max-w-lg">
+
+                  <label
+                    class="input flex-1 border-0 rounded-full cursor-pointer focus-within:outline-none focus-within:ring-0 focus-within:border-transparent"
+                    onclick="search_modal.showModal()">
+                    <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                      <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                      </g>
+                    </svg>
+
+                    <input type="search" class="grow border-0 cursor-pointer" placeholder="Search recipes..." readonly>
+                  </label>
+
+                  <a href="{% url 'login' %}" class="btn btn-soft font-normal rounded-full whitespace-nowrap px-6 lg:hidden shadow-none">
+                    Login
+                  </a>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="hidden lg:block relative overflow-hidden">
+
+            <img
+                src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1800&auto=format&fit=crop"
+                alt="Healthy Food"
+                draggable="false"
+                class="absolute inset-0 h-full w-full object-cover select-none">
+
+            <div class="absolute inset-0 bg-gradient-to-r from-base-100/20 via-transparent to-transparent"></div>
+
+        </div>
+
+    </div>
+
+  </section>
+
+  <section class="trending-discover-section py-16 lg:py-20 px-6">
+
+    <div class="max-w-7xl mx-auto">
+
+      <div class="text-center max-w-2xl mx-auto mb-14">
+
+        <p class="uppercase tracking-[0.3em] text-xs text-primary font-semibold">Featured Recipes</p>
+
+        <h2 class="text-4xl md:text-5xl font-bold mt-3">Discover What's Trending</h2>
+
+        <p class="mt-4 opacity-65">
+            Fresh recipes from our community. Hand-picked to inspire your next meal.
+        </p>
+
+      </div>
+
+      <div class="landing-bento-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-5">
+
+        <!-- left side -->
+        <div class="left contents lg:flex lg:flex-col lg:gap-5 lg:col-span-3">
+
+            {% with recipe=featured_recipes.0 %}
+                {% with image=recipe.photo_set.all.0 %}
+                    <a href="" class="group relative h-[270px] md:h-[320px] lg:h-[258px] overflow-hidden">
+
+                        {% if image %}
+                            <img src="{{ image.image.url }}" alt="{{ recipe.title }}" class="absolute inset-0 w-full h-full object-cover">
+                        {% endif %}
+
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+
+                        <div class="absolute top-6 right-6">
+                            <div class="w-11 h-11 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center">
+                                <span class="material-symbols-rounded">north_east</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute bottom-7 left-7 right-7 z-10">
+                            <h2 class="text-3xl md:text-4xl font-bold leading-tight drop-shadow-lg line-clamp-2 capitalize">{{ recipe.title }}</h2>
+                        </div>
+
+                    </a>
+                {% endwith %}
+            {% endwith %}
+
+    
+            {% with recipe=featured_recipes.1 %}
+                {% with image=recipe.photo_set.all.0 %}
+                    <a href="" class="group relative h-[270px] md:h-[320px] lg:h-[258px] overflow-hidden">
+
+                        {% if image %}
+                            <img src="{{ image.image.url }}" alt="{{ recipe.title }}" class="absolute inset-0 w-full h-full object-cover">
+                        {% endif %}
+
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"></div>
+
+                        <div class="absolute top-6 right-6">
+                            <div class="w-11 h-11 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center">
+                                <span class="material-symbols-rounded">north_east</span>
+                            </div>
+                        </div>
+
+                        <div class="absolute bottom-7 left-7 right-7 z-10">
+                            <h2 class="text-3xl md:text-4xl font-bold leading-tight drop-shadow-lg line-clamp-2 capitalize">{{ recipe.title }}</h2>
+                        </div>
+
+                    </a>
+                {% endwith %}
+            {% endwith %}
+
+        </div>
+
+        <!-- center -->
+        {% with recipe=featured_recipes.2 %}
+          {% with image=recipe.photo_set.all.0 %}
+
+            <div class="center md:col-span-1 lg:col-span-6">
+
+                <a href="" class="group relative block h-[270px] md:h-[320px] lg:h-[535px] overflow-hidden">
+
+                    {% if image %}
+                        <img src="{{ image.image.url }}" alt="{{ recipe.title }}" class="absolute inset-0 h-full w-full object-cover">
+                    {% endif %}
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+
+                    <div class="absolute left-7 right-7 top-7 flex items-center justify-end z-10">
+                        <div class="w-12 h-12 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center">
+                            <span class="material-symbols-rounded">north_east</span>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-7 left-7 right-7 z-10">
+                        <h2 class="text-3xl md:text-4xl font-bold leading-tight drop-shadow-lg line-clamp-2 capitalize">{{ recipe.title }}</h2>
+                    </div>
+
+                </a>
+
+            </div>
+
+          {% endwith %}
+        {% endwith %}
+
+        <!-- right side -->
+        {% with recipe=featured_recipes.3 %}
+          {% with image=recipe.photo_set.all.0 %}
+
+            <div class="right md:col-span-1 lg:col-span-3">
+
+                <a href="" class="group relative block h-[270px] md:h-[320px] lg:h-[535px] overflow-hidden">
+
+                    {% if image %}
+                        <img src="{{ image.image.url }}" alt="{{ recipe.title }}" class="absolute inset-0 w-full h-full object-cover">
+                    {% endif %}
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent"></div>
+
+                    <div class="absolute left-6 right-6 top-6 flex justify-end items-start z-10">
+                        <div class="w-11 h-11 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center">
+                            <span class="material-symbols-rounded">north_east</span>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-7 left-7 right-7 z-10">
+                        <h2 class="text-3xl md:text-4xl font-bold leading-tight drop-shadow-lg line-clamp-2 capitalize">{{ recipe.title }}</h2>
+                    </div>
+
+                </a>
+
+            </div>
+
+          {% endwith %}
+        {% endwith %}
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="py-24 px-6">
+    <div class="max-w-7xl w-full mx-auto space-y-12">
+
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div class="space-y-3">
+                <h3 class="editorial-title text-3xl sm:text-5xl tracking-tight">Explore Global Cuisines</h3>
+                <p class="text-stone-500 text-sm font-light">Embark on a culinary voyage around the world from the comfort of your kitchen.</p>
+            </div>
+        </div>
+
+        <div class="cuisine-section-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+            <a href="{% url 'cuisines' slug='Indian Cuisine' %}" class="group relative h-[430px] overflow-hidden rounded-[2rem]">
+                <img src="{% if indian_image %}{{ indian_image.image.url }}{% else %}https://images.unsplash.com/photo-1694849789325-914b71ab4075?q=80&w=800&auto=format&fit=crop{% endif %}" alt="Indian Food" class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-8">
+                    <p class="text-[11px] uppercase tracking-[0.2em] font-medium text-orange-300">Aromatic & Spice-Rich</p>
+                    <h2 class="mt-2 text-2xl text-white editorial-title">Indian Cuisine</h2>
+                </div>
+            </a>
+
+            <a href="{% url 'cuisines' slug='American Cuisine' %}" class="group relative h-[430px] overflow-hidden rounded-[2rem]">
+                <img src="{% if american_image %}{{ american_image.image.url }}{% else %}https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=800&auto=format&fit=crop{% endif %}" alt="American Food" class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-8">
+                    <p class="text-[11px] uppercase tracking-[0.2em] font-medium text-amber-300">Comfort & Gourmet Classics</p>
+                    <h2 class="mt-2 text-2xl text-white editorial-title">American Cuisine</h2>
+                </div>
+            </a>
+
+            <a href="{% url 'cuisines' slug='Italian Cuisine' %}" class="group relative h-[430px] overflow-hidden rounded-[2rem]">
+                <img src="{% if italian_image %}{{ italian_image.image.url }}{% else %}https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?q=80&w=800&auto=format&fit=crop{% endif %}" alt="Italian Food" class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-8">
+                    <p class="text-[11px] uppercase tracking-[0.2em] font-medium text-emerald-300">Artisanal & Fresh</p>
+                    <h2 class="mt-2 text-2xl text-white editorial-title">Italian Cuisine</h2>
+                </div>
+            </a>
+
+            <a href="{% url 'explore' %}" class="group relative h-[430px] overflow-hidden rounded-[2rem]">
+                <img src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?q=80&w=800&auto=format&fit=crop" alt="More Cuisines" class="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105" loading="lazy">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 right-0 p-8">
+                    <p class="text-[11px] uppercase tracking-[0.2em] font-medium text-cyan-300">Discover New Flavours</p>
+                    <h2 class="mt-2 text-2xl text-white editorial-title">More Cuisines</h2>
+                </div>
+            </a>
+
+        </div>
+
+    </div>
+  </section>
+
+{% else %}
+
+  <script>
+    location.href = "{% url 'home' %}";
+  </script>
+
+{% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block footer %}
+  <section class="footer-section">
+    <footer class="py-16 px-6 relative bg-transparent" id="footer">
+      <div class="max-w-7xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 relative z-10">
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3">
+            <span class="font-medium text-xl">Yummy Recipes</span>
+          </div>
+          <p class="text-stone-500 text-xs font-light max-w-xs leading-relaxed mt-2">
+            The culinary destination for fine recipes, meal curation, and intelligent kitchen assistance.
+          </p>
+        </div>
+        
+        <div class="flex flex-col gap-3">
+          <h5 class="text-sm font-medium">Social</h5>
+          <ul class="space-y-2 text-xs font-light text-stone-500">
+            <li><a href="#" class="hover:text-orange-500 transition-colors">Facebook</a></li>
+            <li><a href="#" class="hover:text-orange-500 transition-colors">Instagram</a></li>
+            <li><a href="#" class="hover:text-orange-500 transition-colors">X / Twitter</a></li>
+          </ul>
+        </div>
+        
+        <div class="flex flex-col gap-3">
+          <h5 class="text-sm font-medium">Overview</h5>
+          <ul class="space-y-2 text-xs font-light text-stone-500">
+            <li><a href="#" class="hover:text-orange-500 transition-colors">About Us</a></li>
+            <li><a href="#" class="hover:text-orange-500 transition-colors">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-orange-500 transition-colors">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-stone-400 font-light max-w-7xl w-full mx-auto relative z-10 border-t border-stone-200/50">
+        <span>&copy; 2026 Yummy Recipes. All rights reserved.</span>
+      </div>
+    </footer>
+  </section>
+{% endblock %}

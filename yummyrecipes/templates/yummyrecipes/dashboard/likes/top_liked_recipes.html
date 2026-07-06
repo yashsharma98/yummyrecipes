@@ -1,0 +1,30 @@
+<table class="dashboard-table table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Recipe</th>
+            <th class="text-center">Likes</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for recipe in top_liked_recipes %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+                <a href="{{ recipe.id }}" class="link link-hover font-medium">
+                    {{ recipe.title }}
+                </a>
+            </td>
+            <td class="text-center font-medium">{{ recipe.num_likes }}</td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center py-12 opacity-60">
+                No liked recipes yet.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

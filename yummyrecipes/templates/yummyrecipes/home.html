@@ -1,0 +1,979 @@
+{% extends 'yummyrecipes/base.html' %}
+
+{% load hitcount_tags %}
+{% load static %}
+{% load notifications_tags %}
+{% load tz %}
+{% load read_time_pluralize %}
+
+{% block title %}
+<title>Home</title>
+{% endblock %}
+
+{% block css %}
+{% endblock %}
+
+{% block raw_content %}
+<body>
+    {% if user.is_authenticated or is_guest %}
+
+        <div class="min-h-screen w-full pt-[50px] relative">
+            
+            <div class="w-full px-2 sm:px-8 sm:pr-2 pt-6 pb-20">
+
+                <header class="main-header space-y-4">
+                    
+                    <div class="px-2 pl-0">
+                        {% for post in spotlight_list|slice:"0:1" %}
+                            {% if post.date_post.day == date.day and post.date_post.month == date.month and post.date_post.year == date.year %}
+                            {% else %}
+                                <h1 class="text-3xl font-bold tracking-tight">Spotlight</h1>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="flex overflow-x-auto no-scrollbar gap-4 pb-4 px-2 pl-0">
+                        
+                        {% for post in spotlight_list %}
+                            {% if post.date_post.day == date.day and post.date_post.month == date.month and post.date_post.year == date.year %}
+                            {% else %}
+                                {% if 'rice' in post.title %}
+                                {% else %}
+                                    <button type="button" class="header-squircle-card group" onclick="document.getElementById('spotlightModal{{post.pk}}').showModal()">
+                                        {% for i in post.photo_set.all %}
+                                        {% if forloop.counter0 == 0 %}
+                                            <img loading="lazy" src="{{ i.image.url }}" alt="{{post.title}}">
+                                            <div class="card-gradient"></div>
+                                            <div class="card-title-bottom">
+                                                <h3 class="font-bold text-base leading-tight">{{post.whenpublished}}</h3>
+                                            </div>
+                                        {% endif %}
+                                        {% endfor %}  
+                                    </button> 
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {# year recap #}
+                        {% if date.month == 12 %}
+                            <a href="{% url 'year_recap' %}" class="header-squircle-card group hover:scal">
+                                <div class="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500"></div>
+                                <div class="card-title-bottom">
+                                    <span class="text-xs uppercase tracking-widest">Year Recap</span>
+
+                                    <h3 class="font-bold text-2xl">{{ date.year }}</h3>
+                                </div>
+                            </a>
+                        {% endif %}
+                        
+                        {# similar rice recipes #}
+                        {% for post in rice_recipe_list %}
+                            {% if forloop.first %}
+                                <button type="button" class="header-squircle-card group" onclick="document.getElementById('similarricerecipes').showModal()">
+                                    {% for i in post.photo_set.all %}
+                                        {% if forloop.counter0 == 0 %}
+                                            <img loading="lazy" src="{{ i.image.url }}" alt="{{post.title}}">
+                                            <div class="card-gradient"></div>
+                                            <div class="card-title-bottom">
+                                                <h3 class="font-medium text-base leading-tight">Rice recipes</h3>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %} 
+                                </button>    
+                            {% endif %}       
+                        {% endfor %}
+
+                        {# popular or random recipe #}
+                        {% if popular_recipe %}
+
+                            {% for post in popular_recipe|slice:"0:1" %}
+
+                                <a href="{% url 'viewpost' post.pk %}" class="header-squircle-card group">
+                                    {% for i in post.photo_set.all %}
+                                        {% if forloop.first %}
+                                            <img loading="lazy"src="{{ i.image.url }}"alt="{{ post.title }}">
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <div class="card-gradient"></div>
+
+                                    <div class="card-title-bottom">
+                                        <span class="text-xs opacity-80">Popular This Week</span>
+
+                                        <h3 class="font-medium text-base leading-tight">{{ post.title|truncatechars:28 }}</h3>
+                                    </div>
+                                </a>
+
+                            {% endfor %}
+
+                        {% elif random_obj %}
+
+                            <a href="{% url 'viewpost' random_obj.pk %}" class="header-squircle-card group">
+                                {% if random_obj.photo_set.first %}
+                                    <img loading="lazy" src="{{ random_obj.photo_set.first.image.url }}" alt="{{ random_obj.title }}">
+                                {% endif %}
+
+                                <div class="card-gradient"></div>
+
+                                <div class="card-title-bottom">
+                                    <span class="text-xs opacity-80">Featured</span>
+
+                                    <h3 class="font-medium text-base leading-tight">{{ random_obj.title|truncatechars:28 }}</h3>
+                                </div>
+                            </a>
+                        {% endif %}
+
+                    </div>    
+                </header>
+
+                <div class="flex flex-col xl:flex-row gap-10">
+
+                    {# main content section #}
+                    <div class="flex-1 min-w-0 xl:max-w-[70%]">
+
+                        {# meal nav button & links #}
+                        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mt-4 mb-4 whitespace-nowrap">
+                            {% for tab_name, posts in recipe_tabs.items %}
+                                <button
+                                    class="meal-tab meal-tab-btn cursor-pointer tracking-tight
+                                    {% if tab_name == active_meal %}active-meal{% endif %}"
+                                    data-meal="{{ tab_name }}">
+                                    {{ tab_name }}
+                                </button>
+                            {% endfor %}
+
+                            <button id="cuisine-btn" class="meal-tab cursor-pointer tracking-tight" onclick="cuisineModal.showModal()">Cuisine</button>
+                        </div>
+
+                        
+                        {# dynamic time based recpipe with meal nav #}
+                        <section class="mt-6">
+                            
+                            <div id="recipes-container">
+
+                                {% for meal_name, posts in combined_recipe.items %}
+                                    <div class="meal-panel {% if meal_name == active_meal %}active{% else %}hidden{% endif %}" data-panel="{{ meal_name }}">
+
+                                        <div class="grid grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 gap-3 gap-y-10 gap-y-5">
+                                            {% for post in posts %}
+                                            
+                                            <div class="recipe-cards dynamic-bg group relative">
+                                                
+                                                <div class="aspect-[5/4] relative img-container {% if post.pk in historys_pk %}in-history{% endif %} overflow-hidden">
+                                                    
+                                                    {# Favourite #} 
+                                                    <div class="absolute top-2 left-2 z-20 pointer-events-auto">
+                                                        <div class="recipe-action p-2.5 favourite-action cursor-pointer flex items-center justify-center w-full h-full 
+                                                            tooltip tooltip-right {% if post in user.favourite.all %}active{% endif %}"
+                                                            data-tip="{% if post in user.favourite.all %}Remove{% else %}Favourite{% endif %}"
+                                                            data-post-id="{{ post.id }}">
+                                                            <span
+                                                                class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">
+                                                                favorite
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    {# Quick View #}
+                                                    <div class="absolute top-2 right-2 z-20 quickview-wrapper">
+                                                        <button
+                                                            type="button"
+                                                            class="recipe-action p-2.5 quickview-action quick-view-btn cursor-pointer"
+                                                            data-pk="{{ post.pk }}"
+                                                            data-title="{{ post.title }}"
+
+                                                            data-author="{{ post.author.first_name }} {{ post.author.last_name }}"
+
+                                                            data-image="{% for i in post.photo_set.all %}{% if forloop.first %}{{ i.image.url }}{% endif %}{% endfor %}"
+                                                        
+                                                            data-published = "{{ post.get_date }}"
+                                                            data-modified="{{post.get_modified_date}}"
+                                                            data-likes="{{post.total_likes}}"
+                                                            data-dislikes="{{post.total_dislikes}}"
+                                                            data-type = "{{ post.type }}"
+
+                                                            data-time="{{ post.timing }}"
+                                                            data-difficulty="{{ post.difficulty }}"
+                                                            data-category="{{ post.category }}"
+                                                            data-cuisine="{{ post.cuisine }}"
+                                                            data-servings="{{ post.servings }}"
+                                                            data-views="{% get_hit_count for post %}"
+                                                            data-readtime="{{ post.read_time|pluralize_min }}"
+                                                            data-url="{% url 'viewpost' post.pk %}">
+
+                                                            <span class="material-symbols-rounded">
+                                                                view_headline
+                                                            </span>
+                                                        </button>
+                                                    </div>
+
+                                                    <a href="{% url 'viewpost' post.pk %}" class="absolute inset-0 z-10 w-full h-full flex">
+                                                        {% for i in post.photo_set.all %}
+                                                            {% if forloop.first %}
+                                                                <img loading="lazy" src="{{ i.image.url }}" class="w-full h-full object-cover recipe-main-img" alt="{{ post.title }}">
+                                                            {% endif %}
+                                                        {% empty %}
+                                                            <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="w-full h-full object-cover recipe-main-img">
+                                                        {% endfor %}
+                                                    </a>
+
+                                                </div>
+
+                                                <a href="{% url 'viewpost' post.pk %}" class="py-4 pb-2 px-2 recipe-info flex flex-col gap-2.5">
+
+                                                    <div class="recipe-info-header flex items-center justify-between gap-2">
+
+                                                        <div class="flex items-center gap-1.5 min-w-0">
+                                                            <img src="{{ post.author.profile.profile_img.url }}" class="w-5 h-5 rounded-full object-cover" alt="Author">
+
+                                                            <span class="capitalize truncate text-[0.8rem]">{{ post.author.first_name }} {{ post.author.last_name }}</span>
+                                                        </div>
+
+                                                        <div class="flex items-center gap-1 hidden md:flex rounded-full px-2 py-1 text-[0.7rem] shrink-0">
+                                                            <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                            <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <h4 class="recipe-title text-xl md:text-[1.75rem] font-medium line-clamp-2 capitalize">{{ post.title }}</h4>
+
+                                                    <div class="flex flex-wrap items-center gap-2 tracking-tight mt-1">
+
+                                                        <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                            <span class="material-symbols-rounded !text-[0.8rem]">
+                                                                visibility
+                                                            </span>
+                                                            <span class="text-[0.75rem]">{% get_hit_count for post %} views</span>
+                                                        </span>
+
+                                                        <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                            <span class="material-symbols-rounded !text-[0.85rem]">
+                                                                groups
+                                                            </span>
+                                                            <span class="text-[0.75rem]">{{ post.cuisine|cut:"cuisine" }}</span>
+                                                        </span>
+
+                                                        <span class="flex items-center whitespace-nowrap badge badge badge-md p-2
+                                                            {% if post.category == 'Veg' %}badge-success{% else %}badge-error{% endif %}">
+                                                            <span class="text-[0.75rem]">{{ post.category }}</span>
+                                                        </span>
+
+                                                        <div class="flex items-center recipe-info-last rounded-lg gap-1 md:hidden px-2 py-1 text-[0.7rem] shrink-0">
+                                                            <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                            <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                
+                                                {% if post.pk in historys_pk %}
+                                                    <div class="cards-footer hidden"></div>
+                                                {% endif %}
+
+                                            </div>
+                                            {% empty %}
+                                            <div class="col-span-full py-16 text-center rounded-[2.5rem]">
+                                                <span class="material-symbols-rounded text-5xl text-stone-300 mb-3">restaurant</span>
+                                                <h4 class="text-lg font-bold tracking-tight">No recipes found</h4>
+                                                <p class="text-sm mt-1 font-light">Check back later for fresh culinary inspiration.</p>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        {% if posts %}
+                                            <div class="flex justify-end mt-8">
+                                                <a href="{% url 'meal_detail' meal_name|slugify %}" class="more-recipe-link link no-underline p-2 px-4 text-[0.9rem] inline-flex items-center gap-2 hover:opacity-75">
+                                                    See all recipes
+                                                <span class="material-symbols-rounded text-base">trending_flat</span>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                        </section>
+                    
+
+                        {# recommended recipes #}
+                        <section class="recommended-recipe-section mt-[4rem] p-3 xl:pb-8 xl:p-6">
+
+                            <div class="flex items-center justify-between mb-6">
+
+                                <div class="p-3 pb-0 sm:p-3 sm:pb-0 xl:p-0">
+                                    {% if recommended_recipes %}
+                                        <h2 class="text-xl lg:text:2xl xl:text-3xl font-medium tracking-tight">Recommended recipes</h2>
+
+                                        <p class="text-sm mt-1 opacity-60">Personalized picks based on your interests.</p>
+                                    {% else %}
+                                        <h2 class="text-xl lg:text:2xl xl:text-3xl font-medium tracking-tight">Curated recipes</h2>
+
+                                        <p class="text-sm mt-1 opacity-60">Handpicked recipes you might enjoy.</p>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 gap-3 gap-y-10">
+                                
+                                {% if recommended_recipes %}
+
+                                    {% for post in recommended_recipes %}
+                                        <div class="recipe-cards dynamic-bg group relative">
+                                            
+                                            <div class="aspect-[5/4] relative img-container {% if post.pk in historys_pk %}in-history{% endif %} overflow-hidden">
+                                                {# Favourite #} 
+                                                <div class="absolute top-2 left-2 z-20 pointer-events-auto">
+                                                    <div class="recipe-action p-2.5 favourite-action cursor-pointer flex items-center justify-center w-full h-full 
+                                                        tooltip tooltip-right {% if post in user.favourite.all %}active{% endif %}"
+                                                        data-tip="{% if post in user.favourite.all %}Remove{% else %}Favourite{% endif %}"
+                                                        data-post-id="{{ post.id }}">
+                                                        <span
+                                                            class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">
+                                                            favorite
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {# Quick View #}
+                                                <div class="absolute top-2 right-2 z-20 quickview-wrapper">
+                                                    <button
+                                                        type="button"
+                                                        class="recipe-action p-2.5 quickview-action quick-view-btn cursor-pointer"
+                                                        data-pk="{{ post.pk }}"
+                                                        data-title="{{ post.title }}"
+
+                                                        data-author="{{ post.author.first_name }} {{ post.author.last_name }}"
+
+                                                        data-image="{% for i in post.photo_set.all %}{% if forloop.first %}{{ i.image.url }}{% endif %}{% endfor %}"
+                                                    
+                                                        data-published = "{{ post.get_date }}"
+                                                        data-modified="{{post.get_modified_date}}"
+                                                        data-likes="{{post.total_likes}}"
+                                                        data-dislikes="{{post.total_dislikes}}"
+                                                        data-type = "{{ post.type }}"
+
+                                                        data-time="{{ post.timing }}"
+                                                        data-difficulty="{{ post.difficulty }}"
+                                                        data-category="{{ post.category }}"
+                                                        data-cuisine="{{ post.cuisine }}"
+                                                        data-servings="{{ post.servings }}"
+                                                        data-views="{% get_hit_count for post %}"
+                                                        data-readtime="{{ post.read_time|pluralize_min }}"
+                                                        data-url="{% url 'viewpost' post.pk %}">
+
+                                                        <span class="material-symbols-rounded">
+                                                            view_headline
+                                                        </span>
+                                                    </button>
+                                                </div>
+
+                                                <a href="{% url 'viewpost' post.pk %}" class="absolute inset-0 w-full h-full flex">
+                                                    {% for i in post.photo_set.all %}
+                                                        {% if forloop.first %}
+                                                            <img loading="lazy" src="{{ i.image.url }}" class="w-full h-full object-cover recipe-main-img" alt="{{ post.title }}">
+                                                        {% endif %}
+                                                    {% empty %}
+                                                        <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="w-full h-full object-cover recipe-main-img">
+                                                    {% endfor %}
+                                                </a>
+                                            </div>
+
+                                            <a href="{% url 'viewpost' post.pk %}" class="py-4 pb-2 px-2 recipe-info flex flex-col gap-2.5">
+
+                                                <div class="recipe-info-header flex items-center justify-between gap-2">
+
+                                                    <div class="flex items-center gap-1.5 min-w-0">
+                                                        <img src="{{ post.author.profile.profile_img.url }}" class="w-5 h-5 rounded-full object-cover" alt="Author">
+
+                                                        <span class="capitalize truncate text-[0.8rem]">{{ post.author.first_name }} {{ post.author.last_name }}</span>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-1 hidden md:flex rounded-full px-2 py-1 text-[0.7rem] shrink-0">
+                                                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                    </div>
+
+                                                </div>
+
+                                                <h4 class="recipe-title text-xl md:text-[1.75rem] font-medium line-clamp-2 capitalize">{{ post.title }}</h4>
+
+                                                <div class="flex flex-wrap items-center gap-2 tracking-tight mt-1">
+
+                                                    <div class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                        <span class="material-symbols-rounded !text-[0.8rem]">
+                                                            schedule
+                                                        </span>
+                                                        <span class="text-[0.75rem]">{{ post.read_time|pluralize_min }}</span>
+                                                    </div>
+
+                                                    <div class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                        <span class="material-symbols-rounded !text-[0.85rem]">
+                                                            groups
+                                                        </span>
+                                                        <span class="text-[0.75rem]">{{ post.cuisine|cut:"cuisine" }}</span>
+                                                    </div>
+
+                                                    <div class="flex items-center whitespace-nowrap badge badge badge-md p-2
+                                                        {% if post.category == 'Veg' %}badge-success{% else %}badge-error{% endif %}">
+                                                        <span class="text-[0.75rem]">{{ post.category }}</span>
+                                                    </div>
+
+                                                    <div class="flex items-center recipe-info-last rounded-lg gap-1 md:hidden px-2 py-1 text-[0.7rem] shrink-0">
+                                                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            
+                                            {% if post.pk in historys_pk %}
+                                                <div class="cards-footer hidden"></div>
+                                            {% endif %}
+
+                                        </div>
+                                    {% empty %}
+                                        <div class="col-span-full py-16 text-center rounded-[2.5rem]">
+                                            <span class="material-symbols-rounded text-5xl text-stone-300 mb-3">restaurant</span>
+                                            <h4 class="text-lg font-bold tracking-tight">No recipes found</h4>
+                                            <p class="text-sm mt-1 font-light">Check back later for fresh culinary inspiration.</p>
+                                        </div>
+                                    {% endfor %}
+
+                                {% elif all_urecipe %}
+
+                                    {% for post in all_urecipe %}
+                                        <div class="recipe-cards dynamic-bg group relative">
+                                            
+                                            <div class="aspect-[5/4] relative img-container {% if post.pk in historys_pk %}in-history{% endif %} overflow-hidden">
+                                                {# Favourite #} 
+                                                <div class="absolute top-2 left-2 z-20 pointer-events-auto">
+                                                    <div class="recipe-action p-2.5 favourite-action cursor-pointer flex items-center justify-center w-full h-full 
+                                                        tooltip tooltip-right {% if post in user.favourite.all %}active{% endif %}"
+                                                        data-tip="{% if post in user.favourite.all %}Remove{% else %}Favourite{% endif %}"
+                                                        data-post-id="{{ post.id }}">
+                                                        <span
+                                                            class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">
+                                                            favorite
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {# Quick View #}
+                                                <div class="absolute top-2 right-2 z-20 quickview-wrapper">
+                                                    <button
+                                                        type="button"
+                                                        class="recipe-action p-2.5 quickview-action quick-view-btn cursor-pointer"
+                                                        data-pk="{{ post.pk }}"
+                                                        data-title="{{ post.title }}"
+
+                                                        data-author="{{ post.author.first_name }} {{ post.author.last_name }}"
+
+                                                        data-image="{% for i in post.photo_set.all %}{% if forloop.first %}{{ i.image.url }}{% endif %}{% endfor %}"
+                                                    
+                                                        data-published = "{{ post.get_date }}"
+                                                        data-modified="{{post.get_modified_date}}"
+                                                        data-likes="{{post.total_likes}}"
+                                                        data-dislikes="{{post.total_dislikes}}"
+                                                        data-type = "{{ post.type }}"
+
+                                                        data-time="{{ post.timing }}"
+                                                        data-difficulty="{{ post.difficulty }}"
+                                                        data-category="{{ post.category }}"
+                                                        data-cuisine="{{ post.cuisine }}"
+                                                        data-servings="{{ post.servings }}"
+                                                        data-views="{% get_hit_count for post %}"
+                                                        data-readtime="{{ post.read_time|pluralize_min }}"
+                                                        data-url="{% url 'viewpost' post.pk %}">
+
+                                                        <span class="material-symbols-rounded">
+                                                            view_headline
+                                                        </span>
+                                                    </button>
+                                                </div>
+
+                                                <a href="{% url 'viewpost' post.pk %}" class="absolute inset-0 w-full h-full flex">
+                                                    {% for i in post.photo_set.all %}
+                                                        {% if forloop.first %}
+                                                            <img loading="lazy" src="{{ i.image.url }}" class="w-full h-full object-cover recipe-main-img" alt="{{ post.title }}">
+                                                        {% endif %}
+                                                    {% empty %}
+                                                        <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="w-full h-full object-cover recipe-main-img">
+                                                    {% endfor %}
+                                                </a>
+                                            </div>
+
+                                            <a href="{% url 'viewpost' post.pk %}" class="py-4 pb-2 px-2 recipe-info flex flex-col gap-2.5">
+
+                                                <div class="recipe-info-header flex items-center justify-between gap-2">
+
+                                                    <div class="flex items-center gap-1.5 min-w-0">
+                                                        <img src="{{ post.author.profile.profile_img.url }}" class="w-5 h-5 rounded-full object-cover" alt="Author">
+
+                                                        <span class="capitalize truncate text-[0.8rem]">{{ post.author.first_name }} {{ post.author.last_name }}</span>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-1 hidden md:flex rounded-full px-2 py-1 text-[0.7rem] shrink-0">
+                                                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                    </div>
+
+                                                </div>
+
+                                                <h4 class="recipe-title text-xl md:text-[1.75rem] font-medium line-clamp-2 capitalize">{{ post.title }}</h4>
+
+                                                <div class="flex flex-wrap items-center gap-2 tracking-tight mt-1">
+
+                                                    <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                        <span class="material-symbols-rounded !text-[0.8rem]">
+                                                            schedule
+                                                        </span>
+                                                        <span class="text-[0.75rem]">{{ post.read_time|pluralize_min }}</span>
+                                                    </span>
+
+                                                    <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                        <span class="material-symbols-rounded !text-[0.85rem]">
+                                                            groups
+                                                        </span>
+                                                        <span class="text-[0.75rem]">{{ post.cuisine|cut:"cuisine" }}</span>
+                                                    </span>
+
+                                                    <span class="flex items-center whitespace-nowrap badge badge badge-md p-2
+                                                        {% if post.category == 'Veg' %}badge-success{% else %}badge-error{% endif %}">
+                                                        <span class="text-[0.75rem]">{{ post.category }}</span>
+                                                    </span>
+
+                                                    <div class="flex items-center recipe-info-last rounded-lg gap-1 md:hidden px-2 py-1 text-[0.7rem] shrink-0">
+                                                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            
+                                            {% if post.pk in historys_pk %}
+                                                <div class="cards-footer hidden"></div>
+                                            {% endif %}
+
+                                        </div>
+                                    {% empty %}
+                                        <div class="col-span-full py-16 text-center rounded-[2.5rem]">
+                                            <span class="material-symbols-rounded text-5xl text-stone-300 mb-3">restaurant</span>
+                                            <h4 class="text-lg font-bold tracking-tight">No recipes found</h4>
+                                            <p class="text-sm mt-1 font-light">Check back later for fresh culinary inspiration.</p>
+                                        </div>
+                                    {% endfor %}
+
+                                {% endif %}
+
+                            </div>
+
+                        </section>
+
+
+                        {# recipe from people they follow #}
+                        <section class="mt-[4rem]">
+
+                            <div class="flex items-center justify-between mb-6">
+
+                                <div>
+                                    <h2 class="text-xl lg:text:2xl xl:text-3xl font-medium tracking-tight">From people you follow</h2>
+                                </div>
+
+                            </div>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 3xl:grid-cols-4 gap-3 gap-y-10">
+                                
+                                {% for user, posts in following_user_posts.items %}
+
+                                    {% for post in posts %}
+                                        <div class="recipe-cards dynamic-bg group relative">
+                                            
+                                            <div class="aspect-[5/4] relative img-container {% if post.pk in historys_pk %}in-history{% endif %} overflow-hidden">
+                                                {# Favourite #} 
+                                                <div class="absolute top-2 left-2 z-20 pointer-events-auto">
+                                                    <div class="recipe-action p-2.5 favourite-action cursor-pointer flex items-center justify-center w-full h-full 
+                                                        tooltip tooltip-right {% if post in user.favourite.all %}active{% endif %}"
+                                                        data-tip="{% if post in user.favourite.all %}Remove{% else %}Favourite{% endif %}"
+                                                        data-post-id="{{ post.id }}">
+                                                        <span
+                                                            class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">
+                                                            favorite
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {# Quick View #}
+                                                <div class="absolute top-2 right-2 z-20 quickview-wrapper">
+                                                    <button
+                                                        type="button"
+                                                        class="recipe-action p-2.5 quickview-action quick-view-btn cursor-pointer"
+                                                        data-pk="{{ post.pk }}"
+                                                        data-title="{{ post.title }}"
+
+                                                        data-author="{{ post.author.first_name }} {{ post.author.last_name }}"
+
+                                                        data-image="{% for i in post.photo_set.all %}{% if forloop.first %}{{ i.image.url }}{% endif %}{% endfor %}"
+                                                    
+                                                        data-published = "{{ post.get_date }}"
+                                                        data-modified="{{post.get_modified_date}}"
+                                                        data-likes="{{post.total_likes}}"
+                                                        data-dislikes="{{post.total_dislikes}}"
+                                                        data-type = "{{ post.type }}"
+
+                                                        data-time="{{ post.timing }}"
+                                                        data-difficulty="{{ post.difficulty }}"
+                                                        data-category="{{ post.category }}"
+                                                        data-cuisine="{{ post.cuisine }}"
+                                                        data-servings="{{ post.servings }}"
+                                                        data-views="{% get_hit_count for post %}"
+                                                        data-readtime="{{ post.read_time|pluralize_min }}"
+                                                        data-url="{% url 'viewpost' post.pk %}">
+
+                                                        <span class="material-symbols-rounded">
+                                                            view_headline
+                                                        </span>
+                                                    </button>
+                                                </div>
+
+                                                <a href="{% url 'viewpost' post.pk %}" class="absolute inset-0 w-full h-full flex">
+                                                    {% for i in post.photo_set.all %}
+                                                        {% if forloop.first %}
+                                                            <img loading="lazy" src="{{ i.image.url }}" class="w-full h-full object-cover recipe-main-img" alt="{{ post.title }}">
+                                                        {% endif %}
+                                                    {% empty %}
+                                                        <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="w-full h-full object-cover recipe-main-img">
+                                                    {% endfor %}
+                                                </a>
+                                            </div>
+
+                                            <a href="{% url 'viewpost' post.pk %}" class="py-4 pb-2 px-2 recipe-info flex flex-col gap-2.5">
+
+                                                <div class="recipe-info-header flex items-center justify-between gap-2">
+
+                                                    <div class="flex items-center gap-1.5 min-w-0">
+                                                        <img src="{{ post.author.profile.profile_img.url }}" class="w-5 h-5 rounded-full object-cover" alt="Author">
+
+                                                        <span class="capitalize truncate text-[0.8rem]">{{ post.author.first_name }} {{ post.author.last_name }}</span>
+                                                    </div>
+
+                                                    <div class="flex items-center gap-1 hidden md:flex rounded-full px-2 py-1 text-[0.7rem] shrink-0">
+                                                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                    </div>
+
+                                                </div>
+
+                                                <h4 class="recipe-title text-xl md:text-[1.75rem] font-medium line-clamp-2 capitalize">{{ post.title }}</h4>
+
+                                                <div class="flex flex-wrap items-center gap-2 tracking-tight mt-1">
+
+                                                    <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                        <span class="material-symbols-rounded !text-[0.8rem]">
+                                                            schedule
+                                                        </span>
+                                                        <span class="text-[0.75rem]">{{ post.read_time|pluralize_min }}</span>
+                                                    </span>
+
+                                                    <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                                                        <span class="material-symbols-rounded !text-[0.85rem]">
+                                                            groups
+                                                        </span>
+                                                        <span class="text-[0.75rem]">{{ post.cuisine|cut:"cuisine" }}</span>
+                                                    </span>
+
+                                                    <span class="flex items-center whitespace-nowrap badge badge badge-md p-2
+                                                        {% if post.category == 'Veg' %}badge-success{% else %}badge-error{% endif %}">
+                                                        <span class="text-[0.75rem]">{{ post.category }}</span>
+                                                    </span>
+
+                                                    <div class="flex items-center recipe-info-last rounded-lg gap-1 md:hidden px-2 py-1 text-[0.7rem] shrink-0">
+                                                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                                                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            
+                                            {% if post.pk in historys_pk %}
+                                                <div class="cards-footer hidden"></div>
+                                            {% endif %}
+
+                                        </div>
+                                    {% empty %}
+                                        <div class="col-span-full py-16 text-center rounded-[2.5rem]">
+                                            <span class="material-symbols-rounded text-5xl text-stone-300 mb-3">restaurant</span>
+                                            <h4 class="text-lg font-bold tracking-tight">No recipes found</h4>
+                                            <p class="text-sm mt-1 font-light">Check back later for fresh culinary inspiration.</p>
+                                        </div>
+                                    {% endfor %}
+
+                                {% endfor %}
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+
+                    {# Right trending container #}
+                    <aside class="w-full xl:max-w-[30%] ml-0 md:ml-12 shrink-0">
+
+                        <div class="sticky top-24">
+
+                            <div class="pl-4 pt-4">
+
+                                <h3 class="font-medium text-3xl tracking-tight mb-4">Trending</h3>
+
+                                <div class="space-y-2">
+
+                                    {% if trending_recipes %}
+
+                                        {% for post in trending_recipes|slice:"0:10" %}
+
+                                        <a href="{% url 'viewpost' post.pk %}" class="card card-side trending-cards p-1">
+
+                                            <figure class="shrink-0">
+                                                {% for i in post.photo_set.all %}
+                                                    {% if forloop.counter0 == 0 %}
+                                                        <img loading="lazy" src="{{ i.image.url }}" alt="{{post.title}}" class="w-full h-full object-cover">
+                                                    {% endif %}
+                                                {% empty %}
+                                                    <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="w-full h-full object-cover">
+                                                {% endfor %}
+                                            </figure>
+
+                                            <div class="card-body p-3 gap-1">
+                                                <h4 class="font-medium text-lg leading-tight line-clamp-2">{{ post.title }}</h4>
+
+                                                <div class="text-xs leading-tight">
+                                                    <p class="mb-1 capitalize">By {{ post.author.first_name }} {{ post.author.last_name }}</p>
+                                                    <!-- <p>{% get_hit_count for post %} views</p> -->
+                                                </div>
+                                            </div>
+                                        </a>
+
+                                        {% endfor %}
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </aside>
+                
+                </div>
+
+            </div>
+        </div>
+
+    {% else %}
+        <script>
+        location.href = "{% url 'login' %}";
+        </script>
+    {% endif %}
+
+    {% block modals %}
+
+        {% for post in spotlight_list %}
+        <dialog id="spotlightModal{{post.pk}}" class="modal">
+            <div class="modal-box max-w-full w-full h-[100dvh] max-h-screen rounded-none p-0 overflow-hidden bg-stone-950 shadow-none border-none">
+                
+                <div class="relative w-full h-full">
+                    {% for i in post.photo_set.all %}
+                    {% if forloop.counter0 == 0 %}
+                        <img src="{{ i.image.url }}" class="w-full h-full object-cover opacity-90">
+                    {% endif %}
+                    {% empty %}
+                        <img src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="w-full h-full object-cover opacity-90">
+                    {% endfor %}
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/30 to-transparent"></div>
+                    
+                    <div class="absolute bottom-0 left-0 w-full p-8 md:p-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 z-10">
+                        <div>
+                            <h2 class="text-5xl md:text-7xl font-bold text-white tracking-tight leading-tight mb-2">{{post.title}}</h2>
+                            <p class="text-stone-300 text-lg md:text-xl font-medium">{{post.get_date|date:"F j, Y"}}</p>
+                        </div>
+                        
+                        <a href="{% url 'viewpost' post.pk %}" class="flex-shrink-0 bg-stone-100 px-10 py-4 rounded-full text-sm font-bold tracking-wide hover:bg-stone-200 transition-colors shadow-xl">
+                            Read Full Recipe
+                        </a>
+                    </div>
+                    
+                    <form method="dialog" class="absolute top-6 right-6 md:top-10 md:right-10 z-20">
+                        <button class="w-12 h-12 rounded-full bg-black/30 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-black/50 transition-colors">
+                            <span class="material-symbols-rounded">close</span>
+                        </button>
+                    </form>
+                </div>
+                
+            </div>
+        </dialog>
+        {% endfor %}
+
+        {# similar recipe dialog #}
+        <dialog id="similarricerecipes" class="modal">
+            <div class="modal-box max-w-full w-full h-[100dvh] max-h-screen rounded-none p-0 overflow-hidden bg-stone-50 shadow-none border-none flex flex-col relative">
+                
+                <form method="dialog" class="absolute top-6 right-6 md:top-10 md:right-10 z-20">
+                    <button class="w-12 h-12 rounded-full bg-stone-100 shadow-md border border-stone-200 flex items-center justify-center hover:bg-stone-100 transition-colors">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </form>
+
+                <div class="flex-1 overflow-y-auto p-8 md:p-16 pt-24 md:pt-32">
+                    <div class="max-w-7xl mx-auto">
+                        <h3 class="text-4xl md:text-5xl font-bold tracking-tight mb-10">Similar Rice Recipes</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {% for post in rice_recipe_list %}
+                            <a href="{% url 'viewpost' post.pk %}" class="bg-stone-100 rounded-[1.5rem] p-4 flex flex-col gap-4 hover:shadow-lg transition-all duration-300 border border-stone-100 group">
+                                <div class="w-full aspect-[4/3] rounded-xl overflow-hidden flex-shrink-0">
+                                    {% for i in post.photo_set.all %}
+                                    {% if forloop.counter0 == 0 %}
+                                        <img src="{{ i.image.url }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-base truncate">{{post.title}}</h4>
+                                    <p class="text-xs mt-1 font-medium">{{post.get_date|date:"F j, Y"}}</p>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </dialog>
+
+        {# cuisine dialog #}
+        <dialog id="cuisineModal" class="modal cuisine-modal">
+            <div class="modal-box">
+                <h3 class="text-lg font-semibold">Select Cuisine</h3>
+                <ul class="menu p-2 mt-2 bg-re-300 rounded-box w-full">
+                    {% for meal_name, posts in cuisine_tabs.items %}
+                            <li>
+                                <a class="meal-tab-btn w-full text-left" 
+                                data-meal="{{meal_name}}"onclick="document.getElementById('cuisineModal').close()">
+                                {{meal_name}}</a>
+                            </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="modal-action mt-2">
+                    <form method="dialog">
+                        <button class="btn btn-transparent bg-transparent border-0 font-normal shadow-none">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <form method="dialog" class="modal-backdrop">
+                <button></button>
+            </form>
+        </dialog>
+
+    {% endblock %}
+
+    {% if success_text %}
+        <div class="fixed bottom-4 right-4 z-50 pointer-events-none">
+            <dotlottie-player src="https://lottie.host/c4123073-6711-404a-8725-078a15a5803e/4m2OD09vRe.json" background="transparent" speed="1" style="width: 250px; height: 250px;" autoplay></dotlottie-player>
+            <div id="newToast" class="bg-stone-900 text-white px-6 py-3 rounded-xl shadow-lg mt-[-50px] pointer-events-auto">
+                <p class="text-sm"><b>{{ success_text }}</b> successfully published!</p>
+            </div>
+        </div>
+        <script>
+            setTimeout(() => { document.getElementById('newToast').style.display = 'none'; }, 4000);
+        </script>
+    {% endif %}
+
+    {# meal navigation script #}
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const cuisineModal = document.getElementById("cuisineModal");
+            const cuisineBtn = document.getElementById("cuisine-btn");
+
+            document.querySelectorAll(".meal-tab-btn").forEach(tab => {
+
+                tab.addEventListener("click", () => {
+
+                    const meal = tab.dataset.meal;
+                    const isCuisine = cuisineModal.contains(tab);
+
+                    // Remove active from all tabs/buttons
+                    document.querySelectorAll(".meal-tab-btn")
+                        .forEach(btn => btn.classList.remove("active-meal"));
+
+                    if (isCuisine) {
+
+                        // Selected cuisine
+                        tab.classList.add("active-meal");
+
+                        cuisineBtn.classList.add("active-meal");
+                        cuisineBtn.textContent = tab.textContent.trim();
+
+                        cuisineModal.close();
+
+                    } else {
+
+                        // Selected regular meal tab
+                        tab.classList.add("active-meal");
+
+                        cuisineBtn.classList.remove("active-meal");
+                        cuisineBtn.textContent = "Cuisine";
+                    }
+
+                    // Hide all panels
+                    document.querySelectorAll(".meal-panel")
+                        .forEach(panel => {
+                            panel.classList.remove("active", "animate-in");
+                            panel.classList.add("hidden");
+                        });
+
+                    // Show target panel
+                    const targetPanel = document.querySelector(
+                        `.meal-panel[data-panel="${meal}"]`
+                    );
+
+                    if (!targetPanel) return;
+
+                    targetPanel.classList.remove("hidden");
+                    targetPanel.classList.add("active");
+
+                    // Stagger animation
+                    const cards = targetPanel.querySelectorAll(".recipe-cards");
+
+                    cards.forEach((card, index) => {
+                        const delay = Math.min(index * 60, 500);
+                        card.style.setProperty("--delay", `${delay}ms`);
+                    });
+
+                    void targetPanel.offsetWidth;
+
+                    requestAnimationFrame(() => {
+                        targetPanel.classList.add("animate-in");
+                    });
+
+                });
+
+            });
+
+        });
+    </script>
+
+
+</body>
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+{% block title %}
+    <title>{{todays_date.year}} recap</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div class="min-h-screen w-full pt-[80px] relative">
+
+  <div class="w-full px-2 sm:px-8 sm:pr-2 xl:pr-4 pt-8 pb-20">
+
+    <header class="main-header px-5 sm:px-0 mb-3">
+        <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Your {{todays_date.year}} recap</h1>
+        <p class="mt-1 text-sm opacity-75">Top rated recipes that made your year</p>
+    </header>
+
+    <div class="flex flex-col lg:flex-row gap-6 mt-8">
+
+        <div class="flex-1 min-w-0">
+
+            <section class="mt-1">
+            
+                <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 gap-y-5">
+
+                    <div id="card-1" class="col-span-full">
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h2 class="text-2xl font-medium">Most Viewed Recipes</h2>
+                                <p class="text-sm opacity-70">Your Top 5 most viewed recipes this year</p>
+                            </div>
+                        </div>
+
+                        {% if auth_trending_recipes %}
+                            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                                {% for post in auth_trending_recipes|slice:"0:5" %}
+                                    <div class="relative">
+                                        {% include "yummyrecipes/recipe_card.html" with post=post %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="hero rounded-box">
+                                <div class="hero-content text-center py-12">
+                                    <div>
+                                        <span class="material-symbols-rounded text-6xl opacity-40">restaurant</span>
+                                        <h3 class="text-2xl font-medium mt-3">No recipes uploaded</h3>
+                                        <p class="opacity-70 mt-1">Upload recipes to see your yearly recap.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div id="card-2" class="col-span-full">
+                        <div class="mb-5">
+                            <h2 class="text-2xl font-medium">Best Recipe From Each Meal</h2>
+                            <p class="text-sm opacity-70">Highest viewed recipe from every meal type</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                            {% for post in top_breakfast|slice:"0:1" %}
+                                <div><div class="badge badge-warning mb-3">Breakfast</div>{% include "yummyrecipes/recipe_card.html" with post=post %}</div>
+                            {% endfor %}
+
+                            {% for post in top_lunch|slice:"0:1" %}
+                                <div><div class="badge badge-success mb-3">Lunch</div>{% include "yummyrecipes/recipe_card.html" with post=post %}</div>
+                            {% endfor %}
+
+                            {% for post in top_evesnack|slice:"0:1" %}
+                                <div><div class="badge badge-secondary mb-3">Snacks</div>{% include "yummyrecipes/recipe_card.html" with post=post %}</div>
+                            {% endfor %}
+
+                            {% for post in top_dinner|slice:"0:1" %}
+                                <div><div class="badge badge-error mb-3">Dinner</div>{% include "yummyrecipes/recipe_card.html" with post=post %}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div id="card-3" class="col-span-full">
+                        <div class="mb-5">
+                            <h2 class="text-2xl font-medium">Best Veg & Non-Veg Recipes</h2>
+                            <p class="text-sm opacity-70">Highest viewed recipe from each category</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-2 gap-3">
+                            {% for post in topveg|slice:"0:1" %}
+                                <div>
+                                    <div class="badge badge-success mb-3">Top Veg Recipe</div>
+                                    {% include "yummyrecipes/recipe_card.html" with post=post %}
+                                </div>
+                            {% empty %}
+                                <div class="card">
+                                    <div class="card-body items-center text-center py-10">
+                                        <span class="material-symbols-rounded text-5xl opacity-40">eco</span>
+                                        <p class="opacity-70">No Veg recipes this year.</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            {% for post in topnonveg|slice:"0:1" %}
+                                <div>
+                                    <div class="badge badge-error mb-3">Top Non-Veg Recipe</div>
+                                    {% include "yummyrecipes/recipe_card.html" with post=post %}
+                                </div>
+                            {% empty %}
+                                <div class="card">
+                                    <div class="card-body items-center text-center py-10">
+                                        <span class="material-symbols-rounded text-5xl opacity-40">restaurant</span>
+                                        <p class="opacity-70">No Non-Veg recipes this year.</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if total_likes != 0 %}
+
+                    <div id="card-4" class="col-span-full">
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h2 class="text-2xl font-medium">Most Liked Recipe</h2>
+                                <p class="text-sm opacity-70">Your most loved recipe this year</p>
+                            </div>
+                            <div class="badge badge-primary badge-outline">{{ total_likes }} Likes</div>
+                        </div>
+
+                        {% for post in most_liked_recipe|slice:"0:1" %}
+                            <div class="max-w-md">
+                                {% include "yummyrecipes/recipe_card.html" with post=post %}
+                            </div>
+                        {% empty %}
+                            <div class="card">
+                                <div class="card-body items-center text-center py-10">
+                                    <span class="material-symbols-rounded text-5xl opacity-40">favorite</span>
+                                    <p class="opacity-70">No liked recipes yet.</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <aside class="hidden xl:block w-80 shrink-0">
+            <div class="sticky top-24 space-y-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center"><span class="material-symbols-rounded text-primary">calendar_month</span></div>
+                            <div>
+                                <h2 class="card-title text-lg">{{ curyear }} Summary</h2>
+                                <p class="text-sm opacity-70">Your year in cooking</p>
+                            </div>
+                        </div>
+
+                        <div class="year-recap stats stats-vertical rounded-2xl bg-red-300 mt-1">
+                            <div class="stat py-2">
+                                <div class="stat-title">Recipes</div>
+                                <div class="stat-value text-2xl mt-2">{{ total_recipes }}</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 text-sm mt-2">
+                            <div class="flex justify-between"><span>Breakfast</span><span class="font-medium">{{ total_breakfast }}</span></div>
+                            <div class="flex justify-between"><span>Lunch</span><span class="font-medium">{{ total_lunch }}</span></div>
+                            <div class="flex justify-between"><span>Snacks</span><span class="font-medium">{{ total_evesnack }}</span></div>
+                            <div class="flex justify-between"><span>Dinner</span><span class="font-medium">{{ total_dinner }}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title text-lg">On this page</h2>
+                        <p class="text-sm opacity-70 mb-2">Jump to a section</p>
+
+                        <ul class="menu rounded-box">
+                            <li><a href="#card-1"><span class="material-symbols-rounded">visibility</span>Most Viewed</a></li>
+                            <li><a href="#card-2"><span class="material-symbols-rounded">breakfast_dining</span>Meal Types</a></li>
+                            <li><a href="#card-3"><span class="material-symbols-rounded">eco</span>Veg & Non-Veg</a></li>
+
+                            {% if total_likes != 0 %}
+                                <li><a href="#card-4"><span class="material-symbols-rounded">favorite</span>Most Liked</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div> -->
+            </div>
+        </aside>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

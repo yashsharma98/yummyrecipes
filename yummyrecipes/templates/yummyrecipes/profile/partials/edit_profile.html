@@ -1,0 +1,118 @@
+<div id="profile-page" data-active-nav="edit"></div>
+
+<div class="profile-partial-back-btn mb-4 grid grid-cols-[auto_1fr] gap-x-2 pl-2 md:pl-0">
+  <button class="btn btn-transparent bg-transparent border-0 -ml-2 shadow-none" hx-get="{% url 'profile_details_partial' %}" hx-target="#profile-content" hx-swap="innerHTML">
+    <span class="material-symbols-rounded text-lg">arrow_back</span>
+  </button>
+
+  <div>
+    <h2 class="text-xl font-medium">Edit profile</h2>
+
+    <p class="opacity-70 text-sm mt-0.5">
+      Update your personal information and public profile.
+    </p>
+  </div>
+
+</div>
+
+
+<div class="profile-partials-container p-7">
+  <form method="POST" enctype="multipart/form-data" hx-post="{% url 'updateprofile' %}" hx-target="#profile-content" hx-swap="innerHTML">
+    {% csrf_token %}
+
+    <!-- Avatar -->
+    <div class="flex flex-col items-center mb-10">
+      <div class="avatar">
+        <div class="w-40 rounded-[2.5rem] overflow-hidden border border-base-300">
+          <img id="profile-preview" src="{{ user.profile.profile_img.url }}" alt="{{ user.username }}">
+        </div>
+      </div>
+
+      <input id="id_profile_img" name="profile_img" type="file" accept="image/*" class="hidden">
+
+      <button type="button" class="edit-img-btn btn btn-transparent font-normal bg-transparent border-0 -ml-2 shadow-none rounded-full mt-5" onclick="document.getElementById('id_profile_img').click()">
+        Change Photo
+      </button>
+    </div>
+
+    <!-- Basic Info -->
+    <div class="grid md:grid-cols-2 gap-6">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend font-medium opacity-65">First Name</legend>
+        <input class="input w-full focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="text" name="first_name" value="{{ user.first_name }}">
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend font-medium opacity-65">Last Name</legend>
+        <input class="input w-full focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="text" name="last_name" value="{{ user.last_name }}">
+      </fieldset>
+    </div>
+
+    <fieldset class="fieldset mt-5">
+      <legend class="fieldset-legend font-medium opacity-65">Email Address</legend>
+      <input class="input w-full focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="email" name="email" value="{{ user.email }}">
+    </fieldset>
+
+    <div class="grid md:grid-cols-2 gap-6 mt-5">
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend font-medium opacity-65">Gender</legend>
+        <select class="select w-full" name="gender">
+          {% for choice in gender_choices %}
+            <option value="{{ choice.0 }}" {% if user.profile.gender == choice.0 %}selected{% endif %}>
+              {{ choice.1 }}
+            </option>
+          {% endfor %}
+        </select>
+      </fieldset>
+
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend font-medium opacity-65">Date of Birth</legend>
+        <input class="input w-full focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="date" name="dob" value="{{ user.profile.dob|date:'Y-m-d' }}">
+      </fieldset>
+    </div>
+
+    <fieldset class="fieldset mt-5">
+      <legend class="fieldset-legend font-medium opacity-65">Bio</legend>
+      <textarea class="textarea min-h-28 max-h-40 w-full focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" maxlength="114" name="bio">{{ user.profile.bio }}</textarea>
+      <label class="fieldset-label">Maximum 114 characters</label>
+    </fieldset>
+
+    <div class="divider my-8">Social Links</div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <input class="input focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="url" name="facebook" placeholder="Facebook URL" value="{{ user.profile.facebook }}">
+      <input class="input focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="url" name="instagram" placeholder="Instagram URL" value="{{ user.profile.instagram }}">
+      <input class="input focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="url" name="twitter" placeholder="X URL" value="{{ user.profile.twitter }}">
+      <input class="input focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="url" name="threads" placeholder="Threads URL" value="{{ user.profile.threads }}">
+      <input class="input focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="url" name="youtube" placeholder="YouTube URL" value="{{ user.profile.youtube }}">
+      <input class="input focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none" type="url" name="website" placeholder="Website" value="{{ user.profile.website }}">
+    </div>
+
+    <div class="flex justify-end gap-3 mt-10">
+      <button type="button" class="btn btn-transparent bg-transparent border-0 font-medium shadow-none hover:opacity-75" hx-get="{% url 'profile_details_partial' %}" hx-target="#profile-content" hx-swap="innerHTML">
+        Cancel
+      </button>
+
+      <button type="submit" class="btn btn-transparent bg-transparent border-0 font-medium shadow-none">
+        Save changes
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("id_profile_img");
+    const preview = document.getElementById("profile-preview");
+
+    if (!input || !preview) return;
+
+    input.addEventListener("change", function () {
+      if (!this.files.length) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => preview.src = e.target.result;
+      reader.readAsDataURL(this.files[0]);
+    });
+  });
+</script>

@@ -1,0 +1,330 @@
+{% extends 'yummyrecipes/base.html' %}
+
+{% load hitcount_tags %}
+{% load static %}
+{% load socialaccount %}
+
+{% block title %}
+<title>Signup — Yummy Recipes</title>
+{% endblock %}
+
+{% block raw_content %}
+<div class="flex flex-col min-[1000px]:flex-row w-full h-[100dvh] pt-20 overflow-hidden select-none">
+
+    <div class="max-[999px]:hidden min-[1000px]:flex w-[55%] h-full relative overflow-hidden flex-col justify-center items-center px-12">
+
+        <div class="w-full rounded-[2.5rem] overflow-hidden relative z-10">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop"
+                alt="Preparing Fresh Food"
+                class="w-full h-full object-cover">
+        </div>
+
+    </div>
+
+    <div class="w-full min-[1000px]:w-[45%] h-full flex flex-col justify-center items-center px-6 lg:px-12 relative z-10 shadow-[-10px_0_30px_rgba(0,0,0,0.02)] overflow-hidden">
+        
+        <div class="w-full max-w-[450px] space-y-4 my-auto">
+            
+            <div class="text-left space-y-1">
+                <h1 class="text-3xl lg:text-4xl font-semibold text-stone-900 tracking-tight">Create an account</h1>
+                <p class="text-stone-500 text-sm font-light">Join Yummy Recipes to start your culinary journey.</p>
+            </div>
+
+            <form method="POST" class="login-signup-form signup-form space-y-3" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="flex flex-row gap-3 w-full">
+                    <div class="relative w-1/2">
+                        <input type="text" name="fname" id="id_fname" 
+                            class="input validator w-full px-5 py-6 rounded-full text-sm text-stone-900 placeholder-stone-400 shadow-none outline-none transition-all duration-300"
+                            pattern="^[A-Za-z]+(?:[ '\-][A-Za-z]+)*$" placeholder="First Name" value="{{ form.fname.value|default_if_none:'' }}" required>
+                    </div>
+                    <div class="relative w-1/2">
+                        <input type="text" name="lname" id="id_lname" 
+                            class="input validator w-full px-5 py-6 rounded-full text-sm text-stone-900 placeholder-stone-400 shadow-none outline-none transition-all duration-300"
+                            pattern="^[A-Za-z]+(?:[ '\-][A-Za-z]+)*$" placeholder="Last Name" value="{{ form.lname.value|default_if_none:'' }}" required>
+                    </div>
+                </div>
+
+                <div class="relative w-full">
+                    <input type="email" name="email" id="id_email" 
+                        class="input validator w-full px-5 py-6 rounded-full text-sm text-stone-900 placeholder-stone-400 shadow-none outline-none transition-all duration-300" 
+                        placeholder="Email Address" value="{{ form.email.value|default_if_none:'' }}" pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" required>
+                </div>
+                
+                <div class="relative w-full">
+                    <input type="password" name="password1" id="id_password1" 
+                        class="input validator w-full px-5 py-6 rounded-full text-sm text-stone-900 placeholder-stone-400 shadow-none outline-none transition-all duration-300"
+                        placeholder="Password" minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}" required>
+                    <button type="button" onclick="togglePassword('id_password1', 'pwd-icon-1')" class="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 transition-colors focus:outline-none flex items-center justify-center p-1">
+                        <span id="pwd-icon-1" class="material-symbols-rounded text-[18px]">visibility</span>
+                    </button>
+                </div>
+
+                <div class="relative w-full">
+                    <input type="password" name="password2" id="id_password2" 
+                        class="input validator w-full px-5 py-6 rounded-full text-sm text-stone-900 placeholder-stone-400 shadow-none outline-none transition-all duration-300" 
+                        placeholder="Confirm Password" minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}" required>
+                    <button type="button" onclick="togglePassword('id_password2', 'pwd-icon-2')" class="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 transition-colors focus:outline-none flex items-center justify-center p-1">
+                        <span id="pwd-icon-2" class="material-symbols-rounded text-[18px]">visibility</span>
+                    </button>
+                </div>
+                
+                <div class="px-2 pt-0.5 pb-0.5">
+                    <ul class="text-sm text-stone-500 font-normal space-y-1 font-medium">
+                        <li class="flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-stone-300"></span> Minimum 8 characters.</li>
+                        <li class="flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-stone-300"></span> Cannot be entirely numeric.</li>
+                        <li class="flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-stone-300"></span> Cannot be a common password.</li>
+                    </ul>
+                </div>
+                
+                <button type="submit" id="btnSubmit" class="btn btn-neutral px-5 py-6 w-full text-white rounded-full font-medium mt-2">
+                    Sign up
+                </button>
+            </form>
+
+
+            <div class="divider text-[10px] font-bold text-stone-400 uppercase tracking-widest">Or sign up with</div>
+
+
+            <div class="space-y-2.5">
+                <a href="{% provider_login_url 'google' %}" class="btn btn-outline w-full rounded-full border-stone-200 bg-white text-stone-700 hover:bg-stone-50 hover:text-stone-900">
+                    <button class="btn bg-white text-black border-0">
+                        <svg aria-label="Google logo" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g><path d="m0 0H512V512H0" fill="#fff"></path><path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path><path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path><path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path><path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path></g></svg>
+                        Sign up with Google
+                    </button>
+                </a>
+                
+                <!-- {% if not is_guest %}
+                <button type="button" onclick="guest_modal.showModal()" class="w-full flex items-center justify-center gap-3 bg-stone-100 border border-transparent rounded-full py-3.5 text-sm font-semibold text-stone-700 hover:bg-stone-200 transition-colors duration-300">
+                    <span class="material-symbols-rounded text-[16px]">person</span>
+                    Continue as Guest
+                </button>
+                {% endif %} -->
+            </div>
+
+            <p class="text-center text-[13px] text-stone-500 pt-1 pb-4">
+                Already have an account? 
+                <a href="{% url 'login' %}" class="font-bold text-stone-900 hover:text-orange-600 transition-colors">Login Here</a>
+            </p>
+
+        </div>
+    </div>
+    
+</div>
+
+{% block modals %}
+
+    <dialog id="signupErrorModal" class="modal">
+        <div class="modal-box max-w-md">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="material-symbols-rounded text-error text-4xl">
+                    person_off
+                </span>
+
+                <div>
+                    <h3 class="font-bold text-lg">
+                        Signup Failed
+                    </h3>
+                    <p id="signupErrorText" class="opacity-70"></p>
+                </div>
+            </div>
+
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn btn-ghost border-0 bg-transparent shadow-none rounded-full font-normal">
+                        OK
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <form method="dialog" class="modal-backdrop">
+            <button></button>
+        </form>
+    </dialog>
+
+    <dialog id="validationModal" class="modal">
+        <div class="modal-box bg-white rounded-3xl border border-stone-200 shadow-xl p-8">
+            <h3 class="font-bold text-xl text-stone-900 mb-2">Validation Error</h3>
+            <p class="text-stone-500 validation-modal-body"></p>
+            <div class="modal-action mt-6">
+                <form method="dialog">
+                    <button class="bg-stone-100 hover:bg-stone-200 text-stone-900 px-6 py-2.5 rounded-full text-sm font-medium transition-colors">Close</button>
+                </form>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+    
+    <dialog id="guest_modal" class="modal">
+        <div class="modal-box bg-white rounded-3xl border border-stone-200 shadow-xl p-0 overflow-hidden max-w-md">
+            <div class="modal-slide-content relative" id="guestSlideContent" style="display: flex; width: 200%; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);">
+                
+                <div class="slide-panel p-8" style="width: 100%; flex-shrink: 0;">
+                    <h2 class="text-2xl font-bold text-stone-900">Guest Login</h2>
+                    <p class="text-sm text-stone-500 mt-1 mb-6">Proceeding as a guest.</p>
+                    
+                    <form method="post" id="guestInputForm" action="{% url 'guest_mode' %}" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="relative w-full">
+                            <input type="text" name="guest_user_name" id="guest_user_name" 
+                                class="w-full px-5 py-6 rounded-full premium-input border border-stone-200 text-sm text-stone-900 placeholder-stone-400 bg-stone-50 outline-none" 
+                                placeholder="Enter your first name" maxlength="50" required>
+                            <p id="guest-error" class="hidden text-xs text-red-500 mt-2 ml-4">Name is required.</p>
+                        </div>
+                    </form>
+
+                    <div class="flex justify-end gap-3 mt-8">
+                        <form method="dialog">
+                            <button class="px-6 py-2.5 rounded-full text-sm font-medium text-stone-500 hover:bg-stone-100 transition-colors">Cancel</button>
+                        </form>
+                        <button type="button" id="guestContinueBtn" class="bg-stone-900 hover:bg-stone-800 text-white px-8 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm">Next</button>
+                    </div>
+                </div>
+
+                <div class="slide-panel p-8 flex flex-col justify-center" style="width: 100%; flex-shrink: 0;">
+                    <h2 class="text-2xl font-bold text-stone-900" id="guestDisplayTitle">Welcome!</h2>
+                    <p class="text-sm text-stone-500 mt-2 mb-6 leading-relaxed">
+                        As a guest user, some features are restricted. Consider signing up for the full experience later.
+                    </p>
+                    
+                    <div class="flex justify-end gap-3 mt-auto">
+                        <button type="button" id="guestBackBtn" class="px-6 py-2.5 rounded-full text-sm font-medium text-stone-500 hover:bg-stone-100 transition-colors mr-auto">Back</button>
+                        <button type="submit" form="guestInputForm" class="bg-stone-900 hover:bg-stone-800 text-white px-8 py-2.5 rounded-full text-sm font-medium transition-all shadow-sm">Start Cooking</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+
+{% if messages %}
+    {% for message in messages %}
+        {% if "signup-error" in message.tags %}
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.getElementById("signupErrorText").textContent = "{{ message|escapejs }}";
+                    document.getElementById("signupErrorModal").showModal();
+                });
+            </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+<script>
+    function togglePassword(inputId, iconId) {
+        const pwdInput = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        if (pwdInput.type === "password") {
+            pwdInput.type = "text";
+            icon.textContent = "visibility_off";
+            icon.classList.add("text-stone-900");
+        } else {
+            pwdInput.type = "password";
+            icon.textContent = "visibility";
+            icon.classList.remove("text-stone-900");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const inputs = document.querySelectorAll(".validator");
+
+        function validateInput(input) {
+
+            input.classList.remove("border-success", "border-error");
+            input.setCustomValidity("");
+
+            const value = input.value.trim();
+
+            if (value === "") {
+                return;
+            }
+
+            if (input.id === "id_password2") {
+                const password = document.getElementById("id_password1");
+
+                if (value === password.value) {
+                    input.classList.add("border-success");
+                } else {
+                    input.setCustomValidity("Passwords do not match");
+                    input.classList.add("border-error");
+                }
+
+                return;
+            }
+
+            if (input.validity.valid) {
+                input.classList.add("border-success");
+            } else {
+                input.classList.add("border-error");
+            }
+        }
+
+        inputs.forEach(input => {
+            ["input", "change", "blur"].forEach(event =>
+                input.addEventListener(event, () => validateInput(input))
+            );
+        });
+
+        const password1 = document.getElementById("id_password1");
+        const password2 = document.getElementById("id_password2");
+
+        if (password1 && password2) {
+            password1.addEventListener("input", () => {
+                validateInput(password1);
+
+                if (password2.value !== "") {
+                    validateInput(password2);
+                }
+            });
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const continueBtn = document.getElementById("guestContinueBtn");
+        const backBtn = document.getElementById("guestBackBtn");
+        const slideContent = document.getElementById("guestSlideContent");
+        const nameField = document.getElementById("guest_user_name");
+        const guestTitle = document.getElementById("guestDisplayTitle");
+        const errorMsg = document.getElementById("guest-error");
+
+        if (continueBtn && backBtn) {
+            continueBtn.addEventListener("click", () => {
+                if (!nameField.value.trim()) {
+                    errorMsg.classList.remove("hidden");
+                    nameField.classList.add("border-red-500");
+                    return;
+                }
+                
+                errorMsg.classList.add("hidden");
+                nameField.classList.remove("border-red-500");
+                guestTitle.textContent = `Welcome, ${nameField.value.trim()}!`;
+                slideContent.style.transform = "translateX(-50%)";
+            });
+
+            backBtn.addEventListener("click", () => {
+                slideContent.style.transform = "translateX(0)";
+            });
+            
+            nameField.addEventListener("keydown", (e) => {
+                if(e.key === "Enter") {
+                    e.preventDefault();
+                    continueBtn.click();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

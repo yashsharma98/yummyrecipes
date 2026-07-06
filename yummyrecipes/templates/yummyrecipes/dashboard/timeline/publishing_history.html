@@ -1,0 +1,237 @@
+{% load humanize %}
+
+{% if year_data %}
+
+<div class="space-y-4 mt-2">
+
+    {% for year in year_data %}
+
+    <div class="dashboard-views-collapse collapse collapse-arrow">
+
+        <input type="checkbox">
+
+        <div class="collapse-title">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                <div>
+                    <h2 class="text-2xl font-medium">{{ year.year }}</h2>
+                    <p class="text-sm opacity-60 mt-1">{{ year.total }} Recipe{{ year.total|pluralize }}</p>
+                </div>
+
+                <div class="timeline-stats stats gap-2">
+
+                    <div class="stat py-3 px-5">
+                        <div class="text-xs">Best Month</div>
+                        <div class="text-md font-medium mt-2">{{ year.best_month }}</div>
+                    </div>
+
+                    <div class="stat py-3 px-5">
+                        <div class="text-xs">Top Recipe</div>
+                        <div class="text-md truncate font-medium mt-2 max-w-[180px]">
+                            {{ year.top_recipe.title|default:"—" }}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="timeline-collapse collapse-content">
+
+            <div class="space-y-3">
+
+                {% for month in year.months %}
+
+                <div class="timeline-history collapse collapse-arrow">
+
+                    <input type="checkbox">
+
+                    <!-- Month Header -->
+
+                    <div class="collapse-title py-4">
+
+                        <div class="flex items-center justify-between">
+
+                            <div class="flex items-center gap-3">
+                                <span class="font-medium">{{ month.name }}</span>
+                            </div>
+
+                            <span class="text-xs badge custom-badge">
+                                {{ month.count }}
+                                recipe{{ month.count|pluralize }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Month Content -->
+
+                    <div class="collapse-content">
+
+                        {% if month.recipes %}
+
+                        <div class="space-y-3">
+
+                            {% for recipe in month.recipes %}
+
+                            <div class="card bg-base-100 border border-base-300">
+
+                                <div class="card-body py-4">
+
+                                    <div class="flex flex-col lg:flex-row lg:justify-between gap-5">
+
+                                        <!-- Recipe -->
+
+                                        <div class="flex-1">
+
+                                            <h3 class="font-medium">
+
+                                                {{ recipe.title }}
+
+                                            </h3>
+
+                                            <div class="flex flex-wrap gap-2 mt-2">
+
+                                                <span class="badge badge-outline">
+
+                                                    {{ recipe.type }}
+
+                                                </span>
+
+                                                <span class="badge badge-outline">
+
+                                                    {{ recipe.category }}
+
+                                                </span>
+
+                                                <span class="badge badge-outline">
+
+                                                    {{ recipe.cuisine }}
+
+                                                </span>
+
+                                                <span class="badge badge-outline">
+
+                                                    {{ recipe.difficulty }}
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Stats -->
+
+                                        <div class="flex flex-wrap gap-6 text-sm">
+
+                                            <div>
+
+                                                <p class="opacity-60">
+
+                                                    Published
+
+                                                </p>
+
+                                                <p class="font-medium">
+
+                                                    {{ recipe.date_post|date:"d M Y" }}
+
+                                                </p>
+
+                                            </div>
+
+                                            <div>
+
+                                                <p class="opacity-60">
+
+                                                    Views
+
+                                                </p>
+
+                                                <p class="font-medium">
+
+                                                    {{ recipe.view_count|default:0|intcomma }}
+
+                                                </p>
+
+                                            </div>
+
+                                            <div>
+
+                                                <p class="opacity-60">
+
+                                                    Likes
+
+                                                </p>
+
+                                                <p class="font-medium">
+
+                                                    {{ recipe.likes_count }}
+
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="text-center py-8">
+
+                            <span class="material-symbols-rounded text-4xl opacity-30">
+
+                                event_busy
+
+                            </span>
+
+                            <p class="mt-3 opacity-60">
+
+                                No recipes published.
+
+                            </p>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="hero py-24">
+    <div class="hero-content text-center">
+        <div>
+            <span class="material-symbols-rounded text-7xl opacity-30">history</span>
+            <h2 class="text-2xl font-medium mt-5">No publishing history</h2>
+            <p class="opacity-60 mt-2">Your recipes will appear here once you start publishing.</p>
+        </div>
+    </div>
+</div>
+
+{% endif %}

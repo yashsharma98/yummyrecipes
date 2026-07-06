@@ -1,0 +1,229 @@
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+<div class="space-y-4">
+
+    <!-- Recipe Statistics + Quick Actions -->
+    <div class="">
+        <div class="grid gap-0 items-start">
+
+            <!-- Recipe Statistics -->
+            <div class="col-span-full card p-0 overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-1 xl:mb-5">
+                        <div class="ml-5 md:ml-0">
+                            <h2 class="text-lg md:text-xl font-medium">Recipe Statistics</h2>
+                            <p class="text-sm opacity-60 mt-1">A quick look at your recipe collection</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 shrink-0">
+                            <div class="recipe-top-right-card px-5 py-4">
+                                <p class="text-xs opacity-60 whitespace-nowrap">Total Recipes</p>
+                                <h3 class="text-xl font-semibold leading-none mt-4">{{ tot_posts_byuser }}</h3>
+                            </div>
+
+                            <div class="recipe-top-right-card px-5 py-4">
+                                <p class="text-xs opacity-60 whitespace-nowrap">Total Views</p>
+                                <h3 class="text-xl font-semibold leading-none mt-4">{{ total_views }}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                        <div class="recipe-top-cards p-4 flex flex-col justify-between min-h-[128px]">
+                            <span class="material-symbols-rounded text-warning">breakfast_dining</span>
+                            <div>
+                                <h3 class="text-2xl font-semibold">{{ breakfast }}</h3>
+                                <p class="text-xs opacity-60 mt-1">Breakfast</p>
+                            </div>
+                        </div>
+
+                        <div class="recipe-top-cards p-4 flex flex-col justify-between min-h-[128px]">
+                            <span class="material-symbols-rounded text-success">lunch_dining</span>
+                            <div>
+                                <h3 class="text-2xl font-semibold">{{ lunch }}</h3>
+                                <p class="text-xs opacity-60 mt-1">Lunch</p>
+                            </div>
+                        </div>
+
+                        <div class="recipe-top-cards p-4 flex flex-col justify-between min-h-[128px]">
+                            <span class="material-symbols-rounded text-error">dinner_dining</span>
+                            <div>
+                                <h3 class="text-2xl font-semibold">{{ dinner }}</h3>
+                                <p class="text-xs opacity-60 mt-1">Dinner</p>
+                            </div>
+                        </div>
+
+                        <div class="recipe-top-cards p-4 flex flex-col justify-between min-h-[128px]">
+                            <span class="material-symbols-rounded text-secondary">bakery_dining</span>
+                            <div>
+                                <h3 class="text-2xl font-semibold">{{ evesnack }}</h3>
+                                <p class="text-xs opacity-60 mt-1">Snacks</p>
+                            </div>
+                        </div>
+
+                        <div class="recipe-top-cards p-4 flex flex-col justify-between min-h-[128px]">
+                            <span class="material-symbols-rounded text-success">eco</span>
+                            <div>
+                                <h3 class="text-2xl font-semibold">{{ veg }}</h3>
+                                <p class="text-xs opacity-60 mt-1">Veg</p>
+                            </div>
+                        </div>
+
+                        <div class="recipe-top-cards p-4 flex flex-col justify-between min-h-[128px]">
+                            <span class="material-symbols-rounded text-error">kebab_dining</span>
+                            <div>
+                                <h3 class="text-2xl font-semibold">{{ nonveg }}</h3>
+                                <p class="text-xs opacity-60 mt-1">Non-Veg</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Recent recipes info -->
+    <div class="mt-8">
+        <div class="flex items-center justify-between mb-4 ml-5 md:ml-0">
+            <div>
+                <h2 class="text-lg md:text-xl font-medium">Recent Activity</h2>
+                <p class="text-sm opacity-60 mt-0.5">Your latest recipe moments</p>
+            </div>
+        </div>
+
+        <div class="recent-recipe grid grid-cols-2 xl:grid-cols-4 gap-4">
+            <!-- Last Uploaded -->
+            {% if last_recipe %}
+                <a href="{% if last_recipe %}{{ last_recipe.get_absolute_url }}{% else %}#{% endif %}"
+                class="card hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                    <div class="card-body p-3 md:p-4">
+                        <div class="aspect-[16/10] rounded-[1.5rem] overflow-hidden bg-base-200 mb-4">                                    
+                            {% for i in last_recipe.photo_set.all %}
+                                {% if forloop.first %}
+                                    <img loading="lazy" src="{{ i.image.url }}" alt="{{ last_recipe.title }}" class="w-full h-full object-cover object-center">
+                                {% endif %}
+                            {% empty %}
+                                <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" alt="{{ last_recipe.title }}" class="w-full h-full object-cover object-center">
+                            {% endfor %}
+                        </div>
+
+                        <div class="px-1 py-0">
+                            <div class="flex items-center gap-2 text-xs md:text-sm opacity-60">
+                                <span class="material-symbols-rounded !text-[1.1rem]">upload</span>
+                                Last Uploaded
+                            </div>
+
+                            {% if last_recipe %}
+                                <h3 class="text-sm md:text-lg font-medium capitalize truncate line-clamp-2 mt-2">{{ last_recipe.title }}</h3>
+                                <p class="text-xs mt-0.5 opacity-60">{{ last_recipe.date_post|date:"d M Y" }}</p>
+                            {% else %}
+                                <h3 class="text-xs md:text-md font-medium opacity-60 mt-1">No recipes uploaded yet</h3>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+
+            <!-- Last Viewed -->
+            {% if last_viewed_recipe %}
+                <a href="{% if last_viewed_recipe %}{{ last_viewed_recipe.blog_post.get_absolute_url }}{% else %}#{% endif %}"
+                class="card hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                    <div class="card-body p-3 md:p-4">
+                        <div class="aspect-[16/10] rounded-[1.5rem] overflow-hidden bg-base-200 mb-4">
+                            {% for i in last_viewed_recipe.blog_post.photo_set.all %}
+                                {% if forloop.first %}
+                                    <img loading="lazy" src="{{ i.image.url }}" alt="{{ last_viewed_recipe.blog_post.title }}" class="w-full h-full object-cover object-center">
+                                {% endif %}
+                            {% empty %}
+                                <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" alt="{{ last_viewed_recipe.blog_post.title }}" class="w-full h-full object-cover object-center">
+                            {% endfor %}
+                        </div>
+
+                        <div class="px-1 py-0">
+                            <div class="flex items-center gap-2 text-xs md:text-sm opacity-60">
+                                <span class="material-symbols-rounded !text-[1.1rem]">visibility</span>
+                                Last Viewed
+                            </div>
+
+                            {% if last_viewed_recipe %}
+                                <h3 class="text-sm md:text-lg font-medium capitalize truncate line-clamp-2 mt-2">{{ last_viewed_recipe.blog_post.title }}</h3>
+                                <p class="text-xs mt-0.5 opacity-60">{{ last_viewed_recipe.timestamp|date:"d M Y" }}</p>
+                            {% else %}
+                                <h3 class="text-sm md:text-md font-medium opacity-60 mt-2">No viewed recipes yet</h3>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+
+            <!-- Last Liked -->
+            {% if last_liked_recipe %}
+                <a href="{% if last_liked_recipe %}{{ last_liked_recipe.get_absolute_url }}{% else %}#{% endif %}"
+                class="card hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                    <div class="card-body p-3 md:p-4">
+                        <div class="aspect-[16/10] rounded-[1.5rem] overflow-hidden bg-base-200 mb-4">
+                            {% for i in last_liked_recipe.photo_set.all %}
+                                {% if forloop.first %}
+                                    <img loading="lazy" src="{{ i.image.url }}" alt="{{ last_liked_recipe.title }}" class="w-full h-full object-cover object-center">
+                                {% endif %}
+                            {% empty %}
+                                <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" alt="{{ last_liked_recipe.title }}" class="w-full h-full object-cover object-center">
+                            {% endfor %}
+                        </div>
+
+                        <div class="px-1 py-0">
+                            <div class="flex items-center gap-2 text-xs md:text-sm opacity-60">
+                                <span class="material-symbols-rounded !text-[1.1rem]">favorite</span>
+                                Last Liked
+                            </div>
+
+                            {% if last_liked_recipe %}
+                                <h3 class="text-sm md:text-lg font-medium capitalize truncate line-clamp-2 mt-2">{{ last_liked_recipe.title }}</h3>
+                                <p class="text-xs mt-0.5 opacity-60">{{ last_liked_recipe.date_post|date:"d M Y" }}</p>
+                            {% else %}
+                                <h3 class="text-sm md:text-md font-medium opacity-60 mt-2">No liked recipes yet</h3>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+
+
+            <!-- Last Commented -->
+            {% if commented_post %}
+                <a href="{% if commented_post %}{{ commented_post.get_absolute_url }}{% else %}#{% endif %}"
+                class="card hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                    <div class="card-body p-3 md:p-4">
+                        <div class="aspect-[16/10] rounded-[1.5rem] overflow-hidden bg-base-200 mb-4">
+                            {% for i in commented_post.photo_set.all %}
+                                {% if forloop.first %}
+                                    <img loading="lazy" src="{{ i.image.url }}" alt="{{ commented_post.title }}" class="w-full h-full object-cover object-center">
+                                {% endif %}
+                            {% empty %}
+                                <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" alt="{{ commented_post.title }}" class="w-full h-full object-cover object-center">
+                            {% endfor %}
+                        </div>
+
+                        <div class="px-1 py-0">
+                            <div class="flex items-center gap-2 text-xs md:text-sm opacity-60">
+                                <span class="material-symbols-rounded !text-[1.1rem]">chat_bubble</span>
+                                Last Commented
+                            </div>
+
+                            {% if commented_post %}
+                                <h3 class="text-sm md:text-lg font-medium capitalize truncate line-clamp-2 mt-2">{{ commented_post.title }}</h3>
+                                <p class="text-xs mt-0.5 opacity-60">{{ last_comment.date_comment|date:"d M Y" }}</p>
+                            {% else %}
+                                <h3 class="text-sm md:text-md font-medium opacity-60 mt-2">No comments yet</h3>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,32 @@
+.top-section h1,
+.landing-bento-grid h2,
+.trending-discover-section h2{
+    font-family:'Instrument Serif',serif;
+    font-weight: 400;
+}
+
+.top-section img{
+    border-bottom-left-radius: 15rem;
+    corner-shape: superellipse(1.5);
+}
+
+.landing-bento-grid a {
+  overflow: hidden;
+  border-radius: 4rem;
+  corner-shape: superellipse(1.5);
+  transition: all 0.3s ease;
+}
+
+.landing-bento-grid a:hover{
+  transform: translateY(-4px);
+  border-radius: 4rem;
+  corner-shape: superellipse(1.5);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.landing-bento-grid h2,
+.cuisine-section-grid p,
+.cuisine-section-grid h2{
+    color: white;
+    mix-blend-mode: difference;
+}

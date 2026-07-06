@@ -1,0 +1,59 @@
+{% load humanize %}
+
+{% if recent_uploads %}
+
+<div class="overflow-x-auto mt-2">
+    <table class="dashboard-table table">
+
+        <thead>
+            <tr>
+                <th>Recipe</th>
+                <th>Published</th>
+                <th class="text-center">Meal</th>
+                <th class="text-center">Views</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for recipe in recent_uploads %}
+            <tr class="hover">
+
+                <td>
+                    <div>
+                        <div class="font-medium">{{ recipe.title }}</div>
+                        <div class="text-xs opacity-60 mt-1">
+                            {{ recipe.cuisine }} • {{ recipe.category }}
+                        </div>
+                    </div>
+                </td>
+
+                <td>
+                    <div>{{ recipe.date_post|date:"d M Y" }}</div>
+                </td>
+
+                <td class="text-center">
+                    <span class="badge badge-outline">{{ recipe.type }}</span>
+                </td>
+
+                <td class="text-center">{{ recipe.hit_count.hits|default:0|intcomma }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% else %}
+
+<div class="hero py-20">
+    <div class="hero-content text-center">
+        <div>
+            <span class="material-symbols-rounded text-7xl opacity-30">history</span>
+            <h2 class="text-2xl font-medium mt-5">No uploads yet</h2>
+            <p class="opacity-60 mt-2">Recently published recipes will appear here.</p>
+        </div>
+    </div>
+</div>
+
+{% endif %}

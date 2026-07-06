@@ -1,0 +1,96 @@
+<div class="space-y-4">
+
+    <header class="ml-5 md:ml-0">
+        <h1 class="text-lg md:text-xl font-medium">Timeline</h1>
+        <p class="mt-1 text-sm opacity-60">Explore your publishing journey</p>
+    </header>
+
+    <div class="likes-top-cards grid grid-cols-2 md:grid-cols-3 gap-2">
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Total Recipes</p>
+                <h2 class="text-3xl font-medium mt-2">{{ total_recipes }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Years Active</p>
+                <h2 class="text-3xl font-medium mt-2">{{ years_active }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Best Year</p>
+                <h2 class="text-3xl font-medium mt-2">{{ best_year|default:"—" }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid xl:grid-cols-3 items-start">
+
+        <div class="dashboard-activity-container col-span-full">
+
+            <div class="card mt-2">
+
+                <div class="card-body p-0 ml-5 md:ml-0">
+                    <div>
+                        <h2 class="text-xl font-medium">Timeline Activity</h2>
+                        <p class="text-sm opacity-60 mt-1">Publishing history by year & month</p>
+                    </div>
+                </div>
+
+                <div role="tablist" class="tabs border-0 p-1 mt-4 mb-1 gap-2">
+
+                    <button class="tab tab-active rounded-xl timeline-tab"
+                            hx-get="{% url 'dashboard_timeline_overview' %}"
+                            hx-target="#timeline-content"
+                            hx-swap="innerHTML">
+                        Overview
+                    </button>
+
+                    <button class="tab rounded-xl timeline-tab"
+                            hx-get="{% url 'dashboard_recent_uploads' %}"
+                            hx-target="#timeline-content"
+                            hx-swap="innerHTML">
+                        Recent
+                    </button>
+
+                    <button class="tab rounded-xl timeline-tab"
+                            hx-get="{% url 'dashboard_publishing_history' %}"
+                            hx-target="#timeline-content"
+                            hx-swap="innerHTML">
+                        Publishing History
+                    </button>
+
+                </div>
+
+                <div id="timeline-content"
+                     class="overflow-y-auto max-h-[650px] pb-6"
+                     hx-get="{% url 'dashboard_timeline_overview' %}"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("click", e => {
+    const tab = e.target.closest(".timeline-tab");
+    if (!tab) return;
+
+    document.querySelectorAll(".timeline-tab")
+        .forEach(b => b.classList.remove("tab-active"));
+
+    tab.classList.add("tab-active");
+});
+</script>

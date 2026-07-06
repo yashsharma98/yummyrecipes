@@ -1,0 +1,122 @@
+{% load static %}
+{% load hitcount_tags %}
+{% load read_time_pluralize %}
+
+        <div class="recipe-cards dynamic-bg group relative">
+            
+            <div class="aspect-[5/4] relative img-container {% if post.pk in historys_pk %}in-history{% endif %} overflow-hidden">
+                
+                {% if user.is_authenticated or is_guest %}
+                    {# Favourite #} 
+                    <div class="absolute top-2 left-2 z-20 pointer-events-auto">
+                        <div class="recipe-action p-2.5 favourite-action cursor-pointer flex items-center justify-center w-full h-full 
+                            tooltip tooltip-right {% if post in user.favourite.all %}active{% endif %}"
+                            data-tip="{% if post in user.favourite.all %}Remove from favourites{% else %}Favourite{% endif %}"
+                            data-post-id="{{ post.id }}">
+                            <span
+                                class="material-symbols-rounded favourite-icon {% if post in user.favourite.all %}favourite-added{% endif %}">
+                                favorite
+                            </span>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Quick View #}
+                <div class="absolute top-2 right-2 z-20 quickview-wrapper">
+                    <button
+                        type="button"
+                        class="recipe-action p-2.5 quickview-action quick-view-btn cursor-pointer"
+                        data-pk="{{ post.pk }}"
+                        data-title="{{ post.title }}"
+
+                        data-author="{{ post.author.first_name }} {{ post.author.last_name }}"
+
+                        data-image="{% for i in post.photo_set.all %}{% if forloop.first %}{{ i.image.url }}{% endif %}{% endfor %}"
+                    
+                        data-published = "{{ post.get_date }}"
+                        data-modified="{{post.get_modified_date}}"
+                        data-likes="{{post.total_likes}}"
+                        data-dislikes="{{post.total_dislikes}}"
+                        data-type = "{{ post.type }}"
+
+                        data-time="{{ post.timing }}"
+                        data-difficulty="{{ post.difficulty }}"
+                        data-category="{{ post.category }}"
+                        data-cuisine="{{ post.cuisine }}"
+                        data-servings="{{ post.servings }}"
+                        data-views="{% get_hit_count for post %}"
+                        data-readtime="{{ post.read_time|pluralize_min }}"
+                        data-url="{% url 'viewpost' post.pk %}">
+
+                        <span class="material-symbols-rounded">
+                            view_headline
+                        </span>
+                    </button>
+                </div>
+
+                <a href="{% url 'viewpost' post.pk %}" class="absolute inset-0 w-full h-full flex">
+                    {% for i in post.photo_set.all %}
+                        {% if forloop.first %}
+                            <img loading="lazy" src="{{ i.image.url }}" class="w-full h-full object-cover recipe-main-img" alt="{{ post.title }}">
+                        {% endif %}
+                    {% empty %}
+                        <img loading="lazy" src="{% static 'yummyrecipes/media/empty4.jpg' %}" class="w-full h-full object-cover recipe-main-img">
+                    {% endfor %}
+                </a>
+
+            </div>
+
+            <a href="{% url 'viewpost' post.pk %}" class="py-4 pb-2 px-2 recipe-info flex flex-col gap-2.5">
+
+                <div class="recipe-info-header flex items-center justify-between gap-2">
+
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <img src="{{ post.author.profile.profile_img.url }}" class="w-5 h-5 rounded-full object-cover" alt="Author">
+
+                        <span class="capitalize truncate text-[0.8rem]">{{ post.author.first_name }} {{ post.author.last_name }}</span>
+                    </div>
+
+                    <div class="flex items-center gap-1 hidden md:flex rounded-full bg-stone-100 px-2 py-1 text-[0.7rem] shrink-0">
+                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                    </div>
+
+                </div>
+
+                <h4 class="recipe-title text-xl md:text-[1.75rem] font-medium line-clamp-2 capitalize">{{ post.title }}</h4>
+
+                <div class="flex flex-wrap items-center gap-2 tracking-tight mt-1">
+
+                    <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                        <span class="material-symbols-rounded !text-[0.8rem]">
+                            visibility
+                        </span>
+                        <span class="text-[0.75rem]">{% get_hit_count for post %} views</span>
+                    </span>
+
+                    <span class="recipe-info-pill flex items-center gap-1 whitespace-nowrap badge badge-md bg-transparent p-2">
+                        <span class="material-symbols-rounded !text-[0.85rem]">
+                            groups
+                        </span>
+                        <span class="text-[0.75rem]">{{ post.cuisine|cut:"cuisine" }}</span>
+                    </span>
+
+                    <span class="flex items-center whitespace-nowrap badge badge-md p-2
+                        {% if post.category == 'Veg' %}badge-success{% else %}badge-error{% endif %}">
+                        <span class="text-[0.75rem]">{{ post.category }}</span>
+                    </span>
+
+                    <div class="flex items-center recipe-info-last rounded-lg gap-1 md:hidden px-2 py-1 text-[0.7rem] shrink-0">
+                        <span class="material-symbols-rounded !text-[0.75rem]">chef_hat</span>
+
+                        <span class="tracking-tight">{{ post.difficulty }}</span>
+                    </div>
+                </div>
+            </a>
+            
+            {% if post.pk in historys_pk %}
+                <div class="cards-footer hidden"></div>
+            {% endif %}
+
+        </div>

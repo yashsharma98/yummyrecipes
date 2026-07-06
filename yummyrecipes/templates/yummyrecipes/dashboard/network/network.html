@@ -1,0 +1,114 @@
+<div class="space-y-4">
+
+    <header class="ml-5 md:ml-0">
+        <h1 class="text-lg md:text-xl font-medium">Network</h1>
+        <p class="mt-1 text-sm opacity-60">Followers and following overview</p>
+    </header>
+
+    <!-- Summary -->
+    <div class="likes-top-cards grid grid-cols-2 gap-2">
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Followers</p>
+                <h2 class="text-3xl font-medium mt-2">{{ followers_count }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Following</p>
+                <h2 class="text-3xl font-medium mt-2">{{ following_count }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    {% if year_data %}
+
+    <div class="space-y-2">
+
+        {% for year in year_data %}
+
+        <div class="dashboard-views-collapse collapse collapse-arrow">
+
+            <input type="checkbox">
+
+            <div class="collapse-title">
+                <div class="flex items-center justify-between">
+
+                    <div>
+                        <h2 class="text-xl font-medium">{{ year.year }}</h2>
+                        <p class="text-sm opacity-60 mt-1">
+                            {{ year.followers_count }} Followers · {{ year.following_count }} Following
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="dashboard-activity-container collapse-content">
+
+                <div role="tablist" class="tabs border-0 mt-1 mb-1 gap-2">
+
+                    <button
+                        class="tab tab-active network-tab shadow-none"
+                        hx-get="{% url 'dashboard_network_followers' year.year %}"
+                        hx-target="#network-{{ year.year }}"
+                        hx-swap="innerHTML">
+                        Followers
+                    </button>
+
+                    <button
+                        class="tab network-tab shadow-none"
+                        hx-get="{% url 'dashboard_network_following' year.year %}"
+                        hx-target="#network-{{ year.year }}"
+                        hx-swap="innerHTML">
+                        Following
+                    </button>
+
+                </div>
+
+                <div
+                    id="network-{{ year.year }}"
+                    class="mt-2"
+                    hx-get="{% url 'dashboard_network_followers' year.year %}"
+                    hx-trigger="load"
+                    hx-swap="innerHTML">
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="hero py-24">
+        <div class="hero-content text-center">
+            <div>
+                <span class="material-symbols-rounded text-7xl opacity-30">group</span>
+                <h2 class="text-2xl font-medium mt-5">No network yet</h2>
+                <p class="opacity-60 mt-2">Followers and following will appear here.</p>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener("click", e => {
+    const tab = e.target.closest(".network-tab");
+    if (!tab) return;
+
+    document.querySelectorAll(".timeline-tab")
+        .forEach(b => b.classList.remove("tab-active"));
+
+    tab.classList.add("tab-active");
+});
+</script>

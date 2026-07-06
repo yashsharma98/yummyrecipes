@@ -1,21 +1,17 @@
-yummyrecipes/
-
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Virtual env
-venv/
-env/
-.venv/
+build.sh
+
+/.github/
 
 # Django
 db.sqlite3
-media/
+/media/
 staticfiles/
-static/
 
 # Celery
 celerybeat-schedule*
@@ -46,6 +42,4 @@ node_modules/
 dist/
 build/
 
-test_project/__pycache__/
-
-docs/
+recipes/__pycache__/

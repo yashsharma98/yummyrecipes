@@ -1,0 +1,96 @@
+<div class="space-y-4">
+
+    <header class="ml-5 md:ml-0">
+        <h1 class="text-lg md:text-xl font-medium">Dislikes</h1>
+        <p class="mt-1 text-sm opacity-60">Track disliked recipes and received dislikes</p>
+    </header>
+
+    <div class="likes-top-cards grid grid-cols-2 md:grid-cols-3 gap-2">
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Recipes Disliked</p>
+                <h2 class="text-3xl font-medium mt-2">{{ total_disliked_recipes }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Dislikes Received</p>
+                <h2 class="text-3xl font-medium mt-2">{{ total_received_dislikes }}</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p class="text-sm opacity-60">Highest Dislikes</p>
+                <h2 class="text-3xl font-medium mt-2">{{ top_dislikes }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid xl:grid-cols-3 items-start">
+
+        <div class="dashboard-activity-container col-span-full">
+
+            <div class="card mt-2">
+
+                <div class="card-body p-0 ml-5 md:ml-0">
+                    <div>
+                        <h2 class="text-lg md:text-xl font-medium">Dislikes Activity</h2>
+                        <p class="text-sm opacity-60 mt-1">Disliked recipes & received dislikes</p>
+                    </div>
+                </div>
+
+                <div role="tablist" class="tabs border-0 p-1 mt-4 mb-1 gap-2">
+
+                    <button class="tab tab-active dislike-tab shadow-none"
+                            hx-get="{% url 'dashboard_disliked_recipes' %}"
+                            hx-target="#dislikes-content"
+                            hx-swap="innerHTML">
+                        Disliked Recipes
+                    </button>
+
+                    <button class="tab dislike-tab shadow-none"
+                            hx-get="{% url 'dashboard_dislikes_received' %}"
+                            hx-target="#dislikes-content"
+                            hx-swap="innerHTML">
+                        Received
+                    </button>
+
+                    <button class="tab dislike-tab shadow-none"
+                            hx-get="{% url 'dashboard_top_disliked_recipes' %}"
+                            hx-target="#dislikes-content"
+                            hx-swap="innerHTML">
+                        Top Disliked
+                    </button>
+
+                </div>
+
+                <div id="dislikes-content"
+                    class="overflow-y-auto max-h-[650px] pb-6"
+                    hx-get="{% url 'dashboard_disliked_recipes' %}"
+                    hx-trigger="load"
+                    hx-swap="innerHTML">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("click", e => {
+    const tab = e.target.closest(".dislike-tab");
+    if (!tab) return;
+
+    document.querySelectorAll(".dislike-tab")
+        .forEach(b => b.classList.remove("tab-active"));
+
+    tab.classList.add("tab-active");
+});
+</script>

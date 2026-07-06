@@ -1,0 +1,356 @@
+{% extends 'yummyrecipes/base.html' %} 
+
+{% load hitcount_tags %} 
+
+{% load static %} 
+
+{% load read_time_pluralize %} 
+
+{% block title %}
+  <title>Kitchen AI</title>
+{% endblock %} 
+
+{% block raw_content %}
+
+{% if user.is_authenticated or is_guest %}
+
+  <div class="min-h-screen w-full pt-[80px] relative">
+    <div class="w-full px-2 sm:px-8 sm:pr-2 pt-4 pb-20">
+
+      <div class="flex flex-col lg:flex-row">
+        <div class="flex-1 min-w-0">
+          <section>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
+
+              <div class="col-span-full">
+
+                <div class="relative min-h-[calc(100vh-180px)]">
+
+                  {# Scrollable Content #}
+                  <div id="recipe-content" class="generated-recipe-content max-w-3xl mx-auto pb-10">
+
+                    {# Placeholder #}
+                    <div id="recipe-placeholder" class="dynamic-bg rounded-[2.5rem] p-12 text-center mt-8">
+
+                      <span class="material-symbols-rounded text-8xl opacity-20">ramen_dining</span>
+
+                      <h2 class="text-3xl font-semibold mt-6">Kitchen AI</h2>
+
+                      <p class="text-base opacity-70 max-w-xl mx-auto mt-4">
+                          Describe any recipe or ingredients below and Kitchen AI
+                          will generate a realistic recipe, nutrition facts,
+                          cooking instructions and an AI-generated food image.
+                      </p>
+
+                    </div>
+
+                    {# Loader #}
+                    <div id="recipe-loader" class="hidden py-28">
+
+                      <div class="flex flex-col items-center">
+
+                        <span class="loading loading-spinner loading-xl"></span>
+
+                        <h3 class="text-2xl font-semibold mt-6">Cooking...</h3>
+
+                        <p class="opacity-70 mt-2">Creating your recipe and generating an image.</p>
+
+                      </div>
+
+                    </div>
+
+                    {# Result #}
+                    <div id="recipe-result" class="hidden px-3">
+
+                      <img id="recipe-image" class="w-full mx-auto mb-6 aspect-video object-cover">
+
+                      <h1 id="recipe-title" class="text-xl md:text-4xl text-center font-medium"></h1>
+
+                      <div class="grid md:grid-cols-2 gap-2 mt-8">
+
+                        <div class="p-5">
+
+                          <h3 class="font-medium mb-4">Nutrition</h3>
+
+                          <table class="table px-3 py-2 rounded-2xl">
+                            <tbody>
+                              <tr><th>Calories</th><td id="nutrition-calories"></td></tr>
+                              <tr><th>Protein</th><td id="nutrition-protein"></td></tr>
+                              <tr><th>Fat</th><td id="nutrition-fat"></td></tr>
+                              <tr><th>Carbs</th><td id="nutrition-carbohydrates"></td></tr>
+                              <tr><th>Fiber</th><td id="nutrition-fiber"></td></tr>
+                              <tr><th>Sugar</th><td id="nutrition-sugar"></td></tr>
+                              <tr><th>Sodium</th><td id="nutrition-sodium"></td></tr>
+                            </tbody>
+                          </table>
+
+                        </div>
+
+                        <div class="p-5">
+
+                          <h3 class="font-medium mb-4">Details</h3>
+
+                          <table class="table px-3 py-2 rounded-2xl">
+                            <tbody>
+                              <tr><th>Prep Time</th><td id="detail-prep"></td></tr>
+                              <tr><th>Cook Time</th><td id="detail-cook"></td></tr>
+                              <tr><th>Servings</th><td id="detail-servings"></td></tr>
+                              <tr><th>Difficulty</th><td id="detail-difficulty"></td></tr>
+                              <tr><th>Cuisine</th><td id="detail-cuisine"></td></tr>
+                              <tr><th>Category</th><td id="detail-category"></td></tr>
+                              <tr><th>Best Time</th><td id="detail-besttime"></td></tr>
+                            </tbody>
+                          </table>
+
+                        </div>
+
+                      </div>
+
+                      <div class="p-4 pt-0 mt-2">
+
+                        <h2 class="text-xl font-medium mt-8 mb-4">Ingredients</h2>
+
+                        <ol id="ingredients-list" class="list-decimal pl-6 space-y-2 text-[0.95rem]"></ol>
+
+                      </div>
+
+                      <div class="p-4 pt-0 mt-2">
+
+                        <h2 class="text-xl font-medium mt-8 mb-4">Instructions</h2>
+
+                        <ol id="instructions-list" class="list-decimal pl-6 space-y-2 text-[0.95rem]"></ol>
+
+                      </div>
+
+                    </div>
+
+                    {# Error #}
+                    <div id="recipe-error" class="alert alert-error hidden mt-8">
+                      <span class="material-symbols-rounded">error</span>
+
+                      <span>Unable to generate recipe. Please try again.</span>
+                    </div>
+
+                  </div>
+
+                  <!-- Sticky Composer -->
+                  <div class="gen-recipe-composer sticky bottom-0 z-10 pb-3">
+
+                    <div class="gen-recipe-form-container max-w-3xl mx-auto">
+
+                      <form id="recipeForm">
+                        {% csrf_token %}
+                        <div class="gen-recipe-form-container border border-transparent p-4 pb-3 pr-3 focus-within:ring-1 focus-within:ring-primary focus-within:!border-transparent transition-colors">
+                          <textarea id="id_title" name="title" 
+                              class="textarea min-h-10 max-h-35 border-0 shadow-none focus:outline-none focus:ring-0 w-full resize-none p-0 bg-transparent"
+                              placeholder="Describe a recipe or ingredients...">{{ initial_query }}</textarea>
+
+                          <div class="flex items-center justify-end mt-1">
+                            <button id="generateRecipe" class="btn btn-transparent bg-transparent border-0 mt-2 font-light shadow-none ml-auto lock">
+                              <span class="material-symbols-rounded !text-[1.1rem]">auto_awesome</span>
+                                Generate
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("recipeForm");
+      const titleInput = document.getElementById("id_title");
+      const submitBtn = document.getElementById("generateRecipe");
+
+      const placeholder = document.getElementById("recipe-placeholder");
+      const loader = document.getElementById("recipe-loader");
+      const result = document.getElementById("recipe-result");
+      const error = document.getElementById("recipe-error");
+
+      const recipeImage = document.getElementById("recipe-image");
+      const recipeTitle = document.getElementById("recipe-title");
+
+      const calories = document.getElementById("nutrition-calories");
+      const protein = document.getElementById("nutrition-protein");
+      const fat = document.getElementById("nutrition-fat");
+      const carbs = document.getElementById("nutrition-carbohydrates");
+      const fiber = document.getElementById("nutrition-fiber");
+      const sugar = document.getElementById("nutrition-sugar");
+      const sodium = document.getElementById("nutrition-sodium");
+
+      const prep = document.getElementById("detail-prep");
+      const cook = document.getElementById("detail-cook");
+      const servings = document.getElementById("detail-servings");
+      const category = document.getElementById("detail-category");
+      const difficulty = document.getElementById("detail-difficulty");
+      const cuisine = document.getElementById("detail-cuisine");
+      const bestTime = document.getElementById("detail-besttime");
+
+      const ingredientsList = document.getElementById("ingredients-list");
+      const instructionsList = document.getElementById("instructions-list");
+
+      const csrfToken = document.querySelector(
+        "[name=csrfmiddlewaretoken]",
+      ).value;
+
+      async function generateRecipe() {
+        const title = titleInput.value.trim();
+
+        if (!title) {
+          titleInput.focus();
+          return;
+        }
+
+        placeholder.classList.add("hidden");
+        result.classList.add("hidden");
+        error.classList.add("hidden");
+        loader.classList.remove("hidden");
+
+        submitBtn.disabled = true;
+
+        const formData = new FormData(form);
+        formData.append("regenerate", "1");
+
+        try {
+          const response = await fetch("{% url 'kitchen_ai' %}", {
+            method: "POST",
+            headers: {
+              "X-CSRFToken": csrfToken,
+            },
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error("Request failed");
+          }
+
+          const data = await response.json();
+
+          loader.classList.add("hidden");
+          submitBtn.disabled = false;
+
+          if (!data.success) {
+            loader.classList.add("hidden");
+            submitBtn.disabled = false;
+
+            error.querySelector("span:last-child").textContent =
+              data.error || "Something went wrong.";
+
+            error.classList.remove("hidden");
+            placeholder.classList.remove("hidden");
+            return;
+          }
+
+          const recipe = data.generated_recipe || {};
+
+          if (data.recipe_image_url) {
+            recipeImage.src = data.recipe_image_url;
+            recipeImage.classList.remove("hidden");
+          } else {
+            recipeImage.classList.add("hidden");
+          }
+
+          recipeTitle.textContent = recipe.title || "";
+
+          const nutrition = recipe.nutrition || {};
+          calories.textContent = nutrition.calories || "-";
+          protein.textContent = nutrition.protein || "-";
+          fat.textContent = nutrition.fat || "-";
+          carbs.textContent = nutrition.carbohydrates || "-";
+          fiber.textContent = nutrition.fiber || "-";
+          sugar.textContent = nutrition.sugar || "-";
+          sodium.textContent = nutrition.sodium || "-";
+
+          const details = recipe.details || {};
+          prep.textContent = details.prep_time || "-";
+          cook.textContent = details.cook_time || "-";
+          servings.textContent = details.servings || "-";
+          category.textContent = details.category || "-";
+          difficulty.textContent = details.difficulty || "-";
+          cuisine.textContent = details.cuisine || "-";
+          bestTime.textContent = details.best_time || "-";
+
+          ingredientsList.replaceChildren();
+
+          (recipe.ingredients || []).forEach((item) => {
+            const li = document.createElement("li");
+
+            if (typeof item === "object") {
+              const quantity = item.quantity || "";
+              const ingredient = item.item || "";
+              const notes = item.notes ? ` (${item.notes})` : "";
+
+              li.textContent = `${quantity} ${ingredient}${notes}`.trim();
+            } else {
+              li.textContent = item;
+            }
+
+            ingredientsList.appendChild(li);
+          });
+
+          instructionsList.replaceChildren();
+
+          (recipe.instructions || []).forEach((step) => {
+            const li = document.createElement("li");
+            li.textContent = step;
+
+            instructionsList.appendChild(li);
+          });
+
+          result.classList.remove("hidden");
+        } catch (err) {
+          console.error(err);
+
+          loader.classList.add("hidden");
+          submitBtn.disabled = false;
+
+          error.classList.remove("hidden");
+          placeholder.classList.remove("hidden");
+        }
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        generateRecipe();
+      });
+
+      titleInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          generateRecipe();
+        }
+      });
+
+      const initialQuery = "{{ initial_query|escapejs }}";
+
+      if (initialQuery.trim()) {
+        titleInput.value = initialQuery;
+        generateRecipe();
+      }
+    });
+  </script>
+
+{% else %}
+
+  <script>
+    location.href = "{% url 'login' %}";
+  </script>
+
+{% endif %}
+
+{% endblock %}

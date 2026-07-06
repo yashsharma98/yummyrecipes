@@ -1,0 +1,56 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+{% block title %}
+    <title>Trending</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div class="min-h-screen w-full pt-[80px] relative">
+
+  <div class="w-full px-2 sm:px-8 sm:pr-2 xl:pr-4 pt-8 pb-20">
+
+    <header class="main-header px-5 sm:px-0 mb-3">
+        <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Trending</h1>
+        <p class="mt-1 text-sm opacity-75">Discover what's delicious and in demand</p>
+    </header>
+
+    <div class="flex flex-col lg:flex-row mt-8">
+
+      <div class="flex-1 min-w-0">
+
+        <section class="mt-1">
+          
+          <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 gap-y-10 gap-y-5">
+
+            {% include "yummyrecipes/partials/trending_cards.html" %}
+
+            {% if has_more %}
+              <div id="load-more-wrapper" class="load-more-recipe-container col-span-full flex justify-center mt-10">
+                  <button
+                      class="btn btn-transparent bg-transparent border-0 font-medium shadow-none"
+                      hx-get="{% url 'more_trending_recipe' %}?offset={{ next_offset }}"
+                      hx-target="#load-more-wrapper"
+                      hx-swap="outerHTML">
+                      More Trending Recipes
+                  </button>
+              </div>
+            {% endif %}
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% load humanize %}
+{% load hitcount_tags %}
+
+{% if top_viewed_recipes %}
+
+<div class="overflow-x-auto mt-2">
+    <table class="dashboard-table table">
+        <thead>
+            <tr>
+                <th width="60">#</th>
+                <th>Recipe</th>
+                <th>Published</th>
+                <th class="text-center">Category</th>
+                <th class="text-center">Views</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for recipe in top_viewed_recipes %}
+            <tr>
+
+                <td>
+                    <span class="font-medium">{{ forloop.counter }}</span>
+                </td>
+
+                <td>
+                    <div>
+                        <a href="{% url 'viewpost' recipe.pk %}" class="hover hover:underline">
+                            <div class="capitalize truncate line-clamp-2 font-medium">
+                                {{ recipe.title }}
+                            </div>
+                        </a> 
+                        <div class="text-xs opacity-60 mt-1">
+                            {{ recipe.cuisine }} • {{ recipe.type }}
+                        </div>
+                    </div>
+                </td>
+
+                <td>{{ recipe.date_post|date:"d M Y" }}</td>
+
+                <td class="text-center">
+                    <div class="badge badge-outline">{{ recipe.category }}</div>
+                </td>
+
+                <td class="text-center font-medium">
+                    {{ recipe.view_count|default:0|intcomma }}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+
+<div class="hero py-20">
+    <div class="hero-content text-center">
+        <div>
+            <span class="material-symbols-rounded text-6xl opacity-30">visibility</span>
+            <h2 class="text-2xl font-medium mt-4">No viewed recipes</h2>
+            <p class="opacity-60 mt-2">Publish recipes to start tracking views.</p>
+        </div>
+    </div>
+</div>
+
+{% endif %}

@@ -1,0 +1,13 @@
+{% if posts.has_next %}
+<div class="load-more-recipe-container">
+    <button
+    class="btn btn-transparent bg-transparent border-0 font-medium shadow-none"
+    hx-get="{% url 'dashboard_recipe_cards' %}?page={{ posts.next_page_number }}&filter={{ current_filter }}&sort={{ current_sort }}"
+    hx-target="#recipe-cards"
+    hx-swap="beforeend"
+    >
+    Load More
+    </button>
+</div>
+
+{% endif %}

@@ -1,0 +1,104 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+{% block title %}
+    <title>Explore</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div class="min-h-screen w-full pt-[80px] relative">
+
+  <div class="w-full px-2 sm:px-8 sm:pr-2 xl:pr-4 pt-8 pb-20">
+
+    <header class="main-header px-5 sm:px-0 mb-3">
+        <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">Explore</h1>
+        <p class="mt-1 text-sm opacity-75">Find inspiration for your next meal</p>
+    </header>
+    
+    <div class="flex flex-col xl:flex-row gap-10">
+
+      <div class="flex-1 min-w-0">
+
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 mt-4 mb-4 whitespace-nowrap">
+          {% for type in types %}
+            <button class="meal-tab meal-tab-btn cursor-pointer tracking-tight {% if type == 'All' %}active-meal{% endif %}"
+              hx-get="{% url 'explore_filter' %}?type={{ type }}" hx-target="#recipes-container" hx-swap="innerHTML">
+              {{ type }}
+            </button>
+          {% endfor %}
+        </div>
+
+        <section class="mt-6">
+          
+          <div id="recipes-container" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 gap-y-10 gap-y-5"
+                hx-get="{% url 'explore_filter' %}?type=All" hx-trigger="load" hx-swap="innerHTML">
+
+              <div class="col-span-full flex justify-center py-16">
+                  <span class="loading loading-spinner loading-lg"></span>
+              </div>
+
+              {# recipe card from partials #}
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{# type button script #}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const cuisineModal = document.getElementById("cuisineModal");
+    const cuisineBtn = document.getElementById("cuisine-btn");
+
+    document.querySelectorAll(".meal-tab-btn").forEach(tab => {
+
+        tab.addEventListener("click", () => {
+
+            const isCuisine =
+                cuisineModal && cuisineModal.contains(tab);
+
+            document.querySelectorAll(".meal-tab-btn")
+                .forEach(btn => btn.classList.remove("active-meal"));
+
+            if (isCuisine) {
+
+                tab.classList.add("active-meal");
+
+                if (cuisineBtn) {
+                    cuisineBtn.classList.add("active-meal");
+                    cuisineBtn.textContent = tab.textContent.trim();
+                }
+
+                cuisineModal.close();
+
+            } else {
+
+                tab.classList.add("active-meal");
+
+                if (cuisineBtn) {
+                    cuisineBtn.classList.remove("active-meal");
+                    cuisineBtn.textContent = "Cuisine";
+                }
+
+            }
+
+        });
+
+    });
+
+  });
+</script>
+
+{% endblock %}

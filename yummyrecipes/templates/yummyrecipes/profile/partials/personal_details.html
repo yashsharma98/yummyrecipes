@@ -1,0 +1,46 @@
+<div id="profile-page" data-active-nav=""></div>
+
+<h2 class="text-xl font-medium mb-4 pl-5">Personal details</h2>
+
+<div class="profile-partials-container p-7">
+  <div class="grid md:grid-cols-2 gap-8">
+    <div>
+      <label class="text-[0.8rem] opacity-60 font-light">Full Name</label>
+      <p class="mt-1">
+        {{ user.get_full_name|default:user.username }}
+      </p>
+    </div>
+
+    <div>
+      <label class="text-[0.8rem] opacity-60 font-light">Email Address</label>
+      <p class="mt-1">{{ user.email }}</p>
+    </div>
+
+    <!-- <div class="md:col-span-2">
+        <label class="text-[0.8rem] opacity-60 font-light">Bio</label>
+        <p class="mt-2 leading-7">
+            {{ user.profile.bio|default:"No bio added yet." }}
+        </p>
+    </div> -->
+
+    <div>
+      <label class="text-[0.8rem] opacity-60 font-light">Date of Birth</label>
+      <p class="mt-1">{{ user.profile.dob|default:"—" }}</p>
+    </div>
+
+    <div>
+      <label class="text-[0.8rem] opacity-60 font-light">Gender</label>
+      <p class="mt-1">{{ user.profile.gender|default:"—" }}</p>
+    </div>
+
+    <div>
+      <label class="text-[0.8rem] opacity-60 font-light">Member Since</label>
+      <p class="mt-1">{{ user.date_joined|date:"d M Y" }}</p>
+    </div>
+
+    <div>
+      <label class="text-[0.8rem] opacity-60 font-light">Last Login</label>
+      <p class="mt-1">{{ user.last_login|date:"d M Y · h:i A" }}</p>
+    </div>
+  </div>
+</div>

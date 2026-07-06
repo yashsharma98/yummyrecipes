@@ -1,0 +1,231 @@
+{% extends 'yummyrecipes/base.html' %}
+{% load hitcount_tags %}
+{% load static %}
+
+{% load read_time_pluralize %}
+
+{% load dictionary_values %}
+
+{% block title %}
+    <title>{{profile_details.get_full_name}}</title>
+{% endblock %}
+
+{% block raw_content %}
+
+<div class="min-h-screen w-full pt-[80px] relative">
+
+  <div class="w-full px-2 sm:px-8 sm:pr-2 xl:pr-4 pt-8 pb-20">
+
+    <header class="main-header px-5 sm:px-0 mb-6">
+
+        {% if error_message %}
+            <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">User not found</h1>
+            <p class="mt-1 text-sm opacity-60">We couldn't find this chef</p>
+
+        {% else %}
+            <h1 class="lg:text-3xl text-2xl font-medium tracking-tight">{{ profile_details.get_full_name }}</h1>
+            <p class="mt-1 text-sm opacity-60">Chef's profile</p>
+
+        {% endif %}
+
+    </header>
+
+    <div class="flex flex-col lg:flex-row mt-8">
+
+      <div class="flex-1 min-w-0">
+
+        <section class="mt-1">
+          
+          <div class="history-grid grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 gap-y-5">
+
+            {% if not error_message %}
+
+              <div class="col-span-full">
+                  <div class="card userchannel-hero-card">
+                      <div class="card-body p-6">
+                          <div class="flex flex-col lg:flex-row gap-8 items-center lg:items-start">
+                              <div class="flex justify-center">
+                                  {% for i in user_profiles %}
+                                      {% if profile_details.email == i.user.email %}
+                                          <div class="avatar"><div class="w-36 rounded-[2rem]"><img src="{{ i.user.profile.profile_img.url }}"></div></div>
+                                      {% endif %}
+                                  {% endfor %}
+                              </div>
+
+                              <div class="flex-1 text-center lg:text-left">
+                                  <div class="flex flex-col xl:flex-row xl:justify-between gap-6">
+                                      <div>
+                                          <h2 class="text-4xl font-semibold">{{ profile_details.get_full_name }}</h2>
+                                          <p class="mt-1 text-xs opacity-70">{{ profile_details.email }}</p>
+                                          {% if user_bio %}<p class="mt-5 max-w-3xl mx-auto lg:mx-0">{{ user_bio }}</p>{% endif %}
+                                      </div>
+
+                                      <div class="flex gap-2 flex-wrap justify-center lg:justify-start">
+                                          {% if user.is_authenticated %}
+                                              {% if profile_details != request.user %}
+                                                  {% for followed_user in is_following %}
+                                                      <form method="post" action="{% url 'follow_unfollow_user' profile_details.username %}">
+                                                          {% csrf_token %}
+                                                          <button class="btn btn-sm {% if followed_user %}btn-outline{% else %}btn-ghost{% endif %} rounded-full font-normal shadow-none border-0">{% if followed_user %}Following{% else %}Follow{% endif %}</button>
+                                                      </form>
+                                                  {% endfor %}
+                                              {% endif %}
+                                          {% endif %}
+
+                                          <button class="btn btn-ghost btn-sm rounded-full font-normal shadow-none border-0" onclick="userdetailModal.showModal()"">About</button>
+                                      </div>
+                                  </div>
+
+                                  <div class="userchannel-stats stats stats-horizontal gap-2 mt-8 w-fit mx-auto lg:mx-0">
+                                      <div class="stat px-5 py-4 border-0"><div class="stat-title mb-1.5">Recipes</div><div class="stat-value text-2xl">{{ total_user_recipes.count }}</div></div>
+                                      <div class="stat px-5 py-4 border-0"><div class="stat-title mb-1.5">Followers</div><div class="stat-value text-2xl">{{ user_followers_count }}</div></div>
+                                      <div class="stat px-5 py-4 border-0"><div class="stat-title mb-1.5">Views</div><div class="stat-value text-2xl">{% if user_total_views %}{{ user_total_views }}{% else %}0{% endif %}</div></div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+            {% endif %}
+            
+            <div class="col-span-full">
+                <div role="tablist" class="tabs tabs-box bg-transparent w-full border-0 col-span-full p-0 gap-2">
+                    {% for category in types %}
+                        <input type="radio" name="user-channel-tabs" role="tab" class="tab shrink-0 whitespace-nowrap" aria-label="{{ category }}" {% if forloop.first %}checked{% endif %}>
+
+                        <div role="tabpanel" class="tab-content rounded-box mt-3 shadow-none">
+                            {% with posts=category_dict|get_item:category %}
+                                {% if posts %}
+                                    <div class="mb-5 flex items-center justify-between">
+                                        <div>
+                                            <h2 class="text-xl font-semibold">{{ category }}</h2>
+                                            <p class="text-sm opacity-70">{{ posts.count }} recipe{{ posts.count|pluralize }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                                        {% for post in posts %}
+                                            {% include "yummyrecipes/recipe_card.html" with post=post %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="hero min-h-[280px]">
+                                        <div class="hero-content text-center">
+                                            <div>
+                                                <span class="material-symbols-rounded text-7xl opacity-30">restaurant</span>
+                                                <h2 class="text-2xl font-semibold mt-4">No recipes yet</h2>
+                                                <p class="opacity-70 mt-2">{{ profile_details.first_name }} hasn't shared any {{ category|lower }} recipes.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{# user detail dialog #}
+<dialog id="userdetailModal" class="modal">
+    <div class="modal-box max-w-3xl p-0">
+        <div class="p-6">
+            <div class="flex items-center gap-5">
+                <div class="avatar">
+                    <div class="w-20 rounded-2xl">
+                        {% for i in user_profiles %}
+                            {% if profile_details.email == i.user.email %}
+                                <img src="{{ i.user.profile.profile_img.url }}">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <h2 class="text-2xl font-semibold">{{ profile_details.get_full_name }}</h2>
+                    <p class="opacity-70">{{ profile_details.email }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 space-y-8">
+            {% if user_bio %}
+                <div>
+                    <h3 class="font-semibold text-lg mb-3">About</h3>
+                    <p class="leading-7 opacity-80">{{ user_bio }}</p>
+                </div>
+            {% endif %}
+
+            <div>
+                <h3 class="font-semibold text-lg mb-4">Statistics</h3>
+
+                <div class="flex flex-wrap gap-3">
+                    <div class="badge custom-badge rounded-full px-5 py-5 gap-2">
+                        <span class="font-medium">Recipes</span>
+                        <span class="font-semibold">{{ total_user_recipes.count }}</span>
+                    </div>
+
+                    <div class="badge custom-badge rounded-full px-5 py-5 gap-2">
+                        <span class="font-medium">Followers</span>
+                        <span class="font-semibold">{{ user_followers_count }}</span>
+                    </div>
+
+                    <div class="badge custom-badge rounded-full px-5 py-5 gap-2">
+                        <span class="font-medium">Views</span>
+                        <span class="font-semibold">{% if user_total_views %}{{ user_total_views }}{% else %}0{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-semibold text-lg mb-4">Details</h3>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="flex items-center gap-3"><span class="material-symbols-rounded text-primary">person</span>{{ profile_details.get_full_name }}</div>
+                    <div class="flex items-center gap-3"><span class="material-symbols-rounded text-primary">mail</span>{{ profile_details.email }}</div>
+                    <div class="flex items-center gap-3"><span class="material-symbols-rounded text-primary">language</span><a href="{{ absolute_url }}" class="link link-primary break-all">{{ absolute_url }}</a></div>
+                    <div class="flex items-center gap-3"><span class="material-symbols-rounded text-primary">calendar_month</span>Joined {{ date_joined }}</div>
+                </div>
+            </div>
+
+            {% if user_social_links.facebook or user_social_links.instagram or user_social_links.twitter or user_social_links.threads or user_social_links.youtube or user_social_links.website %}
+                <div>
+                    <h3 class="font-semibold text-lg mb-4">Social Links</h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {% if user_social_links.website %}<a href="{{ user_social_links.website }}" target="_blank" class="btn btn-ghost bg-transparent justify-start rounded-xl shadow-none">Website</a>{% endif %}
+                        {% if user_social_links.youtube %}<a href="{{ user_social_links.youtube }}" target="_blank" class="btn btn-ghost bg-transparent justify-start rounded-xl shadow-none">YouTube</a>{% endif %}
+                        {% if user_social_links.instagram %}<a href="{{ user_social_links.instagram }}" target="_blank" class="btn btn-ghost bg-transparent justify-start rounded-xl shadow-none">Instagram</a>{% endif %}
+                        {% if user_social_links.facebook %}<a href="{{ user_social_links.facebook }}" target="_blank" class="btn btn-ghost bg-transparent justify-start rounded-xl shadow-none">Facebook</a>{% endif %}
+                        {% if user_social_links.twitter %}<a href="{{ user_social_links.twitter }}" target="_blank" class="btn btn-ghost bg-transparent justify-start rounded-xl shadow-none">X</a>{% endif %}
+                        {% if user_social_links.threads %}<a href="{{ user_social_links.threads }}" target="_blank" class="btn btn-ghost bg-transparent justify-start rounded-xl shadow-none">Threads</a>{% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="modal-action px-4 pb-4 pt-0">
+            <form method="dialog">
+                <button class="btn bg-transparent border-0 shadow-none rounded-full font-normal">Close</button>
+            </form>
+        </div>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button></button>
+    </form>
+</dialog>
+
+{% endblock %}
